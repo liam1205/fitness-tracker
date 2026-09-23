@@ -11,6 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import type { User } from "@/lib/auth";
 import { auth, useAuth } from "@/lib/auth";
@@ -42,6 +43,13 @@ export function AppSideBar() {
   const router = useRouter();
   const { user } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  function collapseSidebar() {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }
 
   async function logout() {
     // `auth.logout` clears the local session even when the backend call fails,
@@ -85,7 +93,7 @@ export function AppSideBar() {
                       isActive={pathname === item.to}
                       tooltip={item.label}
                     >
-                      <Link to={item.to}>
+                      <Link to={item.to} onClick={collapseSidebar}>
                         <Icon />
                         <span>{item.label}</span>
                       </Link>

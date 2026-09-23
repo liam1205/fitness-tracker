@@ -1,31 +1,13 @@
 import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useModal } from "@/hooks/use-modal";
+import { useCreateTemplateModal } from "@/components/views/modals/CreateTemplate";
 
 /**
  * Workout templates: reusable exercise plans a user can start a workout from.
  */
 export function Templates() {
-  const { openModal, closeModal } = useModal();
-
-  function handleCreateTemplate() {
-    openModal({
-      title: "Create template",
-      subtitle: "Build a reusable workout template.",
-      content: (
-        <p className="text-sm text-muted-foreground">
-          Template form goes here.
-        </p>
-      ),
-      rightButtons: [
-        {
-          label: "Save",
-          onClick: closeModal,
-        },
-      ],
-    });
-  }
+  const { openCreateTemplateModal } = useCreateTemplateModal();
 
   return (
     <div className="space-y-2">
@@ -36,7 +18,7 @@ export function Templates() {
       <Button
         size={"lg"}
         className="fixed bottom-6 left-1/2 -translate-x-1/2 shadow-lg"
-        onClick={handleCreateTemplate}
+        onClick={openCreateTemplateModal}
       >
         <Plus />
         Create template

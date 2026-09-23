@@ -1,30 +1,13 @@
-import { Button } from "@/components/ui/button";
-import { useModal } from "@/hooks/use-modal";
 import { Plus } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { useCreateWorkoutModal } from "@/components/views/modals/CreateWorkout";
 
 /**
  * Logged workouts: the history of completed training sessions.
  */
 export function Workouts() {
-  const { openModal, closeModal } = useModal();
-
-  function handleCreateWorkout() {
-    openModal({
-      title: "Create workout",
-      subtitle: "Log a new training session.",
-      content: (
-        <p className="text-sm text-muted-foreground">
-          Workout form goes here.
-        </p>
-      ),
-      rightButtons: [
-        {
-          label: "Save",
-          onClick: closeModal,
-        },
-      ],
-    });
-  }
+  const { openCreateWorkoutModal } = useCreateWorkoutModal();
 
   return (
     <div className="space-y-2">
@@ -35,7 +18,7 @@ export function Workouts() {
       <Button
         size={"lg"}
         className="fixed bottom-6 left-1/2 -translate-x-1/2 shadow-lg"
-        onClick={handleCreateWorkout}
+        onClick={openCreateWorkoutModal}
       >
         <Plus />
         Create workout
