@@ -6,21 +6,27 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
+  ExerciseRead,
+  ExerciseUpdate,
   HTTPValidationError,
   ListExercisesParams,
   PageExerciseRead
@@ -143,3 +149,138 @@ export function useListExercises<TData = Awaited<ReturnType<typeof listExercises
 
 
 
+/**
+ * Update an exercise owned by the current user. Omitted fields are left unchanged.
+ * @summary Update an exercise
+ */
+export const updateExercise = (
+    exerciseId: number,
+    exerciseUpdate: ExerciseUpdate,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<ExerciseRead>(
+      {url: `/api/v1/exercises/${exerciseId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: exerciseUpdate, signal
+    },
+      options);
+    }
+
+
+
+
+export const getUpdateExerciseMutationKey = () => ['updateExercise'] as const;
+
+export const getUpdateExerciseMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateExercise>>, TError,UpdateExerciseMutationVariables, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateExercise>>, TError,UpdateExerciseMutationVariables, TContext> => {
+
+const mutationKey = getUpdateExerciseMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateExercise>>, UpdateExerciseMutationVariables> = (props) => {
+          const {exerciseId,data} = props ?? {};
+
+          return  updateExercise(exerciseId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateExerciseMutationResult = NonNullable<Awaited<ReturnType<typeof updateExercise>>>
+    export type UpdateExerciseMutationBody = ExerciseUpdate
+    export type UpdateExerciseMutationError = ErrorType<HTTPValidationError>
+    export type UpdateExerciseMutationVariables = {exerciseId: number;data: ExerciseUpdate}
+
+    /**
+ * @summary Update an exercise
+ */
+export const useUpdateExercise = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateExercise>>, TError,UpdateExerciseMutationVariables, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateExercise>>,
+        TError,
+        UpdateExerciseMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateExerciseMutationOptions(options), queryClient);
+    }
+    /**
+ * Delete an exercise owned by the current user.
+ * @summary Delete an exercise
+ */
+export const deleteExercise = (
+    exerciseId: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/exercises/${exerciseId}`, method: 'DELETE', signal
+    },
+      options);
+    }
+
+
+
+
+export const getDeleteExerciseMutationKey = () => ['deleteExercise'] as const;
+
+export const getDeleteExerciseMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteExercise>>, TError,DeleteExerciseMutationVariables, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteExercise>>, TError,DeleteExerciseMutationVariables, TContext> => {
+
+const mutationKey = getDeleteExerciseMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteExercise>>, DeleteExerciseMutationVariables> = (props) => {
+          const {exerciseId} = props ?? {};
+
+          return  deleteExercise(exerciseId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteExerciseMutationResult = NonNullable<Awaited<ReturnType<typeof deleteExercise>>>
+
+    export type DeleteExerciseMutationError = ErrorType<HTTPValidationError>
+    export type DeleteExerciseMutationVariables = {exerciseId: number}
+
+    /**
+ * @summary Delete an exercise
+ */
+export const useDeleteExercise = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteExercise>>, TError,DeleteExerciseMutationVariables, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteExercise>>,
+        TError,
+        DeleteExerciseMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteExerciseMutationOptions(options), queryClient);
+    }

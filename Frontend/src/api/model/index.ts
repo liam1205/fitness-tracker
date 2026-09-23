@@ -7,6 +7,7 @@
  */
 
 export * from './exerciseRead';
+export * from './exerciseUpdate';
 export * from './healthResponse';
 export * from './hTTPValidationError';
 export * from './language';

@@ -319,6 +319,93 @@
         }
       }
     },
+    "/api/v1/exercises/{exercise_id}": {
+      "patch": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Update an exercise",
+        "description": "Update an exercise owned by the current user. Omitted fields are left unchanged.",
+        "operationId": "update_exercise",
+        "parameters": [
+          {
+            "name": "exercise_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Exercise Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExerciseUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Delete an exercise",
+        "description": "Delete an exercise owned by the current user.",
+        "operationId": "delete_exercise",
+        "parameters": [
+          {
+            "name": "exercise_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Exercise Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/user-settings": {
       "get": {
         "tags": [
@@ -434,6 +521,39 @@
         ],
         "title": "ExerciseRead",
         "description": "An exercise as returned by the API."
+      },
+      "ExerciseUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "Exercise name.",
+            "examples": [
+              "Bench Press"
+            ]
+          },
+          "muscle_group": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MuscleGroup"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Primary muscle group targeted."
+          }
+        },
+        "type": "object",
+        "title": "ExerciseUpdate",
+        "description": "Payload for updating an exercise. Omitted fields are left unchanged."
       },
       "HTTPValidationError": {
         "properties": {

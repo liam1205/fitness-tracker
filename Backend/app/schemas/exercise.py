@@ -17,3 +17,12 @@ class ExerciseRead(BaseModel):
         None, description="Id of the user who created this exercise, if any."
     )
     created_at: datetime = Field(..., description="When the exercise was created.")
+
+
+class ExerciseUpdate(BaseModel):
+    """Payload for updating an exercise. Omitted fields are left unchanged."""
+
+    name: str | None = Field(None, description="Exercise name.", examples=["Bench Press"])
+    muscle_group: MuscleGroup | None = Field(
+        None, description="Primary muscle group targeted."
+    )
