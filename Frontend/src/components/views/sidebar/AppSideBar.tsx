@@ -1,5 +1,5 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { House, LogOut } from "lucide-react";
+import { Dumbbell, House, LogOut, NotebookTabs } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -18,7 +18,11 @@ import { toastError } from "@/lib/errors";
 import { Separator } from "@/components/ui/separator";
 
 /** Primary navigation. Add entries here as protected routes are added. */
-const NAV_ITEMS = [{ to: "/", label: "Home", icon: House }] as const;
+const NAV_ITEMS = [
+  { to: "/", label: "Home", icon: House },
+  { to: "/templates", label: "Templates", icon: NotebookTabs },
+  { to: "/workouts", label: "Workouts", icon: Dumbbell },
+] as const;
 
 /**
  * Up to two initials for the footer avatar, e.g. "Ada Lovelace" -> "AL". Falls
