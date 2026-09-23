@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "web-app-template-backend"
+version = "0.1.0"
+description = "Backend API for the web app template."
+requires-python = ">=3.12"
+# The single source of dependency truth: Hatch builds local environments from
+# this list, and `pip install .` on a deployment host resolves the same one.
+dependencies = [
+    "fastapi==0.115.6",
+    "uvicorn[standard]==0.34.0",
+    "pydantic==2.10.4",
+    "pydantic-settings==2.7.1",
+    "sqlalchemy[asyncio]==2.0.36",
+    "asyncpg==0.30.0",
+    "alembic==1.14.0",
+    "bcrypt==4.2.1",
+    "cryptography==44.0.0",
+    "email-validator==2.2.0",
+]
+
+# Only `app` is importable code. `alembic/` and `scripts/` are run from the
+# project directory (alembic.ini sets `prepend_sys_path = .`), so they are
+# deliberately left out of the wheel.
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.hatch.envs.default]
+python = "3.12"
+# Keep the environment in-project so editors detect it without configuration.
+path = ".venv"
+
+[tool.hatch.envs.default.scripts]
+dev = "uvicorn app.main:app --reload --port {args:8000}"
+# Mirrors the production start command; PORT is supplied by the host.
+start = "uvicorn app.main:app --host 0.0.0.0 --port {env:PORT:8000}"
+db = "docker compose up -d"
+migrate = "alembic upgrade head"
+revision = "alembic revision --autogenerate -m {args}"
+rollback = "alembic downgrade -1"
+openapi = "python -m scripts.export_openapi"
