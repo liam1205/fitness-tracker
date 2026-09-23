@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import hash_password, verify_password
+from app.crud.exercise import create_default_exercises_for_user
 from app.models.user import User
 from app.schemas.user import UserCreate
 
@@ -30,6 +31,7 @@ async def create_user(db: AsyncSession, payload: UserCreate) -> User:
     db.add(user)
     await db.flush()
     await db.refresh(user)
+    await create_default_exercises_for_user(db, user.id)
     return user
 
 

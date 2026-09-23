@@ -1,5 +1,5 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Dumbbell, House, LogOut, NotebookTabs } from "lucide-react";
+import { Dumbbell, House, ListChecks, LogOut, NotebookTabs } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -23,6 +23,7 @@ const NAV_ITEMS = [
   { to: "/", label: "Home", icon: House },
   { to: "/templates", label: "Templates", icon: NotebookTabs },
   { to: "/workouts", label: "Workouts", icon: Dumbbell },
+  { to: "/exercises", label: "Exercises", icon: ListChecks },
 ] as const;
 
 /**
