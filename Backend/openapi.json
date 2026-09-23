@@ -257,10 +257,122 @@
           }
         }
       }
+    },
+    "/api/v1/exercises": {
+      "get": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "List exercises",
+        "description": "Return a page of the current user's exercises.",
+        "operationId": "list_exercises",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Page number (1-indexed).",
+              "default": 1,
+              "title": "Page"
+            },
+            "description": "Page number (1-indexed)."
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Number of items per page.",
+              "default": 20,
+              "title": "Page Size"
+            },
+            "description": "Number of items per page."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_ExerciseRead_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "ExerciseRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "Unique identifier.",
+            "examples": [
+              1
+            ]
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Exercise name.",
+            "examples": [
+              "Bench Press"
+            ]
+          },
+          "muscle_group": {
+            "$ref": "#/components/schemas/MuscleGroup",
+            "description": "Primary muscle group targeted."
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By",
+            "description": "Id of the user who created this exercise, if any."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "When the exercise was created."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "muscle_group",
+          "created_at"
+        ],
+        "title": "ExerciseRead",
+        "description": "An exercise as returned by the API."
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -309,6 +421,67 @@
         ],
         "title": "HealthResponse",
         "description": "Service health status."
+      },
+      "MuscleGroup": {
+        "type": "string",
+        "enum": [
+          "chest",
+          "back",
+          "shoulders",
+          "biceps",
+          "triceps",
+          "abs",
+          "calves",
+          "quads"
+        ],
+        "title": "MuscleGroup"
+      },
+      "Page_ExerciseRead_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ExerciseRead"
+            },
+            "type": "array",
+            "title": "Items",
+            "description": "The items on this page."
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Total number of items across all pages."
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page",
+            "description": "Current page number (1-indexed).",
+            "examples": [
+              1
+            ]
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size",
+            "description": "Maximum number of items per page.",
+            "examples": [
+              20
+            ]
+          },
+          "pages": {
+            "type": "integer",
+            "title": "Pages",
+            "description": "Total number of pages."
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size",
+          "pages"
+        ],
+        "title": "Page[ExerciseRead]"
       },
       "UserCreate": {
         "properties": {

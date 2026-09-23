@@ -10,7 +10,7 @@ export function Templates() {
   const { openCreateTemplateModal } = useCreateTemplateModal();
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <h1 className="text-4xl font-bold tracking-tight">Templates</h1>
       <p className="text-muted-foreground">
         Your workout templates will show up here.

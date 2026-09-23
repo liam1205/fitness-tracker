@@ -10,7 +10,7 @@ export function Workouts() {
   const { openCreateWorkoutModal } = useCreateWorkoutModal();
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <h1 className="text-4xl font-bold tracking-tight">Workouts</h1>
       <p className="text-muted-foreground">
         Your logged workouts will show up here.
