@@ -9,6 +9,7 @@ import {
 } from '@tanstack/react-query'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner'
+import { ThemeProvider } from '@/components/theme-provider'
 import { ModalProvider } from '@/hooks/use-modal'
 import { auth } from '@/lib/auth'
 import { toastError } from '@/lib/errors'
@@ -46,14 +47,16 @@ declare module '@tanstack/react-router' {
 void auth.bootstrap().finally(() => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <ModalProvider>
-            <RouterProvider router={router} />
-            <Toaster />
-          </ModalProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <ModalProvider>
+              <RouterProvider router={router} />
+              <Toaster />
+            </ModalProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </StrictMode>,
   )
 })

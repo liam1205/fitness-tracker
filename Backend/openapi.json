@@ -318,6 +318,68 @@
           }
         }
       }
+    },
+    "/api/v1/user-settings": {
+      "get": {
+        "tags": [
+          "user-settings"
+        ],
+        "summary": "Get the current user's settings",
+        "description": "Return the current user's settings, seeding defaults if none exist yet.",
+        "operationId": "get_user_settings",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettingsRead"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "user-settings"
+        ],
+        "summary": "Update the current user's settings",
+        "description": "Update the current user's settings. Omitted fields are left unchanged.",
+        "operationId": "update_user_settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSettingsUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettingsRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -422,6 +484,14 @@
         "title": "HealthResponse",
         "description": "Service health status."
       },
+      "Language": {
+        "type": "string",
+        "enum": [
+          "english",
+          "german"
+        ],
+        "title": "Language"
+      },
       "MuscleGroup": {
         "type": "string",
         "enum": [
@@ -482,6 +552,15 @@
           "pages"
         ],
         "title": "Page[ExerciseRead]"
+      },
+      "Theme": {
+        "type": "string",
+        "enum": [
+          "dark",
+          "light",
+          "system"
+        ],
+        "title": "Theme"
       },
       "UserCreate": {
         "properties": {
@@ -621,6 +700,54 @@
         ],
         "title": "UserRead",
         "description": "A user as returned by the API. Never includes the password hash."
+      },
+      "UserSettingsRead": {
+        "properties": {
+          "language": {
+            "$ref": "#/components/schemas/Language",
+            "description": "Preferred UI language."
+          },
+          "theme": {
+            "$ref": "#/components/schemas/Theme",
+            "description": "Preferred UI theme."
+          }
+        },
+        "type": "object",
+        "required": [
+          "language",
+          "theme"
+        ],
+        "title": "UserSettingsRead",
+        "description": "A user's settings as returned by the API."
+      },
+      "UserSettingsUpdate": {
+        "properties": {
+          "language": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Language"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Preferred UI language."
+          },
+          "theme": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Theme"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Preferred UI theme."
+          }
+        },
+        "type": "object",
+        "title": "UserSettingsUpdate",
+        "description": "Payload for updating a user's settings. Omitted fields are left unchanged."
       },
       "ValidationError": {
         "properties": {

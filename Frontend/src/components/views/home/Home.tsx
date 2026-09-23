@@ -21,7 +21,7 @@ export function Home() {
         You're signed in. The whole app is gated behind authentication — the
         sign-in screen is all an unauthenticated visitor can reach.
       </p>
-      <div className="fixed bottom-6 left-1/2 flex -translate-x-1/2 gap-3">
+      <div className="fixed inset-x-0 bottom-6 flex flex-wrap justify-center gap-3 px-4">
         <Button
           size={"lg"}
           className="shadow-lg"

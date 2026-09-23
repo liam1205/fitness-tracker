@@ -16,10 +16,10 @@ export function PageLayout() {
     <SidebarProvider>
       <AppSideBar />
       <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b px-6">
+        <header className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
           <SidebarTrigger className="-ml-1" />
         </header>
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-3">
           <Outlet />
         </div>
       </SidebarInset>

@@ -1,5 +1,20 @@
+import { useEffect, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Dumbbell, House, ListChecks, LogOut, NotebookTabs } from "lucide-react";
+import { useTheme } from "next-themes";
+import {
+  Dumbbell,
+  House,
+  ListChecks,
+  LogOut,
+  NotebookTabs,
+} from "lucide-react";
+import {
+  getGetUserSettingsQueryKey,
+  useGetUserSettings,
+  useUpdateUserSettings,
+} from "@/api/endpoints";
+import type { Theme } from "@/api/model";
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +32,15 @@ import type { User } from "@/lib/auth";
 import { auth, useAuth } from "@/lib/auth";
 import { toastError } from "@/lib/errors";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 /** Primary navigation. Add entries here as protected routes are added. */
 const NAV_ITEMS = [
@@ -24,6 +48,12 @@ const NAV_ITEMS = [
   { to: "/templates", label: "Templates", icon: NotebookTabs },
   { to: "/workouts", label: "Workouts", icon: Dumbbell },
   { to: "/exercises", label: "Exercises", icon: ListChecks },
+] as const;
+
+const THEMES = [
+  { label: "Light", value: "light" },
+  { label: "Dark", value: "dark" },
+  { label: "System", value: "system" },
 ] as const;
 
 /**
@@ -45,6 +75,37 @@ export function AppSideBar() {
   const { user } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { isMobile, setOpenMobile } = useSidebar();
+  const { theme, setTheme } = useTheme();
+  const queryClient = useQueryClient();
+  const { data: userSettings } = useGetUserSettings();
+  const { mutate: updateSettings } = useUpdateUserSettings({
+    mutation: {
+      // Keep the cached settings in sync so this doesn't fight the local
+      // theme on the next render, and so other consumers see the new value
+      // without a refetch.
+      onSuccess: (data) => {
+        queryClient.setQueryData(getGetUserSettingsQueryKey(), data);
+      },
+    },
+  });
+
+  // The server is the source of truth for a signed-in user's theme, but only
+  // apply it once on load — otherwise this fires again after every local
+  // change and reverts it before the mutation has a chance to persist.
+  const hasSyncedTheme = useRef(false);
+  useEffect(() => {
+    if (userSettings && !hasSyncedTheme.current) {
+      hasSyncedTheme.current = true;
+      if (userSettings.theme !== theme) {
+        setTheme(userSettings.theme);
+      }
+    }
+  }, [userSettings, theme, setTheme]);
+
+  function handleThemeChange(value: Theme) {
+    setTheme(value);
+    updateSettings({ data: { theme: value } });
+  }
 
   function collapseSidebar() {
     if (isMobile) {
@@ -109,6 +170,23 @@ export function AppSideBar() {
       <Separator></Separator>
       <SidebarFooter>
         <SidebarMenu className="gap-2">
+          <SidebarMenuItem>
+            <Select value={theme} onValueChange={handleThemeChange}>
+              <SelectTrigger className="w-full max-w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Themes</SelectLabel>
+                  {THEMES.map((theme) => (
+                    <SelectItem key={theme.value} value={theme.value}>
+                      {theme.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
