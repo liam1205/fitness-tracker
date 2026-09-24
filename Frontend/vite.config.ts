@@ -19,9 +19,15 @@ export default defineConfig({
   },
   server: {
     host: true,
+    // host: true binds all interfaces, but Vite still checks the incoming
+    // Host header against an allowlist — without this, LAN requests get
+    // "Blocked request. This host is not allowed."
+    allowedHosts: true,
     proxy: {
       "/api": {
-        target: "http://localhost:8000",
+        // Overridden to the "backend" container hostname in docker-compose.yml;
+        // defaults to localhost for running the frontend directly on the host.
+        target: process.env.VITE_PROXY_TARGET || "http://localhost:8000",
         changeOrigin: true,
       },
     },

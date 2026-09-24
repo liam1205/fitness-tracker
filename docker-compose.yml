@@ -1,0 +1,61 @@
+# Local dev stack: Postgres + backend (FastAPI/uvicorn) + frontend (Vite).
+# Both app services hot-reload — see the Dockerfiles for how.
+#   docker compose up --build
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: fitness-tracker-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app
+    ports:
+      # Bound to localhost only — nothing on the frontend/backend needs to
+      # reach Postgres from the LAN, and it ships with default credentials.
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./Backend
+    container_name: fitness-tracker-backend
+    env_file:
+      - ./Backend/.env
+    environment:
+      # Point at the "db" service instead of whatever localhost resolves to
+      # inside the container. Overrides the value from .env (see config.py).
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./Backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./Frontend
+    container_name: fitness-tracker-frontend
+    env_file:
+      - ./Frontend/.env
+    environment:
+      # vite.config.ts proxies /api here instead of localhost:8000 so it
+      # reaches the backend container over the compose network.
+      VITE_PROXY_TARGET: http://backend:8000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

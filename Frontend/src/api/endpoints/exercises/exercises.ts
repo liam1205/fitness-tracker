@@ -25,6 +25,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ExerciseCreate,
   ExerciseRead,
   ExerciseUpdate,
   HTTPValidationError,
@@ -150,6 +151,74 @@ export function useListExercises<TData = Awaited<ReturnType<typeof listExercises
 
 
 /**
+ * Create a new exercise owned by the current user.
+ * @summary Create an exercise
+ */
+export const createExercise = (
+    exerciseCreate: ExerciseCreate,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<ExerciseRead>(
+      {url: `/api/v1/exercises`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: exerciseCreate, signal
+    },
+      options);
+    }
+
+
+
+
+export const getCreateExerciseMutationKey = () => ['createExercise'] as const;
+
+export const getCreateExerciseMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createExercise>>, TError,CreateExerciseMutationVariables, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof createExercise>>, TError,CreateExerciseMutationVariables, TContext> => {
+
+const mutationKey = getCreateExerciseMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createExercise>>, CreateExerciseMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createExercise(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateExerciseMutationResult = NonNullable<Awaited<ReturnType<typeof createExercise>>>
+    export type CreateExerciseMutationBody = ExerciseCreate
+    export type CreateExerciseMutationError = ErrorType<HTTPValidationError>
+    export type CreateExerciseMutationVariables = {data: ExerciseCreate}
+
+    /**
+ * @summary Create an exercise
+ */
+export const useCreateExercise = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createExercise>>, TError,CreateExerciseMutationVariables, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createExercise>>,
+        TError,
+        CreateExerciseMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateExerciseMutationOptions(options), queryClient);
+    }
+    /**
  * Update an exercise owned by the current user. Omitted fields are left unchanged.
  * @summary Update an exercise
  */

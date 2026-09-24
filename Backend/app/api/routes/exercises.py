@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import crud
 from app.api.deps import CurrentUser
 from app.db import get_db
-from app.schemas.exercise import ExerciseRead, ExerciseUpdate
+from app.schemas.exercise import ExerciseCreate, ExerciseRead, ExerciseUpdate
 from app.schemas.pagination import Page
 
 router = APIRouter(prefix="/exercises", tags=["exercises"])
@@ -21,6 +21,21 @@ async def list_exercises(
     exercises, total = await crud.exercise.list_exercises_for_user(db, user.id, page, page_size)
     pages = (total + page_size - 1) // page_size if total else 0
     return Page(items=exercises, total=total, page=page, page_size=page_size, pages=pages)
+
+
+@router.post(
+    "",
+    response_model=ExerciseRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create an exercise",
+)
+async def create_exercise(
+    payload: ExerciseCreate,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+) -> ExerciseRead:
+    """Create a new exercise owned by the current user."""
+    return await crud.exercise.create_exercise_for_user(db, user.id, payload)
 
 
 @router.patch("/{exercise_id}", response_model=ExerciseRead, summary="Update an exercise")

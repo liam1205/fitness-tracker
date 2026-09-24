@@ -317,6 +317,46 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Create an exercise",
+        "description": "Create a new exercise owned by the current user.",
+        "operationId": "create_exercise",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExerciseCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/exercises/{exercise_id}": {
@@ -471,6 +511,29 @@
   },
   "components": {
     "schemas": {
+      "ExerciseCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Exercise name.",
+            "examples": [
+              "Bench Press"
+            ]
+          },
+          "muscle_group": {
+            "$ref": "#/components/schemas/MuscleGroup",
+            "description": "Primary muscle group targeted."
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "muscle_group"
+        ],
+        "title": "ExerciseCreate",
+        "description": "Payload for creating a new exercise."
+      },
       "ExerciseRead": {
         "properties": {
           "id": {
