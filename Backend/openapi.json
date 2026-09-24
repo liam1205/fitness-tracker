@@ -507,6 +507,72 @@
           }
         }
       }
+    },
+    "/api/v1/workout-templates": {
+      "get": {
+        "tags": [
+          "workout-templates"
+        ],
+        "summary": "List workout templates",
+        "description": "Return all of the current user's workout templates.",
+        "operationId": "list_workout_templates",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WorkoutTemplateRead"
+                  },
+                  "type": "array",
+                  "title": "Response List Workout Templates"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "workout-templates"
+        ],
+        "summary": "Create a workout template",
+        "description": "Create a new workout template owned by the current user.",
+        "operationId": "create_workout_template",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkoutTemplateCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutTemplateRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -736,6 +802,78 @@
         ],
         "title": "Page[ExerciseRead]"
       },
+      "TemplateExerciseCreate": {
+        "properties": {
+          "exercise_id": {
+            "type": "integer",
+            "title": "Exercise Id",
+            "description": "Id of the exercise to add."
+          },
+          "set_count": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Set Count",
+            "description": "Number of planned sets.",
+            "examples": [
+              3
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "exercise_id",
+          "set_count"
+        ],
+        "title": "TemplateExerciseCreate",
+        "description": "Payload for one exercise slot within a new workout template."
+      },
+      "TemplateExerciseRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "Unique identifier."
+          },
+          "exercise_id": {
+            "type": "integer",
+            "title": "Exercise Id",
+            "description": "Id of the exercise in this slot."
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Exercise name.",
+            "examples": [
+              "Bench Press"
+            ]
+          },
+          "muscle_group": {
+            "$ref": "#/components/schemas/MuscleGroup",
+            "description": "Primary muscle group targeted."
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position",
+            "description": "Display order within the template, 1-indexed."
+          },
+          "set_count": {
+            "type": "integer",
+            "title": "Set Count",
+            "description": "Number of planned sets."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "exercise_id",
+          "name",
+          "muscle_group",
+          "position",
+          "set_count"
+        ],
+        "title": "TemplateExerciseRead",
+        "description": "An exercise slot within a workout template, as returned by the API."
+      },
       "Theme": {
         "type": "string",
         "enum": [
@@ -964,6 +1102,81 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "WorkoutTemplateCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Template name.",
+            "examples": [
+              "Push Day"
+            ]
+          },
+          "exercises": {
+            "items": {
+              "$ref": "#/components/schemas/TemplateExerciseCreate"
+            },
+            "type": "array",
+            "title": "Exercises",
+            "description": "Exercise slots to add, in order."
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "WorkoutTemplateCreate",
+        "description": "Payload for creating a new workout template."
+      },
+      "WorkoutTemplateRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "Unique identifier.",
+            "examples": [
+              1
+            ]
+          },
+          "user_id": {
+            "type": "integer",
+            "title": "User Id",
+            "description": "Id of the user who owns this template."
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Template name.",
+            "examples": [
+              "Push Day"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "When the template was created."
+          },
+          "exercises": {
+            "items": {
+              "$ref": "#/components/schemas/TemplateExerciseRead"
+            },
+            "type": "array",
+            "title": "Exercises",
+            "description": "Exercise slots, in order."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "name",
+          "created_at",
+          "exercises"
+        ],
+        "title": "WorkoutTemplateRead",
+        "description": "A workout template as returned by the API."
       }
     }
   }

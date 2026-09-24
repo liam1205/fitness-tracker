@@ -1,7 +1,6 @@
 from datetime import datetime
-from decimal import Decimal
 
-from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String, UniqueConstraint, func
+from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -34,24 +33,4 @@ class TemplateExercise(Base):
     )
     exercise_id: Mapped[int] = mapped_column(ForeignKey("exercises.id"), index=True)
     position: Mapped[int] = mapped_column(Integer)
-
-
-class TemplateSet(Base):
-    """A planned set (target reps/weight) for a template exercise slot."""
-
-    __tablename__ = "template_sets"
-    __table_args__ = (
-        UniqueConstraint(
-            "template_exercise_id",
-            "set_number",
-            name="uq_template_sets_template_exercise_id_set_number",
-        ),
-    )
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    template_exercise_id: Mapped[int] = mapped_column(
-        ForeignKey("template_exercises.id", ondelete="CASCADE")
-    )
-    set_number: Mapped[int] = mapped_column(Integer)
-    target_reps: Mapped[int] = mapped_column(Integer)
-    target_weight: Mapped[Decimal] = mapped_column(Numeric(6, 2))
+    set_count: Mapped[int] = mapped_column(Integer)
