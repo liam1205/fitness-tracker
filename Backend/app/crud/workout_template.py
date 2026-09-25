@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.exercise import Exercise
@@ -9,7 +9,41 @@ from app.schemas.workout_template import (
     TemplateExerciseRead,
     WorkoutTemplateCreate,
     WorkoutTemplateRead,
+    WorkoutTemplateUpdate,
 )
+
+
+async def _get_template_for_user(
+    db: AsyncSession, user_id: int, template_id: int
+) -> WorkoutTemplate | None:
+    result = await db.execute(
+        select(WorkoutTemplate).where(
+            WorkoutTemplate.id == template_id, WorkoutTemplate.user_id == user_id
+        )
+    )
+    return result.scalar_one_or_none()
+
+
+async def _get_exercises_for_template(
+    db: AsyncSession, template_id: int
+) -> list[TemplateExerciseRead]:
+    rows = await db.execute(
+        select(TemplateExercise, Exercise)
+        .join(Exercise, Exercise.id == TemplateExercise.exercise_id)
+        .where(TemplateExercise.template_id == template_id)
+        .order_by(TemplateExercise.position)
+    )
+    return [
+        TemplateExerciseRead(
+            id=template_exercise.id,
+            exercise_id=template_exercise.exercise_id,
+            name=exercise.name,
+            muscle_group=exercise.muscle_group,
+            position=template_exercise.position,
+            set_count=template_exercise.set_count,
+        )
+        for template_exercise, exercise in rows.all()
+    ]
 
 
 async def list_workout_templates_for_user(
@@ -107,3 +141,83 @@ async def create_workout_template_for_user(
         created_at=template.created_at,
         exercises=exercises,
     )
+
+
+async def get_workout_template_for_user(
+    db: AsyncSession, user_id: int, template_id: int
+) -> WorkoutTemplateRead | None:
+    """Return a single workout template owned by ``user_id``, with its exercise slots.
+
+    Returns ``None`` if no such template exists for this user.
+    """
+    template = await _get_template_for_user(db, user_id, template_id)
+    if template is None:
+        return None
+
+    exercises = await _get_exercises_for_template(db, template.id)
+    return WorkoutTemplateRead(
+        id=template.id,
+        user_id=template.user_id,
+        name=template.name,
+        created_at=template.created_at,
+        exercises=exercises,
+    )
+
+
+async def update_workout_template_for_user(
+    db: AsyncSession, user_id: int, template_id: int, payload: WorkoutTemplateUpdate
+) -> WorkoutTemplateRead | None:
+    """Update a workout template owned by ``user_id``. Returns ``None`` if not found.
+
+    Omitted fields are left unchanged. When ``exercises`` is provided, the
+    existing slots are replaced wholesale and position is reassigned from
+    list order, matching how ``create_workout_template_for_user`` works.
+    """
+    template = await _get_template_for_user(db, user_id, template_id)
+    if template is None:
+        return None
+
+    if payload.name is not None:
+        template.name = payload.name
+
+    if payload.exercises is not None:
+        await db.execute(
+            delete(TemplateExercise).where(TemplateExercise.template_id == template.id)
+        )
+        for position, exercise_payload in enumerate(payload.exercises, start=1):
+            db.add(
+                TemplateExercise(
+                    template_id=template.id,
+                    exercise_id=exercise_payload.exercise_id,
+                    position=position,
+                    set_count=exercise_payload.set_count,
+                )
+            )
+
+    await db.flush()
+    exercises = await _get_exercises_for_template(db, template.id)
+    await db.refresh(template)
+    return WorkoutTemplateRead(
+        id=template.id,
+        user_id=template.user_id,
+        name=template.name,
+        created_at=template.created_at,
+        exercises=exercises,
+    )
+
+
+async def delete_workout_template_for_user(
+    db: AsyncSession, user_id: int, template_id: int
+) -> bool:
+    """Delete a workout template owned by ``user_id``, along with its exercise slots.
+
+    Returns ``False`` if no such template exists for this user.
+    """
+    template = await _get_template_for_user(db, user_id, template_id)
+    if template is None:
+        return False
+
+    await db.execute(delete(TemplateExercise).where(TemplateExercise.template_id == template.id))
+    await db.delete(template)
+    await db.flush()
+    return True

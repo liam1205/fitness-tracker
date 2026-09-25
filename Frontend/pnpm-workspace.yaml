@@ -1,2 +1,5 @@
 allowBuilds:
   esbuild: true
+
+overrides:
+  "@tanstack/react-store": ^0.11.0

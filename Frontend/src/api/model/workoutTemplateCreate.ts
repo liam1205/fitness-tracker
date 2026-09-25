@@ -11,8 +11,14 @@ import type { TemplateExerciseCreate } from './templateExerciseCreate';
  * Payload for creating a new workout template.
  */
 export interface WorkoutTemplateCreate {
-  /** Template name. */
+  /**
+     * Template name.
+     * @minLength 1
+     */
   name: string;
-  /** Exercise slots to add, in order. */
-  exercises?: TemplateExerciseCreate[];
+  /**
+     * Exercise slots to add, in order.
+     * @minItems 1
+     */
+  exercises: TemplateExerciseCreate[];
 }

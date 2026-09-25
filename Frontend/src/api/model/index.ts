@@ -26,3 +26,4 @@ export * from './userSettingsUpdate';
 export * from './validationError';
 export * from './workoutTemplateCreate';
 export * from './workoutTemplateRead';
+export * from './workoutTemplateUpdate';

@@ -1,35 +1,101 @@
-import { Ellipsis, Plus } from "lucide-react";
+import { Ellipsis, Eye, Play, Plus, X } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { useCreateTemplateModal } from "@/components/views/modals/CreateTemplate";
-import { useListWorkoutTemplates } from "@/api/endpoints";
+import {
+  getListWorkoutTemplatesQueryKey,
+  useDeleteWorkoutTemplate,
+  useListWorkoutTemplates,
+} from "@/api/endpoints";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useViewTemplateModal } from "../modals/ViewTemplate";
 
 /**
  * Workout templates: reusable exercise plans a user can start a workout from.
  */
 export function Templates() {
+  const queryClient = useQueryClient();
   const { openCreateTemplateModal } = useCreateTemplateModal();
+  const { openViewTemplateModal } = useViewTemplateModal();
   const { data } = useListWorkoutTemplates();
+  const { mutate: deleteWorkoutTemplate } = useDeleteWorkoutTemplate();
+
+  function handleDeleteTemplate(templateId: number) {
+    deleteWorkoutTemplate(
+      { templateId },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: getListWorkoutTemplatesQueryKey(),
+          });
+        },
+      },
+    );
+  }
 
   return (
     <div className="space-y-4">
       <h1 className="text-4xl font-bold tracking-tight">Templates</h1>
       <div className="flex flex-col gap-3">
         {data?.map((template) => (
-          <Card>
+          <Card
+            className="hover:bg-background hover:cursor-pointer active:bg-background"
+            onClick={() => openViewTemplateModal(template)}
+          >
             <CardHeader className="flex flex-row justify-between">
               <span className="text-lg font-semibold">{template.name}</span>
-              <Button size={"icon"} variant={"ghost"}>
-                <Ellipsis></Ellipsis>
-              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button size={"icon"} variant={"ghost"}>
+                    <Ellipsis></Ellipsis>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem
+                      className="flex flex-ro gap-2"
+                      onClick={() => openViewTemplateModal(template)}
+                    >
+                      <Eye className="size-3"></Eye>
+                      View
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="flex flex-ro gap-2">
+                      <Play className="size-3"></Play>
+                      Start Workout
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      variant="destructive"
+                      className="flex flex-ro gap-2"
+                      onClick={() => handleDeleteTemplate(template.id)}
+                    >
+                      <X className="size-3"></X>
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-0.5">
                 {template.exercises.map((exercise) => (
-                  <span className="text-sm text-accent-foreground">
-                    {exercise.set_count} x {exercise.name} (
-                    {exercise.muscle_group})
+                  <span className="flex flex-row items-center gap-1 text-sm text-accent-foreground">
+                    {exercise.set_count}
+                    <X className="size-2.5"></X>
+                    {exercise.name}{" "}
+                    <span className="capitalize">
+                      ({exercise.muscle_group})
+                    </span>
                   </span>
                 ))}
               </div>

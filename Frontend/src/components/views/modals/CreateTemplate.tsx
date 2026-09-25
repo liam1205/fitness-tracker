@@ -1,21 +1,17 @@
 import * as React from "react";
 
 import { useCreateWorkoutTemplate, useListExercises } from "@/api/endpoints";
-import type { ExerciseRead, WorkoutTemplateCreate } from "@/api/model";
-import { Button } from "@/components/ui/button";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from "@/components/ui/combobox";
+import type { WorkoutTemplateCreate } from "@/api/model";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useModal } from "@/hooks/use-modal";
-import { Plus } from "lucide-react";
+import { toastError } from "@/lib/errors";
 import { Separator } from "@/components/ui/separator";
+import {
+  ExerciseRowsEditor,
+  groupExercisesByMuscleGroup,
+  type TemplateExerciseRow,
+} from "@/components/views/modals/TemplateExerciseRows";
 
 export interface CreateTemplateHandle {
   /** Builds the create payload, or null if the form isn't valid yet. */
@@ -58,27 +54,24 @@ export function useCreateTemplateModal() {
   return { openCreateTemplateModal };
 }
 
-const MAX_EXERCISES = 12;
-
-type TemplateExerciseRow = {
-  id: number;
-  exercise: ExerciseRead | null;
-  sets: string;
-};
-
 const CreateTemplate = ({ ref }: { ref?: React.Ref<CreateTemplateHandle> }) => {
   const { data } = useListExercises({ page: 1, page_size: 100 });
   const exercises = data?.items ?? [];
+  const groupedExercises = React.useMemo(
+    () => groupExercisesByMuscleGroup(exercises),
+    [exercises],
+  );
   const [name, setName] = React.useState("");
   const [rows, setRows] = React.useState<TemplateExerciseRow[]>([]);
-  const nextRowId = React.useRef(0);
+  // Portal comboboxes into this container rather than document.body: the
+  // Dialog sets `pointer-events: none` on the body while open and only
+  // re-enables it on its own subtree, so a body-level portal is unclickable.
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   React.useImperativeHandle(ref, () => ({
     getPayload: () => {
       const trimmedName = name.trim();
-      if (!trimmedName) return null;
-
-      const templateExercises = rows.flatMap((row) => {
+      const validExercises = rows.flatMap((row) => {
         const setCount = Number(row.sets);
         if (!row.exercise || !Number.isInteger(setCount) || setCount <= 0) {
           return [];
@@ -86,82 +79,36 @@ const CreateTemplate = ({ ref }: { ref?: React.Ref<CreateTemplateHandle> }) => {
         return [{ exercise_id: row.exercise.id, set_count: setCount }];
       });
 
-      return { name: trimmedName, exercises: templateExercises };
+      if (!trimmedName || validExercises.length === 0) {
+        const missing = [
+          !trimmedName && "a name",
+          validExercises.length === 0 && "at least one exercise",
+        ].filter(Boolean);
+        toastError(null, `Template requires ${missing.join(" and ")}.`);
+        return null;
+      }
+
+      return { name: trimmedName, exercises: validExercises };
     },
   }));
 
-  function addRow() {
-    setRows((rows) => {
-      if (rows.length >= MAX_EXERCISES) return rows;
-      return [
-        ...rows,
-        { id: nextRowId.current++, exercise: null, sets: "" },
-      ];
-    });
-  }
-
-  function updateRow(id: number, changes: Partial<TemplateExerciseRow>) {
-    setRows((rows) =>
-      rows.map((row) => (row.id === id ? { ...row, ...changes } : row)),
-    );
-  }
-
   return (
-    <>
+    <div ref={containerRef} className="flex flex-col gap-3">
       <div className="flex flex-col gap-2">
-        <Label>Name</Label>
+        <Label htmlFor="template-name-input">Name</Label>
         <Input
+          id="template-name-input"
           value={name}
           onChange={(e) => setName(e.target.value)}
         ></Input>
       </div>
       <Separator></Separator>
-      <div className="flex flex-col gap-2">
-        {rows.map((row) => (
-          <div key={row.id} className="flex flex-row gap-4 items-center">
-            <Combobox
-              items={exercises}
-              value={row.exercise}
-              onValueChange={(exercise) => updateRow(row.id, { exercise })}
-              itemToStringLabel={(exercise) => exercise.name}
-              isItemEqualToValue={(a, b) => a.id === b.id}
-            >
-              <ComboboxInput
-                placeholder="Select exercise"
-                className="flex-1"
-              />
-              <ComboboxContent>
-                <ComboboxEmpty>No exercises found.</ComboboxEmpty>
-                <ComboboxList>
-                  {(exercise: ExerciseRead) => (
-                    <ComboboxItem key={exercise.id} value={exercise}>
-                      {exercise.name}
-                    </ComboboxItem>
-                  )}
-                </ComboboxList>
-              </ComboboxContent>
-            </Combobox>
-            <Input
-              disabled
-              className="w-24"
-              value={row.exercise?.muscle_group}
-            ></Input>
-            <Input
-              type="number"
-              placeholder="Sets"
-              className="w-15"
-              value={row.sets}
-              onChange={(e) => updateRow(row.id, { sets: e.target.value })}
-            ></Input>
-          </div>
-        ))}
-        {rows.length < MAX_EXERCISES && (
-          <Button variant={"ghost"} className="w-full" onClick={addRow}>
-            <Plus></Plus>
-            Add exercise
-          </Button>
-        )}
-      </div>
-    </>
+      <ExerciseRowsEditor
+        rows={rows}
+        onRowsChange={setRows}
+        groupedExercises={groupedExercises}
+        containerRef={containerRef}
+      />
+    </div>
   );
 };

@@ -573,6 +573,134 @@
           }
         }
       }
+    },
+    "/api/v1/workout-templates/{template_id}": {
+      "get": {
+        "tags": [
+          "workout-templates"
+        ],
+        "summary": "Get a workout template",
+        "description": "Return a single workout template owned by the current user.",
+        "operationId": "get_workout_template",
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutTemplateRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "workout-templates"
+        ],
+        "summary": "Update a workout template",
+        "description": "Update a workout template owned by the current user. Omitted fields are left unchanged.",
+        "operationId": "update_workout_template",
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkoutTemplateUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutTemplateRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "workout-templates"
+        ],
+        "summary": "Delete a workout template",
+        "description": "Delete a workout template owned by the current user.",
+        "operationId": "delete_workout_template",
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1107,6 +1235,7 @@
         "properties": {
           "name": {
             "type": "string",
+            "minLength": 1,
             "title": "Name",
             "description": "Template name.",
             "examples": [
@@ -1118,13 +1247,15 @@
               "$ref": "#/components/schemas/TemplateExerciseCreate"
             },
             "type": "array",
+            "minItems": 1,
             "title": "Exercises",
             "description": "Exercise slots to add, in order."
           }
         },
         "type": "object",
         "required": [
-          "name"
+          "name",
+          "exercises"
         ],
         "title": "WorkoutTemplateCreate",
         "description": "Payload for creating a new workout template."
@@ -1177,6 +1308,45 @@
         ],
         "title": "WorkoutTemplateRead",
         "description": "A workout template as returned by the API."
+      },
+      "WorkoutTemplateUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "Template name.",
+            "examples": [
+              "Push Day"
+            ]
+          },
+          "exercises": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/TemplateExerciseCreate"
+                },
+                "type": "array",
+                "minItems": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exercises",
+            "description": "Replacement exercise slots, in order."
+          }
+        },
+        "type": "object",
+        "title": "WorkoutTemplateUpdate",
+        "description": "Payload for updating a workout template. Omitted fields are left unchanged.\n\nWhen ``exercises`` is provided, it replaces the entire set of slots;\nposition is assigned from list order, so reordering is done by\nresubmitting the list in the desired order."
       }
     }
   }

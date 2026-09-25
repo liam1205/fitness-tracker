@@ -27,7 +27,8 @@ import type {
 import type {
   HTTPValidationError,
   WorkoutTemplateCreate,
-  WorkoutTemplateRead
+  WorkoutTemplateRead,
+  WorkoutTemplateUpdate
 } from '../../model';
 
 import { customInstance } from '../../http-client';
@@ -213,4 +214,232 @@ export const useCreateWorkoutTemplate = <TError = ErrorType<HTTPValidationError>
         TContext
       > => {
       return useMutation(getCreateWorkoutTemplateMutationOptions(options), queryClient);
+    }
+    /**
+ * Return a single workout template owned by the current user.
+ * @summary Get a workout template
+ */
+export const getWorkoutTemplate = (
+    templateId: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<WorkoutTemplateRead>(
+      {url: `/api/v1/workout-templates/${templateId}`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getGetWorkoutTemplateQueryKey = (templateId: number,) => {
+    return [
+    `/api/v1/workout-templates/${templateId}`
+    ] as const;
+    }
+
+
+export const getGetWorkoutTemplateQueryOptions = <TData = Awaited<ReturnType<typeof getWorkoutTemplate>>, TError = ErrorType<HTTPValidationError>>(templateId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutTemplate>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkoutTemplateQueryKey(templateId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkoutTemplate>>> = ({ signal }) => getWorkoutTemplate(templateId, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: templateId !== null && templateId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkoutTemplate>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetWorkoutTemplateQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkoutTemplate>>>
+export type GetWorkoutTemplateQueryError = ErrorType<HTTPValidationError>
+
+
+export function useGetWorkoutTemplate<TData = Awaited<ReturnType<typeof getWorkoutTemplate>>, TError = ErrorType<HTTPValidationError>>(
+ templateId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutTemplate>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkoutTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkoutTemplate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkoutTemplate<TData = Awaited<ReturnType<typeof getWorkoutTemplate>>, TError = ErrorType<HTTPValidationError>>(
+ templateId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutTemplate>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkoutTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkoutTemplate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkoutTemplate<TData = Awaited<ReturnType<typeof getWorkoutTemplate>>, TError = ErrorType<HTTPValidationError>>(
+ templateId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutTemplate>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get a workout template
+ */
+
+export function useGetWorkoutTemplate<TData = Awaited<ReturnType<typeof getWorkoutTemplate>>, TError = ErrorType<HTTPValidationError>>(
+ templateId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutTemplate>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetWorkoutTemplateQueryOptions(templateId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * Update a workout template owned by the current user. Omitted fields are left unchanged.
+ * @summary Update a workout template
+ */
+export const updateWorkoutTemplate = (
+    templateId: number,
+    workoutTemplateUpdate: WorkoutTemplateUpdate,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<WorkoutTemplateRead>(
+      {url: `/api/v1/workout-templates/${templateId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: workoutTemplateUpdate, signal
+    },
+      options);
+    }
+
+
+
+
+export const getUpdateWorkoutTemplateMutationKey = () => ['updateWorkoutTemplate'] as const;
+
+export const getUpdateWorkoutTemplateMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkoutTemplate>>, TError,UpdateWorkoutTemplateMutationVariables, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateWorkoutTemplate>>, TError,UpdateWorkoutTemplateMutationVariables, TContext> => {
+
+const mutationKey = getUpdateWorkoutTemplateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateWorkoutTemplate>>, UpdateWorkoutTemplateMutationVariables> = (props) => {
+          const {templateId,data} = props ?? {};
+
+          return  updateWorkoutTemplate(templateId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateWorkoutTemplateMutationResult = NonNullable<Awaited<ReturnType<typeof updateWorkoutTemplate>>>
+    export type UpdateWorkoutTemplateMutationBody = WorkoutTemplateUpdate
+    export type UpdateWorkoutTemplateMutationError = ErrorType<HTTPValidationError>
+    export type UpdateWorkoutTemplateMutationVariables = {templateId: number;data: WorkoutTemplateUpdate}
+
+    /**
+ * @summary Update a workout template
+ */
+export const useUpdateWorkoutTemplate = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkoutTemplate>>, TError,UpdateWorkoutTemplateMutationVariables, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateWorkoutTemplate>>,
+        TError,
+        UpdateWorkoutTemplateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateWorkoutTemplateMutationOptions(options), queryClient);
+    }
+    /**
+ * Delete a workout template owned by the current user.
+ * @summary Delete a workout template
+ */
+export const deleteWorkoutTemplate = (
+    templateId: number,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/workout-templates/${templateId}`, method: 'DELETE', signal
+    },
+      options);
+    }
+
+
+
+
+export const getDeleteWorkoutTemplateMutationKey = () => ['deleteWorkoutTemplate'] as const;
+
+export const getDeleteWorkoutTemplateMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkoutTemplate>>, TError,DeleteWorkoutTemplateMutationVariables, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkoutTemplate>>, TError,DeleteWorkoutTemplateMutationVariables, TContext> => {
+
+const mutationKey = getDeleteWorkoutTemplateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkoutTemplate>>, DeleteWorkoutTemplateMutationVariables> = (props) => {
+          const {templateId} = props ?? {};
+
+          return  deleteWorkoutTemplate(templateId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteWorkoutTemplateMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkoutTemplate>>>
+
+    export type DeleteWorkoutTemplateMutationError = ErrorType<HTTPValidationError>
+    export type DeleteWorkoutTemplateMutationVariables = {templateId: number}
+
+    /**
+ * @summary Delete a workout template
+ */
+export const useDeleteWorkoutTemplate = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkoutTemplate>>, TError,DeleteWorkoutTemplateMutationVariables, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteWorkoutTemplate>>,
+        TError,
+        DeleteWorkoutTemplateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteWorkoutTemplateMutationOptions(options), queryClient);
     }

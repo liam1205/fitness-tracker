@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.models.enums import MuscleGroup
 
@@ -40,7 +40,39 @@ class WorkoutTemplateRead(BaseModel):
 class WorkoutTemplateCreate(BaseModel):
     """Payload for creating a new workout template."""
 
-    name: str = Field(..., description="Template name.", examples=["Push Day"])
+    name: str = Field(..., min_length=1, description="Template name.", examples=["Push Day"])
     exercises: list[TemplateExerciseCreate] = Field(
-        default_factory=list, description="Exercise slots to add, in order."
+        ..., min_length=1, description="Exercise slots to add, in order."
     )
+
+    @field_validator("name")
+    @classmethod
+    def name_must_not_be_blank(cls, value: str) -> str:
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("Template name must not be blank.")
+        return stripped
+
+
+class WorkoutTemplateUpdate(BaseModel):
+    """Payload for updating a workout template. Omitted fields are left unchanged.
+
+    When ``exercises`` is provided, it replaces the entire set of slots;
+    position is assigned from list order, so reordering is done by
+    resubmitting the list in the desired order.
+    """
+
+    name: str | None = Field(None, min_length=1, description="Template name.", examples=["Push Day"])
+    exercises: list[TemplateExerciseCreate] | None = Field(
+        None, min_length=1, description="Replacement exercise slots, in order."
+    )
+
+    @field_validator("name")
+    @classmethod
+    def name_must_not_be_blank(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("Template name must not be blank.")
+        return stripped
