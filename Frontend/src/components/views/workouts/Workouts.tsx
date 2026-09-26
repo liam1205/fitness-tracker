@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "@tanstack/react-router";
 
 /**
  * Logged workouts: the history of completed training sessions.
@@ -45,12 +46,22 @@ type WorkoutProps = {
 };
 
 const Workout = ({ session }: WorkoutProps) => {
+  const router = useRouter();
   const started = new Date(session.started_at);
   const completed = session.completed_at
     ? new Date(session.completed_at)
     : new Date();
   return (
-    <Card size="sm">
+    <Card
+      size="sm"
+      className="hover:bg-background hover:cursor-pointer active:bg-background"
+      onClick={() =>
+        router.navigate({
+          to: "/workouts/$workoutId",
+          params: { workoutId: session.id.toLocaleString() },
+        })
+      }
+    >
       <CardHeader>
         <CardTitle>{session.template_name}</CardTitle>
         <CardDescription className="flex justify-start">

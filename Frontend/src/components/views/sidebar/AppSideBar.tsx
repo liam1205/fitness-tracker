@@ -42,7 +42,6 @@ import {
 import type { User } from "@/lib/auth";
 import { auth, useAuth } from "@/lib/auth";
 import { toastError } from "@/lib/errors";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -209,7 +208,16 @@ export function AppSideBar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 {activeSessions.map((session) => (
-                  <SidebarMenuItem key={session.id}>
+                  <SidebarMenuItem
+                    key={session.id}
+                    onClick={() => {
+                      router.navigate({
+                        to: "/workouts/$workoutId",
+                        params: { workoutId: session.id.toLocaleString() },
+                      });
+                      collapseSidebar();
+                    }}
+                  >
                     <SidebarMenuButton className="flex justify-between w-full">
                       <span>{session.template_name ?? "Workout"}</span>
                       <div className="flex justify-center items-center mr-2">
