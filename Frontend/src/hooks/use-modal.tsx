@@ -101,7 +101,7 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
 
             {modal.content}
 
-            <DialogFooter className="items-start sm:justify-between">
+            <DialogFooter className="items-between sm:justify-between">
               <div className="flex flex-row items-start gap-2">
                 <DialogClose asChild>
                   <Button variant="outline">

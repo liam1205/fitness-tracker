@@ -33,7 +33,14 @@ import {
   ComboboxList,
 } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
-import { GripVertical, Plus } from "lucide-react";
+import { GripVertical, InfoIcon, Plus } from "lucide-react";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
+import { Badge } from "@/components/ui/badge";
 
 export const MAX_EXERCISES = 12;
 
@@ -177,48 +184,53 @@ function SortableExerciseRow({
       >
         <GripVertical className="size-4" />
       </Button>
-      <Combobox
-        items={groupedExercises}
-        value={row.exercise}
-        onValueChange={(exercise) => onUpdate({ exercise })}
-        itemToStringLabel={(exercise) => exercise.name}
-        isItemEqualToValue={(a, b) => a.id === b.id}
-      >
-        <ComboboxInput placeholder="Select exercise" className="flex-1" />
-        <ComboboxContent container={containerRef}>
-          <ComboboxEmpty>No exercises found.</ComboboxEmpty>
-          <ComboboxList className={"w-24"}>
-            {(group: ExerciseGroup) => (
-              <ComboboxGroup key={group.value} items={group.items}>
-                <ComboboxLabel>{group.value}</ComboboxLabel>
-                <ComboboxCollection>
-                  {(exercise: ExerciseRead) => (
-                    <ComboboxItem
-                      key={exercise.id}
-                      value={exercise}
-                      className="min-w-0"
-                    >
-                      <span className="truncate">{exercise.name}</span>
-                    </ComboboxItem>
-                  )}
-                </ComboboxCollection>
-              </ComboboxGroup>
-            )}
-          </ComboboxList>
-        </ComboboxContent>
-      </Combobox>
-      <Input
-        disabled
-        className="w-18"
-        value={row.exercise?.muscle_group ?? ""}
-      ></Input>
-      <Input
-        type="number"
-        placeholder="Sets"
-        className="w-9"
-        value={row.sets}
-        onChange={(e) => onUpdate({ sets: e.target.value })}
-      ></Input>
+      <div className="flex flex-col gap-1">
+        <Combobox
+          items={groupedExercises}
+          value={row.exercise}
+          onValueChange={(exercise) => onUpdate({ exercise })}
+          itemToStringLabel={(exercise) => exercise.name}
+          isItemEqualToValue={(a, b) => a.id === b.id}
+        >
+          <ComboboxInput placeholder="Select exercise" className="flex-1" />
+          <ComboboxContent container={containerRef}>
+            <ComboboxEmpty>No exercises found.</ComboboxEmpty>
+            <ComboboxList className={"w-24"}>
+              {(group: ExerciseGroup) => (
+                <ComboboxGroup key={group.value} items={group.items}>
+                  <ComboboxLabel>{group.value}</ComboboxLabel>
+                  <ComboboxCollection>
+                    {(exercise: ExerciseRead) => (
+                      <ComboboxItem
+                        key={exercise.id}
+                        value={exercise}
+                        className="min-w-0"
+                      >
+                        <span className="truncate">{exercise.name}</span>
+                      </ComboboxItem>
+                    )}
+                  </ComboboxCollection>
+                </ComboboxGroup>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+        <div className="flex gap-1 items-center justify-around">
+          <InputGroup className="w-2/5">
+            <InputGroupInput
+              type="number"
+              value={row.sets}
+              onChange={(e) => onUpdate({ sets: e.target.value })}
+            />
+            <InputGroupAddon align="inline-end">
+              <InputGroupText>Sets</InputGroupText>
+            </InputGroupAddon>
+          </InputGroup>
+          <Badge className="w-fit capitalize">
+            {row.exercise?.muscle_group}
+          </Badge>
+        </div>
+      </div>
     </div>
   );
 }

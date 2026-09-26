@@ -19,8 +19,13 @@ import {
   groupExercisesByMuscleGroup,
   type TemplateExerciseRow,
 } from "@/components/views/modals/TemplateExerciseRows";
-import { Play } from "lucide-react";
+import { Info, Play } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 export interface ViewTemplateHandle {
   /** Builds the update payload, or null if the form isn't valid yet. */
@@ -181,41 +186,56 @@ const ViewTemplate = ({
         ></Input>
       </div>
       <Separator></Separator>
-      <ExerciseRowsEditor
-        rows={rows}
-        onRowsChange={setRows}
-        groupedExercises={groupedExercises}
-        containerRef={containerRef}
-      />
-      <Separator></Separator>
-      <div className="py-1 flex flex-row flex-wrap items-stretch gap-4">
-        {setsByMuscleGroupColumns.map((column, index) => (
-          <React.Fragment key={index}>
-            {index > 0 && (
-              <Separator
-                orientation="vertical"
-                className="hidden sm:block"
-              ></Separator>
-            )}
-            <div className="flex min-w-32 flex-1 flex-col gap-1">
-              {column.map(([muscleGroup, setCount]) => (
-                <div
-                  key={muscleGroup}
-                  className="flex flex-row gap-1.5  items-center"
-                >
-                  <Badge
-                    variant={"default"}
-                    className="w-24 capitalize text-xs"
-                  >
-                    {muscleGroup}
-                  </Badge>
-                  <span className="text-xs">{setCount} Sets</span>
-                </div>
-              ))}
-            </div>
-          </React.Fragment>
-        ))}
+      <div className="w-full h-full max-h-72 overflow-y-scroll overflow-x-hidden">
+        <ExerciseRowsEditor
+          rows={rows}
+          onRowsChange={setRows}
+          groupedExercises={groupedExercises}
+          containerRef={containerRef}
+        />
       </div>
+      <Separator></Separator>
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <button
+            type="button"
+            className="flex w-fit items-center gap-1.5 text-xs text-muted-foreground"
+          >
+            <Info className="size-3.5"></Info>
+            Sets by muscle group
+          </button>
+        </HoverCardTrigger>
+        <HoverCardContent className="w-auto max-w-md">
+          <div className="flex flex-row flex-wrap items-stretch gap-4">
+            {setsByMuscleGroupColumns.map((column, index) => (
+              <React.Fragment key={index}>
+                {index > 0 && (
+                  <Separator
+                    orientation="vertical"
+                    className="hidden sm:block"
+                  ></Separator>
+                )}
+                <div className="flex min-w-32 flex-1 flex-col gap-1">
+                  {column.map(([muscleGroup, setCount]) => (
+                    <div
+                      key={muscleGroup}
+                      className="flex flex-row gap-1.5  items-center"
+                    >
+                      <Badge
+                        variant={"default"}
+                        className="w-24 capitalize text-xs"
+                      >
+                        {muscleGroup}
+                      </Badge>
+                      <span className="text-xs">{setCount} Sets</span>
+                    </div>
+                  ))}
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
+        </HoverCardContent>
+      </HoverCard>
     </div>
   );
 };
