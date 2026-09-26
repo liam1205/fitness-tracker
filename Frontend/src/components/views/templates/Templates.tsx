@@ -1,5 +1,6 @@
 import { Ellipsis, Eye, Play, Plus, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useCreateTemplateModal } from "@/components/views/modals/CreateTemplate";
@@ -7,7 +8,9 @@ import {
   getListWorkoutTemplatesQueryKey,
   useDeleteWorkoutTemplate,
   useListWorkoutTemplates,
+  useStartWorkoutSession,
 } from "@/api/endpoints";
+import type { WorkoutTemplateRead } from "@/api/model";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -29,6 +32,7 @@ export function Templates() {
   const { openViewTemplateModal } = useViewTemplateModal();
   const { data } = useListWorkoutTemplates();
   const { mutate: deleteWorkoutTemplate } = useDeleteWorkoutTemplate();
+  const { mutate: startWorkoutSession } = useStartWorkoutSession();
 
   function handleDeleteTemplate(templateId: number) {
     deleteWorkoutTemplate(
@@ -43,21 +47,33 @@ export function Templates() {
     );
   }
 
+  function handleStartWorkout(template: WorkoutTemplateRead) {
+    startWorkoutSession(
+      { data: { template_id: template.id } },
+      {
+        onSuccess: () => {
+          toast.success(`Started "${template.name}".`);
+        },
+      },
+    );
+  }
+
   return (
     <div className="space-y-4">
       <h1 className="text-4xl font-bold tracking-tight">Templates</h1>
       <div className="flex flex-col gap-3">
         {data?.map((template) => (
           <Card
+            size="sm"
             className="hover:bg-background hover:cursor-pointer active:bg-background"
             onClick={() => openViewTemplateModal(template)}
           >
             <CardHeader className="flex flex-row justify-between">
-              <span className="text-lg font-semibold">{template.name}</span>
+              <span className=" font-semibold">{template.name}</span>
 
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <Button size={"icon"} variant={"ghost"}>
+                  <Button size={"xs"} variant={"ghost"}>
                     <Ellipsis></Ellipsis>
                   </Button>
                 </DropdownMenuTrigger>
@@ -70,7 +86,10 @@ export function Templates() {
                       <Eye className="size-3"></Eye>
                       View
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="flex flex-ro gap-2">
+                    <DropdownMenuItem
+                      className="flex flex-ro gap-2"
+                      onClick={() => handleStartWorkout(template)}
+                    >
                       <Play className="size-3"></Play>
                       Start Workout
                     </DropdownMenuItem>

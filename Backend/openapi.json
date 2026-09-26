@@ -701,6 +701,143 @@
           }
         }
       }
+    },
+    "/api/v1/workout-sessions/active": {
+      "get": {
+        "tags": [
+          "workout-sessions"
+        ],
+        "summary": "List active workout sessions",
+        "description": "Return the current user's workout sessions that haven't been completed yet.",
+        "operationId": "list_active_workout_sessions",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WorkoutSessionRead"
+                  },
+                  "type": "array",
+                  "title": "Response List Active Workout Sessions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workout-sessions/completed": {
+      "get": {
+        "tags": [
+          "workout-sessions"
+        ],
+        "summary": "List completed workout sessions",
+        "description": "Return the current user's workout sessions that have been completed.",
+        "operationId": "list_completed_workout_sessions",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WorkoutSessionRead"
+                  },
+                  "type": "array",
+                  "title": "Response List Completed Workout Sessions"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workout-sessions/start": {
+      "post": {
+        "tags": [
+          "workout-sessions"
+        ],
+        "summary": "Start a workout session from a template",
+        "description": "Start a new workout session copying the exercises of a template owned by the current user.",
+        "operationId": "start_workout_session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkoutSessionStart"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutSessionRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workout-sessions/{session_id}/complete": {
+      "post": {
+        "tags": [
+          "workout-sessions"
+        ],
+        "summary": "Complete a workout session",
+        "description": "Mark a workout session owned by the current user as completed.",
+        "operationId": "complete_workout_session",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutSessionRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -929,6 +1066,95 @@
           "pages"
         ],
         "title": "Page[ExerciseRead]"
+      },
+      "SessionExerciseRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "Unique identifier."
+          },
+          "exercise_id": {
+            "type": "integer",
+            "title": "Exercise Id",
+            "description": "Id of the exercise in this slot."
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Exercise name.",
+            "examples": [
+              "Bench Press"
+            ]
+          },
+          "muscle_group": {
+            "$ref": "#/components/schemas/MuscleGroup",
+            "description": "Primary muscle group targeted."
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position",
+            "description": "Display order within the session, 1-indexed."
+          },
+          "sets": {
+            "items": {
+              "$ref": "#/components/schemas/SessionSetRead"
+            },
+            "type": "array",
+            "title": "Sets",
+            "description": "Sets performed for this exercise, in order."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "exercise_id",
+          "name",
+          "muscle_group",
+          "position",
+          "sets"
+        ],
+        "title": "SessionExerciseRead",
+        "description": "An exercise slot within a workout session, as returned by the API."
+      },
+      "SessionSetRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "Unique identifier."
+          },
+          "set_number": {
+            "type": "integer",
+            "title": "Set Number",
+            "description": "Set order within the exercise, 1-indexed."
+          },
+          "reps": {
+            "type": "integer",
+            "title": "Reps",
+            "description": "Reps performed."
+          },
+          "weight": {
+            "type": "string",
+            "title": "Weight",
+            "description": "Weight used."
+          },
+          "completed": {
+            "type": "boolean",
+            "title": "Completed",
+            "description": "Whether this set has been marked done."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "set_number",
+          "reps",
+          "weight",
+          "completed"
+        ],
+        "title": "SessionSetRead",
+        "description": "A single performed set within a session exercise, as returned by the API."
       },
       "TemplateExerciseCreate": {
         "properties": {
@@ -1230,6 +1456,98 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "WorkoutSessionRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "Unique identifier.",
+            "examples": [
+              1
+            ]
+          },
+          "user_id": {
+            "type": "integer",
+            "title": "User Id",
+            "description": "Id of the user who owns this session."
+          },
+          "template_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Id",
+            "description": "Id of the template this session was started from, if any."
+          },
+          "template_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Name",
+            "description": "Name of the template this session was started from, if any."
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At",
+            "description": "When the session was started."
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At",
+            "description": "When the session was completed, if it has been."
+          },
+          "exercises": {
+            "items": {
+              "$ref": "#/components/schemas/SessionExerciseRead"
+            },
+            "type": "array",
+            "title": "Exercises",
+            "description": "Exercise slots, in order."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "started_at",
+          "exercises"
+        ],
+        "title": "WorkoutSessionRead",
+        "description": "A workout session as returned by the API."
+      },
+      "WorkoutSessionStart": {
+        "properties": {
+          "template_id": {
+            "type": "integer",
+            "title": "Template Id",
+            "description": "Id of the template to start a session from."
+          }
+        },
+        "type": "object",
+        "required": [
+          "template_id"
+        ],
+        "title": "WorkoutSessionStart",
+        "description": "Payload for starting a new workout session from a template."
       },
       "WorkoutTemplateCreate": {
         "properties": {

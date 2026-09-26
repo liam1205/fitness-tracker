@@ -3,15 +3,25 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
 import {
+  CircleStop,
   Dumbbell,
   House,
+  Icon,
   ListChecks,
   LogOut,
   NotebookTabs,
+  Pause,
+  Square,
+  StopCircle,
+  StopCircleIcon,
 } from "lucide-react";
 import {
   getGetUserSettingsQueryKey,
+  getListActiveWorkoutSessionsQueryKey,
+  getListCompletedWorkoutSessionsQueryKey,
+  useCompleteWorkoutSession,
   useGetUserSettings,
+  useListActiveWorkoutSessions,
   useUpdateUserSettings,
 } from "@/api/endpoints";
 import type { Theme } from "@/api/model";
@@ -21,6 +31,7 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -41,6 +52,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 /** Primary navigation. Add entries here as protected routes are added. */
 const NAV_ITEMS = [
@@ -78,6 +90,7 @@ export function AppSideBar() {
   const { theme, setTheme } = useTheme();
   const queryClient = useQueryClient();
   const { data: userSettings } = useGetUserSettings();
+  const { data: activeSessions } = useListActiveWorkoutSessions();
   const { mutate: updateSettings } = useUpdateUserSettings({
     mutation: {
       // Keep the cached settings in sync so this doesn't fight the local
@@ -85,6 +98,21 @@ export function AppSideBar() {
       // without a refetch.
       onSuccess: (data) => {
         queryClient.setQueryData(getGetUserSettingsQueryKey(), data);
+      },
+    },
+  });
+  const { mutate: completeWorkoutSession } = useCompleteWorkoutSession({
+    mutation: {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: getListActiveWorkoutSessionsQueryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: getListCompletedWorkoutSessionsQueryKey(),
+        });
+      },
+      onError: (err) => {
+        toastError(err, "Couldn't complete the workout session.");
       },
     },
   });
@@ -105,6 +133,14 @@ export function AppSideBar() {
   function handleThemeChange(value: Theme) {
     setTheme(value);
     updateSettings({ data: { theme: value } });
+  }
+
+  function handleCompleteSession(
+    event: React.MouseEvent<HTMLButtonElement>,
+    sessionId: number,
+  ) {
+    event.stopPropagation();
+    completeWorkoutSession({ sessionId });
   }
 
   function collapseSidebar() {
@@ -166,8 +202,36 @@ export function AppSideBar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {activeSessions && activeSessions.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Active sessions</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {activeSessions.map((session) => (
+                  <SidebarMenuItem key={session.id}>
+                    <SidebarMenuButton className="flex justify-between w-full">
+                      <span>{session.template_name ?? "Workout"}</span>
+                      <div className="flex justify-center items-center mr-2">
+                        <Button
+                          className="size-1"
+                          variant={"destructive"}
+                          size={"icon"}
+                          onClick={(event) =>
+                            handleCompleteSession(event, session.id)
+                          }
+                        >
+                          <Square></Square>
+                        </Button>
+                      </div>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
-      <Separator></Separator>
       <SidebarFooter>
         <SidebarMenu className="gap-2">
           <SidebarMenuItem>

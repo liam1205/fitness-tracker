@@ -1,9 +1,11 @@
 import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import {
   getListWorkoutTemplatesQueryKey,
   useListExercises,
+  useStartWorkoutSession,
   useUpdateWorkoutTemplate,
 } from "@/api/endpoints";
 import type { WorkoutTemplateRead, WorkoutTemplateUpdate } from "@/api/model";
@@ -32,6 +34,7 @@ export function useViewTemplateModal() {
   const { openModal, closeModal } = useModal();
   const queryClient = useQueryClient();
   const { mutate: updateWorkoutTemplate } = useUpdateWorkoutTemplate();
+  const { mutate: startWorkoutSession } = useStartWorkoutSession();
 
   function openViewTemplateModal(template: WorkoutTemplateRead) {
     const formRef = React.createRef<ViewTemplateHandle>();
@@ -47,6 +50,18 @@ export function useViewTemplateModal() {
             queryClient.invalidateQueries({
               queryKey: getListWorkoutTemplatesQueryKey(),
             });
+            closeModal();
+          },
+        },
+      );
+    }
+
+    function handleStartWorkout() {
+      startWorkoutSession(
+        { data: { template_id: template.id } },
+        {
+          onSuccess: () => {
+            toast.success(`Started "${template.name}".`);
             closeModal();
           },
         },
@@ -69,7 +84,7 @@ export function useViewTemplateModal() {
             </>
           ),
           variant: "outline",
-          onClick: undefined,
+          onClick: handleStartWorkout,
         },
       ],
     });
@@ -173,11 +188,16 @@ const ViewTemplate = ({
         containerRef={containerRef}
       />
       <Separator></Separator>
-      <div className="py-1 flex flex-row items-stretch gap-4">
+      <div className="py-1 flex flex-row flex-wrap items-stretch gap-4">
         {setsByMuscleGroupColumns.map((column, index) => (
           <React.Fragment key={index}>
-            {index > 0 && <Separator orientation="vertical"></Separator>}
-            <div className="flex flex-1 flex-col gap-1">
+            {index > 0 && (
+              <Separator
+                orientation="vertical"
+                className="hidden sm:block"
+              ></Separator>
+            )}
+            <div className="flex min-w-32 flex-1 flex-col gap-1">
               {column.map(([muscleGroup, setCount]) => (
                 <div
                   key={muscleGroup}

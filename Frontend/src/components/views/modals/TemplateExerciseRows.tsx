@@ -167,16 +167,16 @@ function SortableExerciseRow({
     <div
       ref={setNodeRef}
       style={style}
-      className="flex flex-row gap-4 items-center"
+      className="flex flex-row gap-1 items-center"
     >
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         className="cursor-grab touch-none text-muted-foreground hover:text-foreground"
         {...attributes}
         {...listeners}
       >
         <GripVertical className="size-4" />
-      </button>
+      </Button>
       <Combobox
         items={groupedExercises}
         value={row.exercise}
@@ -187,14 +187,18 @@ function SortableExerciseRow({
         <ComboboxInput placeholder="Select exercise" className="flex-1" />
         <ComboboxContent container={containerRef}>
           <ComboboxEmpty>No exercises found.</ComboboxEmpty>
-          <ComboboxList>
+          <ComboboxList className={"w-24"}>
             {(group: ExerciseGroup) => (
               <ComboboxGroup key={group.value} items={group.items}>
                 <ComboboxLabel>{group.value}</ComboboxLabel>
                 <ComboboxCollection>
                   {(exercise: ExerciseRead) => (
-                    <ComboboxItem key={exercise.id} value={exercise}>
-                      {exercise.name}
+                    <ComboboxItem
+                      key={exercise.id}
+                      value={exercise}
+                      className="min-w-0"
+                    >
+                      <span className="truncate">{exercise.name}</span>
                     </ComboboxItem>
                   )}
                 </ComboboxCollection>
@@ -205,13 +209,13 @@ function SortableExerciseRow({
       </Combobox>
       <Input
         disabled
-        className="w-24"
+        className="w-18"
         value={row.exercise?.muscle_group ?? ""}
       ></Input>
       <Input
         type="number"
         placeholder="Sets"
-        className="w-15"
+        className="w-9"
         value={row.sets}
         onChange={(e) => onUpdate({ sets: e.target.value })}
       ></Input>
