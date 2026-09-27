@@ -1,6 +1,7 @@
 import * as React from "react";
 
-import { useCreateWorkoutTemplate, useListExercises } from "@/api/endpoints";
+import { useListExercises } from "@/api/endpoints/exercises/exercises";
+import { useCreateWorkoutTemplate } from "@/api/endpoints/workout-templates/workout-templates";
 import type { WorkoutTemplateCreate } from "@/api/model";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

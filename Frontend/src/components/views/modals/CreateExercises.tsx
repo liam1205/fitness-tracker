@@ -1,6 +1,9 @@
 import { useQueryClient } from "@tanstack/react-query";
 
-import { getListExercisesQueryKey, useCreateExercise } from "@/api/endpoints";
+import {
+  getListExercisesQueryKey,
+  useCreateExercise,
+} from "@/api/endpoints/exercises/exercises";
 import { MuscleGroup } from "@/api/model/muscleGroup";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

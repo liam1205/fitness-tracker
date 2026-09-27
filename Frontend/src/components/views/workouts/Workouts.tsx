@@ -3,7 +3,7 @@ import { Plus, TimelineIcon, Timer, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCreateWorkoutModal } from "@/components/views/modals/CreateWorkout";
 import type { WorkoutSessionRead } from "@/api/model";
-import { useListCompletedWorkoutSessions } from "@/api/endpoints";
+import { useListCompletedWorkoutSessions } from "@/api/endpoints/workout-sessions/workout-sessions";
 import { useEffect } from "react";
 import {
   Card,

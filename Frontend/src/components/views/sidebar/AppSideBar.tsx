@@ -3,27 +3,24 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
 import {
-  CircleStop,
   Dumbbell,
   House,
-  Icon,
   ListChecks,
   LogOut,
   NotebookTabs,
-  Pause,
   Square,
-  StopCircle,
-  StopCircleIcon,
 } from "lucide-react";
 import {
   getGetUserSettingsQueryKey,
+  useGetUserSettings,
+  useUpdateUserSettings,
+} from "@/api/endpoints/user-settings/user-settings";
+import {
   getListActiveWorkoutSessionsQueryKey,
   getListCompletedWorkoutSessionsQueryKey,
   useCompleteWorkoutSession,
-  useGetUserSettings,
   useListActiveWorkoutSessions,
-  useUpdateUserSettings,
-} from "@/api/endpoints";
+} from "@/api/endpoints/workout-sessions/workout-sessions";
 import type { Theme } from "@/api/model";
 import {
   Sidebar,

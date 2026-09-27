@@ -4,7 +4,7 @@ import {
   getListExercisesQueryKey,
   useDeleteExercise,
   useUpdateExercise,
-} from "@/api/endpoints";
+} from "@/api/endpoints/exercises/exercises";
 import type { ExerciseRead } from "@/api/model";
 import { MuscleGroup } from "@/api/model/muscleGroup";
 import { Input } from "@/components/ui/input";

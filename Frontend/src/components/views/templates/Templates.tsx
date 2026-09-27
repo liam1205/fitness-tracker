@@ -8,8 +8,8 @@ import {
   getListWorkoutTemplatesQueryKey,
   useDeleteWorkoutTemplate,
   useListWorkoutTemplates,
-  useStartWorkoutSession,
-} from "@/api/endpoints";
+} from "@/api/endpoints/workout-templates/workout-templates";
+import { useStartWorkoutSession } from "@/api/endpoints/workout-sessions/workout-sessions";
 import type { WorkoutTemplateRead } from "@/api/model";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {

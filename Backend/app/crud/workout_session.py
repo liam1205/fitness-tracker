@@ -131,6 +131,27 @@ async def _get_template_name(db: AsyncSession, template_id: int | None) -> str |
     return result.scalar_one_or_none()
 
 
+async def get_workout_session_for_user(
+    db: AsyncSession, user_id: int, session_id: int
+) -> WorkoutSessionRead | None:
+    """Return a single workout session owned by ``user_id``, or ``None`` if not found."""
+    session = await _get_session_for_user(db, user_id, session_id)
+    if session is None:
+        return None
+
+    exercises_by_session = await _get_exercises_for_sessions(db, [session.id])
+    template_name = await _get_template_name(db, session.template_id)
+    return WorkoutSessionRead(
+        id=session.id,
+        user_id=session.user_id,
+        template_id=session.template_id,
+        template_name=template_name,
+        started_at=session.started_at,
+        completed_at=session.completed_at,
+        exercises=exercises_by_session[session.id],
+    )
+
+
 async def complete_workout_session_for_user(
     db: AsyncSession, user_id: int, session_id: int
 ) -> WorkoutSessionRead | None:

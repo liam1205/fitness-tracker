@@ -754,6 +754,49 @@
         }
       }
     },
+    "/api/v1/workout-sessions/{session_id}": {
+      "get": {
+        "tags": [
+          "workout-sessions"
+        ],
+        "summary": "Get a workout session by ID",
+        "description": "Return a single workout session owned by the current user.",
+        "operationId": "get_workout_session",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutSessionRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/workout-sessions/start": {
       "post": {
         "tags": [

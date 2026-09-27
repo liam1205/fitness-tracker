@@ -35,6 +35,25 @@ async def list_completed_workout_sessions(
     return await crud.workout_session.list_completed_workout_sessions_for_user(db, user.id)
 
 
+@router.get(
+    "/{session_id}",
+    response_model=WorkoutSessionRead,
+    summary="Get a workout session by ID",
+)
+async def get_workout_session(
+    session_id: int,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+) -> WorkoutSessionRead:
+    """Return a single workout session owned by the current user."""
+    session = await crud.workout_session.get_workout_session_for_user(db, user.id, session_id)
+    if session is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Workout session not found"
+        )
+    return session
+
+
 @router.post(
     "/start",
     response_model=WorkoutSessionRead,

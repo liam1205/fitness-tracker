@@ -4,10 +4,10 @@ import { toast } from "sonner";
 
 import {
   getListWorkoutTemplatesQueryKey,
-  useListExercises,
-  useStartWorkoutSession,
   useUpdateWorkoutTemplate,
-} from "@/api/endpoints";
+} from "@/api/endpoints/workout-templates/workout-templates";
+import { useListExercises } from "@/api/endpoints/exercises/exercises";
+import { useStartWorkoutSession } from "@/api/endpoints/workout-sessions/workout-sessions";
 import type { WorkoutTemplateRead, WorkoutTemplateUpdate } from "@/api/model";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

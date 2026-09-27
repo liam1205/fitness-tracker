@@ -2,7 +2,7 @@ import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useCreateExerciseModal } from "@/components/views/modals/CreateExercises";
-import { useListExercises } from "@/api/endpoints";
+import { useListExercises } from "@/api/endpoints/exercises/exercises";
 import { Card, CardContent } from "@/components/ui/card";
 import { useViewExerciseModal } from "../modals/ViewExercise";
 import type { ExerciseRead } from "@/api/model";
