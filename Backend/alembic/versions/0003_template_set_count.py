@@ -30,8 +30,8 @@ def downgrade() -> None:
     op.drop_column("template_exercises", "set_count")
     op.create_table(
         "template_sets",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("template_exercise_id", sa.Integer(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("template_exercise_id", sa.Uuid(), nullable=False),
         sa.Column("set_number", sa.Integer(), nullable=False),
         sa.Column("target_reps", sa.Integer(), nullable=False),
         sa.Column("target_weight", sa.Numeric(precision=6, scale=2), nullable=False),

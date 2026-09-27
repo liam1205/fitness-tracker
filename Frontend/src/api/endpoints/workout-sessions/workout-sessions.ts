@@ -244,7 +244,7 @@ export function useListCompletedWorkoutSessions<TData = Awaited<ReturnType<typeo
  * @summary Get a workout session by ID
  */
 export const getWorkoutSession = (
-    sessionId: number,
+    sessionId: string,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
@@ -258,14 +258,14 @@ export const getWorkoutSession = (
 
 
 
-export const getGetWorkoutSessionQueryKey = (sessionId: number,) => {
+export const getGetWorkoutSessionQueryKey = (sessionId: string,) => {
     return [
     `/api/v1/workout-sessions/${sessionId}`
     ] as const;
     }
 
 
-export const getGetWorkoutSessionQueryOptions = <TData = Awaited<ReturnType<typeof getWorkoutSession>>, TError = ErrorType<HTTPValidationError>>(sessionId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutSession>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkoutSessionQueryOptions = <TData = Awaited<ReturnType<typeof getWorkoutSession>>, TError = ErrorType<HTTPValidationError>>(sessionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutSession>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -288,7 +288,7 @@ export type GetWorkoutSessionQueryError = ErrorType<HTTPValidationError>
 
 
 export function useGetWorkoutSession<TData = Awaited<ReturnType<typeof getWorkoutSession>>, TError = ErrorType<HTTPValidationError>>(
- sessionId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutSession>>, TError, TData>> & Pick<
+ sessionId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutSession>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkoutSession>>,
           TError,
@@ -298,7 +298,7 @@ export function useGetWorkoutSession<TData = Awaited<ReturnType<typeof getWorkou
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetWorkoutSession<TData = Awaited<ReturnType<typeof getWorkoutSession>>, TError = ErrorType<HTTPValidationError>>(
- sessionId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutSession>>, TError, TData>> & Pick<
+ sessionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutSession>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkoutSession>>,
           TError,
@@ -308,7 +308,7 @@ export function useGetWorkoutSession<TData = Awaited<ReturnType<typeof getWorkou
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetWorkoutSession<TData = Awaited<ReturnType<typeof getWorkoutSession>>, TError = ErrorType<HTTPValidationError>>(
- sessionId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutSession>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ sessionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutSession>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -316,7 +316,7 @@ export function useGetWorkoutSession<TData = Awaited<ReturnType<typeof getWorkou
  */
 
 export function useGetWorkoutSession<TData = Awaited<ReturnType<typeof getWorkoutSession>>, TError = ErrorType<HTTPValidationError>>(
- sessionId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutSession>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ sessionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkoutSession>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -402,7 +402,7 @@ export const useStartWorkoutSession = <TError = ErrorType<HTTPValidationError>,
  * @summary Complete a workout session
  */
 export const completeWorkoutSession = (
-    sessionId: number,
+    sessionId: string,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
@@ -417,8 +417,8 @@ export const completeWorkoutSession = (
 
 
 export const getCompleteWorkoutSessionMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeWorkoutSession>>, TError,{sessionId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof completeWorkoutSession>>, TError,{sessionId: number}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeWorkoutSession>>, TError,{sessionId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof completeWorkoutSession>>, TError,{sessionId: string}, TContext> => {
 
 const mutationKey = ['completeWorkoutSession'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -430,7 +430,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof completeWorkoutSession>>, {sessionId: number}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof completeWorkoutSession>>, {sessionId: string}> = (props) => {
           const {sessionId} = props ?? {};
 
           return  completeWorkoutSession(sessionId,requestOptions)
@@ -451,11 +451,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Complete a workout session
  */
 export const useCompleteWorkoutSession = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeWorkoutSession>>, TError,{sessionId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeWorkoutSession>>, TError,{sessionId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof completeWorkoutSession>>,
         TError,
-        {sessionId: number},
+        {sessionId: string},
         TContext
       > => {
       return useMutation(getCompleteWorkoutSessionMutationOptions(options), queryClient);

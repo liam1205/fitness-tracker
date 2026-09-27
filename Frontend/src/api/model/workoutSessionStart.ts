@@ -11,5 +11,5 @@
  */
 export interface WorkoutSessionStart {
   /** Id of the template to start a session from. */
-  template_id: number;
+  template_id: string;
 }

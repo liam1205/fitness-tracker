@@ -1,3 +1,4 @@
+import uuid
 from collections import defaultdict
 
 from sqlalchemy import delete, select
@@ -14,7 +15,7 @@ from app.schemas.workout_template import (
 
 
 async def _get_template_for_user(
-    db: AsyncSession, user_id: int, template_id: int
+    db: AsyncSession, user_id: uuid.UUID, template_id: uuid.UUID
 ) -> WorkoutTemplate | None:
     result = await db.execute(
         select(WorkoutTemplate).where(
@@ -25,7 +26,7 @@ async def _get_template_for_user(
 
 
 async def _get_exercises_for_template(
-    db: AsyncSession, template_id: int
+    db: AsyncSession, template_id: uuid.UUID
 ) -> list[TemplateExerciseRead]:
     rows = await db.execute(
         select(TemplateExercise, Exercise)
@@ -47,7 +48,7 @@ async def _get_exercises_for_template(
 
 
 async def list_workout_templates_for_user(
-    db: AsyncSession, user_id: int
+    db: AsyncSession, user_id: uuid.UUID
 ) -> list[WorkoutTemplateRead]:
     """Return all workout templates owned by ``user_id``, with their exercise slots.
 
@@ -66,7 +67,7 @@ async def list_workout_templates_for_user(
         .all()
     )
 
-    exercises_by_template: dict[int, list[TemplateExerciseRead]] = defaultdict(list)
+    exercises_by_template: dict[uuid.UUID, list[TemplateExerciseRead]] = defaultdict(list)
     if templates:
         rows = await db.execute(
             select(TemplateExercise, Exercise)
@@ -99,7 +100,7 @@ async def list_workout_templates_for_user(
 
 
 async def create_workout_template_for_user(
-    db: AsyncSession, user_id: int, payload: WorkoutTemplateCreate
+    db: AsyncSession, user_id: uuid.UUID, payload: WorkoutTemplateCreate
 ) -> WorkoutTemplateRead:
     """Create a new workout template, with its exercise slots, owned by ``user_id``.
 
@@ -144,7 +145,7 @@ async def create_workout_template_for_user(
 
 
 async def get_workout_template_for_user(
-    db: AsyncSession, user_id: int, template_id: int
+    db: AsyncSession, user_id: uuid.UUID, template_id: uuid.UUID
 ) -> WorkoutTemplateRead | None:
     """Return a single workout template owned by ``user_id``, with its exercise slots.
 
@@ -165,7 +166,7 @@ async def get_workout_template_for_user(
 
 
 async def update_workout_template_for_user(
-    db: AsyncSession, user_id: int, template_id: int, payload: WorkoutTemplateUpdate
+    db: AsyncSession, user_id: uuid.UUID, template_id: uuid.UUID, payload: WorkoutTemplateUpdate
 ) -> WorkoutTemplateRead | None:
     """Update a workout template owned by ``user_id``. Returns ``None`` if not found.
 
@@ -207,7 +208,7 @@ async def update_workout_template_for_user(
 
 
 async def delete_workout_template_for_user(
-    db: AsyncSession, user_id: int, template_id: int
+    db: AsyncSession, user_id: uuid.UUID, template_id: uuid.UUID
 ) -> bool:
     """Delete a workout template owned by ``user_id``, along with its exercise slots.
 

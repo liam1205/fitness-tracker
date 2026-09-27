@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -41,7 +43,7 @@ async def list_completed_workout_sessions(
     summary="Get a workout session by ID",
 )
 async def get_workout_session(
-    session_id: int,
+    session_id: uuid.UUID,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ) -> WorkoutSessionRead:
@@ -80,7 +82,7 @@ async def start_workout_session(
     summary="Complete a workout session",
 )
 async def complete_workout_session(
-    session_id: int,
+    session_id: uuid.UUID,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ) -> WorkoutSessionRead:

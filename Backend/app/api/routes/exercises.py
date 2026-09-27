@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -40,7 +42,7 @@ async def create_exercise(
 
 @router.patch("/{exercise_id}", response_model=ExerciseRead, summary="Update an exercise")
 async def update_exercise(
-    exercise_id: int,
+    exercise_id: uuid.UUID,
     payload: ExerciseUpdate,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
@@ -56,7 +58,7 @@ async def update_exercise(
     "/{exercise_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete an exercise"
 )
 async def delete_exercise(
-    exercise_id: int,
+    exercise_id: uuid.UUID,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ) -> None:

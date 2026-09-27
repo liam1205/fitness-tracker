@@ -11,13 +11,13 @@
  */
 export interface SessionSetRead {
   /** Unique identifier. */
-  id: number;
+  id: string;
   /** Set order within the exercise, 1-indexed. */
   set_number: number;
-  /** Reps performed. */
-  reps: number;
-  /** Weight used. */
-  weight: string;
+  /** Reps performed, once recorded. */
+  reps?: number | null;
+  /** Weight used, once recorded. */
+  weight?: string | null;
   /** Whether this set has been marked done. */
   completed: boolean;
 }

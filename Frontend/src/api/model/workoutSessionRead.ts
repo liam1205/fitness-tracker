@@ -12,11 +12,11 @@ import type { SessionExerciseRead } from './sessionExerciseRead';
  */
 export interface WorkoutSessionRead {
   /** Unique identifier. */
-  id: number;
+  id: string;
   /** Id of the user who owns this session. */
-  user_id: number;
+  user_id: string;
   /** Id of the template this session was started from, if any. */
-  template_id?: number | null;
+  template_id?: string | null;
   /** Name of the template this session was started from, if any. */
   template_name?: string | null;
   /** When the session was started. */

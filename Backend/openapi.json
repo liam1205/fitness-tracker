@@ -229,7 +229,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
+              "format": "uuid",
               "title": "User Id"
             }
           }
@@ -373,7 +374,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
+              "format": "uuid",
               "title": "Exercise Id"
             }
           }
@@ -424,7 +426,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
+              "format": "uuid",
               "title": "Exercise Id"
             }
           }
@@ -588,7 +591,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
+              "format": "uuid",
               "title": "Template Id"
             }
           }
@@ -629,7 +633,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
+              "format": "uuid",
               "title": "Template Id"
             }
           }
@@ -680,7 +685,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
+              "format": "uuid",
               "title": "Template Id"
             }
           }
@@ -768,7 +774,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
+              "format": "uuid",
               "title": "Session Id"
             }
           }
@@ -853,7 +860,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
+              "type": "string",
+              "format": "uuid",
               "title": "Session Id"
             }
           }
@@ -911,12 +919,10 @@
       "ExerciseRead": {
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid",
             "title": "Id",
-            "description": "Unique identifier.",
-            "examples": [
-              1
-            ]
+            "description": "Unique identifier."
           },
           "name": {
             "type": "string",
@@ -933,7 +939,8 @@
           "created_by": {
             "anyOf": [
               {
-                "type": "integer"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
@@ -1113,12 +1120,14 @@
       "SessionExerciseRead": {
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid",
             "title": "Id",
             "description": "Unique identifier."
           },
           "exercise_id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid",
             "title": "Exercise Id",
             "description": "Id of the exercise in this slot."
           },
@@ -1163,7 +1172,8 @@
       "SessionSetRead": {
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid",
             "title": "Id",
             "description": "Unique identifier."
           },
@@ -1173,14 +1183,28 @@
             "description": "Set order within the exercise, 1-indexed."
           },
           "reps": {
-            "type": "integer",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Reps",
-            "description": "Reps performed."
+            "description": "Reps performed, once recorded."
           },
           "weight": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Weight",
-            "description": "Weight used."
+            "description": "Weight used, once recorded."
           },
           "completed": {
             "type": "boolean",
@@ -1192,8 +1216,6 @@
         "required": [
           "id",
           "set_number",
-          "reps",
-          "weight",
           "completed"
         ],
         "title": "SessionSetRead",
@@ -1202,7 +1224,8 @@
       "TemplateExerciseCreate": {
         "properties": {
           "exercise_id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid",
             "title": "Exercise Id",
             "description": "Id of the exercise to add."
           },
@@ -1227,12 +1250,14 @@
       "TemplateExerciseRead": {
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid",
             "title": "Id",
             "description": "Unique identifier."
           },
           "exercise_id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid",
             "title": "Exercise Id",
             "description": "Id of the exercise in this slot."
           },
@@ -1382,12 +1407,10 @@
             ]
           },
           "id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid",
             "title": "Id",
-            "description": "Unique identifier.",
-            "examples": [
-              1
-            ]
+            "description": "Unique identifier."
           },
           "is_active": {
             "type": "boolean",
@@ -1503,22 +1526,22 @@
       "WorkoutSessionRead": {
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid",
             "title": "Id",
-            "description": "Unique identifier.",
-            "examples": [
-              1
-            ]
+            "description": "Unique identifier."
           },
           "user_id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid",
             "title": "User Id",
             "description": "Id of the user who owns this session."
           },
           "template_id": {
             "anyOf": [
               {
-                "type": "integer"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
@@ -1580,7 +1603,8 @@
       "WorkoutSessionStart": {
         "properties": {
           "template_id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid",
             "title": "Template Id",
             "description": "Id of the template to start a session from."
           }
@@ -1624,15 +1648,14 @@
       "WorkoutTemplateRead": {
         "properties": {
           "id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid",
             "title": "Id",
-            "description": "Unique identifier.",
-            "examples": [
-              1
-            ]
+            "description": "Unique identifier."
           },
           "user_id": {
-            "type": "integer",
+            "type": "string",
+            "format": "uuid",
             "title": "User Id",
             "description": "Id of the user who owns this template."
           },

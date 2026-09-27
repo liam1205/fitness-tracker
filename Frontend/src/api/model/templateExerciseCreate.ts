@@ -11,7 +11,7 @@
  */
 export interface TemplateExerciseCreate {
   /** Id of the exercise to add. */
-  exercise_id: number;
+  exercise_id: string;
   /**
      * Number of planned sets.
      * @exclusiveMinimum 0

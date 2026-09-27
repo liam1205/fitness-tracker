@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -10,10 +11,10 @@ class ExerciseRead(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: int = Field(..., description="Unique identifier.", examples=[1])
+    id: uuid.UUID = Field(..., description="Unique identifier.")
     name: str = Field(..., description="Exercise name.", examples=["Bench Press"])
     muscle_group: MuscleGroup = Field(..., description="Primary muscle group targeted.")
-    created_by: int | None = Field(
+    created_by: uuid.UUID | None = Field(
         None, description="Id of the user who created this exercise, if any."
     )
     created_at: datetime = Field(..., description="When the exercise was created.")

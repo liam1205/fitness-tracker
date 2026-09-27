@@ -23,7 +23,7 @@ export interface UserRead {
      */
   last_name: string;
   /** Unique identifier. */
-  id: number;
+  id: string;
   /** Whether the account is active. */
   is_active: boolean;
   /** Whether the account has elevated privileges. */

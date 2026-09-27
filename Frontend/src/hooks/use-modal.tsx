@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 export interface ModalButton {
   label: React.ReactNode;
@@ -89,7 +90,7 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
       <Dialog open={open} onOpenChange={handleOpenChange}>
         {modal && (
           <DialogContent
-            className={modal.className}
+            className={cn(modal.className, "w-4/5")}
             showCloseButton={modal.showCloseIcon ?? true}
           >
             <DialogHeader>

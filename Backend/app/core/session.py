@@ -10,6 +10,7 @@ which re-issues the cookie on every authenticated request).
 import base64
 import hashlib
 import json
+import uuid
 from functools import lru_cache
 
 from cryptography.fernet import Fernet, InvalidToken
@@ -34,13 +35,13 @@ def _fernet() -> Fernet:
         return Fernet(base64.urlsafe_b64encode(hashlib.sha256(secret).digest()))
 
 
-def create_session_token(user_id: int) -> str:
+def create_session_token(user_id: uuid.UUID) -> str:
     """Encrypt a session token carrying the user id."""
-    payload = json.dumps({"sub": user_id}).encode()
+    payload = json.dumps({"sub": str(user_id)}).encode()
     return _fernet().encrypt(payload).decode()
 
 
-def read_session_token(token: str) -> int | None:
+def read_session_token(token: str) -> uuid.UUID | None:
     """Decrypt a session token, returning the user id, or None if invalid/expired."""
     try:
         payload = _fernet().decrypt(
@@ -49,12 +50,12 @@ def read_session_token(token: str) -> int | None:
     except InvalidToken:
         return None
     try:
-        return int(json.loads(payload)["sub"])
+        return uuid.UUID(json.loads(payload)["sub"])
     except (ValueError, KeyError, TypeError):
         return None
 
 
-def set_session_cookie(response: Response, user_id: int) -> None:
+def set_session_cookie(response: Response, user_id: uuid.UUID) -> None:
     """Set (or refresh) the encrypted session cookie on the response."""
     response.set_cookie(
         key=settings.SESSION_COOKIE_NAME,

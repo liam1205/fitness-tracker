@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -7,7 +9,7 @@ from app.schemas.exercise import ExerciseCreate, ExerciseUpdate
 
 
 async def list_exercises_for_user(
-    db: AsyncSession, user_id: int, page: int, page_size: int
+    db: AsyncSession, user_id: uuid.UUID, page: int, page_size: int
 ) -> tuple[list[Exercise], int]:
     """Return a page of the exercises owned by ``user_id``, plus the total count."""
     total = await db.scalar(
@@ -23,7 +25,9 @@ async def list_exercises_for_user(
     return list(result.scalars().all()), total or 0
 
 
-async def get_exercise_for_user(db: AsyncSession, user_id: int, exercise_id: int) -> Exercise | None:
+async def get_exercise_for_user(
+    db: AsyncSession, user_id: uuid.UUID, exercise_id: uuid.UUID
+) -> Exercise | None:
     """Return the exercise if it exists and is owned by ``user_id``, else ``None``."""
     result = await db.execute(
         select(Exercise).where(Exercise.id == exercise_id, Exercise.created_by == user_id)
@@ -32,7 +36,7 @@ async def get_exercise_for_user(db: AsyncSession, user_id: int, exercise_id: int
 
 
 async def create_exercise_for_user(
-    db: AsyncSession, user_id: int, payload: ExerciseCreate
+    db: AsyncSession, user_id: uuid.UUID, payload: ExerciseCreate
 ) -> Exercise:
     """Create a new exercise owned by ``user_id``."""
     exercise = Exercise(
@@ -45,7 +49,7 @@ async def create_exercise_for_user(
 
 
 async def update_exercise_for_user(
-    db: AsyncSession, user_id: int, exercise_id: int, payload: ExerciseUpdate
+    db: AsyncSession, user_id: uuid.UUID, exercise_id: uuid.UUID, payload: ExerciseUpdate
 ) -> Exercise | None:
     """Update an exercise owned by ``user_id``. Returns ``None`` if not found."""
     exercise = await get_exercise_for_user(db, user_id, exercise_id)
@@ -60,7 +64,7 @@ async def update_exercise_for_user(
     return exercise
 
 
-async def delete_exercise_for_user(db: AsyncSession, user_id: int, exercise_id: int) -> bool:
+async def delete_exercise_for_user(db: AsyncSession, user_id: uuid.UUID, exercise_id: uuid.UUID) -> bool:
     """Delete an exercise owned by ``user_id``. Returns whether it was found."""
     exercise = await get_exercise_for_user(db, user_id, exercise_id)
     if exercise is None:
@@ -71,7 +75,7 @@ async def delete_exercise_for_user(db: AsyncSession, user_id: int, exercise_id: 
     return True
 
 
-async def create_default_exercises_for_user(db: AsyncSession, user_id: int) -> list[Exercise]:
+async def create_default_exercises_for_user(db: AsyncSession, user_id: uuid.UUID) -> list[Exercise]:
     """Seed a user's exercise list from the built-in default catalog.
 
     Each default becomes a row owned by the user (``created_by``), so it

@@ -1,3 +1,4 @@
+import uuid
 from collections import defaultdict
 from datetime import UTC, datetime
 
@@ -11,9 +12,9 @@ from app.schemas.workout_session import SessionExerciseRead, SessionSetRead, Wor
 
 
 async def _get_exercises_for_sessions(
-    db: AsyncSession, session_ids: list[int]
-) -> dict[int, list[SessionExerciseRead]]:
-    exercises_by_session: dict[int, list[SessionExerciseRead]] = defaultdict(list)
+    db: AsyncSession, session_ids: list[uuid.UUID]
+) -> dict[uuid.UUID, list[SessionExerciseRead]]:
+    exercises_by_session: dict[uuid.UUID, list[SessionExerciseRead]] = defaultdict(list)
     if not session_ids:
         return exercises_by_session
 
@@ -26,7 +27,7 @@ async def _get_exercises_for_sessions(
         )
     ).all()
 
-    sets_by_session_exercise: dict[int, list[SessionSetRead]] = defaultdict(list)
+    sets_by_session_exercise: dict[uuid.UUID, list[SessionSetRead]] = defaultdict(list)
     session_exercise_ids = [session_exercise.id for session_exercise, _ in exercise_rows]
     if session_exercise_ids:
         set_rows = (
@@ -63,7 +64,7 @@ async def _get_exercises_for_sessions(
 
 
 async def _list_workout_sessions_for_user(
-    db: AsyncSession, user_id: int, *, completed: bool
+    db: AsyncSession, user_id: uuid.UUID, *, completed: bool
 ) -> list[WorkoutSessionRead]:
     condition = (
         WorkoutSession.completed_at.is_not(None)
@@ -98,21 +99,21 @@ async def _list_workout_sessions_for_user(
 
 
 async def list_active_workout_sessions_for_user(
-    db: AsyncSession, user_id: int
+    db: AsyncSession, user_id: uuid.UUID
 ) -> list[WorkoutSessionRead]:
     """Return all in-progress workout sessions (``completed_at`` unset) owned by ``user_id``."""
     return await _list_workout_sessions_for_user(db, user_id, completed=False)
 
 
 async def list_completed_workout_sessions_for_user(
-    db: AsyncSession, user_id: int
+    db: AsyncSession, user_id: uuid.UUID
 ) -> list[WorkoutSessionRead]:
     """Return all completed workout sessions (``completed_at`` set) owned by ``user_id``."""
     return await _list_workout_sessions_for_user(db, user_id, completed=True)
 
 
 async def _get_session_for_user(
-    db: AsyncSession, user_id: int, session_id: int
+    db: AsyncSession, user_id: uuid.UUID, session_id: uuid.UUID
 ) -> WorkoutSession | None:
     result = await db.execute(
         select(WorkoutSession).where(
@@ -122,7 +123,7 @@ async def _get_session_for_user(
     return result.scalar_one_or_none()
 
 
-async def _get_template_name(db: AsyncSession, template_id: int | None) -> str | None:
+async def _get_template_name(db: AsyncSession, template_id: uuid.UUID | None) -> str | None:
     if template_id is None:
         return None
     result = await db.execute(
@@ -132,7 +133,7 @@ async def _get_template_name(db: AsyncSession, template_id: int | None) -> str |
 
 
 async def get_workout_session_for_user(
-    db: AsyncSession, user_id: int, session_id: int
+    db: AsyncSession, user_id: uuid.UUID, session_id: uuid.UUID
 ) -> WorkoutSessionRead | None:
     """Return a single workout session owned by ``user_id``, or ``None`` if not found."""
     session = await _get_session_for_user(db, user_id, session_id)
@@ -153,7 +154,7 @@ async def get_workout_session_for_user(
 
 
 async def complete_workout_session_for_user(
-    db: AsyncSession, user_id: int, session_id: int
+    db: AsyncSession, user_id: uuid.UUID, session_id: uuid.UUID
 ) -> WorkoutSessionRead | None:
     """Mark a workout session owned by ``user_id`` as completed, returning it with updated state.
 
@@ -182,14 +183,16 @@ async def complete_workout_session_for_user(
 
 
 async def start_workout_session_from_template(
-    db: AsyncSession, user_id: int, template_id: int
+    db: AsyncSession, user_id: uuid.UUID, template_id: uuid.UUID
 ) -> WorkoutSessionRead | None:
     """Start a new workout session copying the exercise slots of a template.
 
     The template must be owned by ``user_id``; returns ``None`` otherwise.
     ``started_at`` is set automatically and ``completed_at`` is left unset, as
     is expected of a freshly started session. Exercise slots are copied over
-    in template order, but with no sets recorded yet.
+    in template order, each pre-populated with the number of empty sets
+    (``reps``/``weight`` unset) given by the template exercise's
+    ``set_count``.
     """
     template = (
         await db.execute(
@@ -222,6 +225,24 @@ async def start_workout_session_from_template(
         db.add(session_exercise)
         await db.flush()
 
+        sets: list[SessionSetRead] = []
+        for set_number in range(1, template_exercise.set_count + 1):
+            session_set = SessionSet(
+                session_exercise_id=session_exercise.id,
+                set_number=set_number,
+            )
+            db.add(session_set)
+            await db.flush()
+            sets.append(
+                SessionSetRead(
+                    id=session_set.id,
+                    set_number=session_set.set_number,
+                    reps=session_set.reps,
+                    weight=session_set.weight,
+                    completed=session_set.completed,
+                )
+            )
+
         exercises.append(
             SessionExerciseRead(
                 id=session_exercise.id,
@@ -229,7 +250,7 @@ async def start_workout_session_from_template(
                 name=exercise.name,
                 muscle_group=exercise.muscle_group,
                 position=session_exercise.position,
-                sets=[],
+                sets=sets,
             )
         )
 

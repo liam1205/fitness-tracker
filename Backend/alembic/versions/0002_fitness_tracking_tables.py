@@ -31,8 +31,8 @@ muscle_group_enum = sa.Enum(
 def upgrade() -> None:
     op.create_table(
         "exercises",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("created_by", sa.Integer(), nullable=True),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("created_by", sa.Uuid(), nullable=True),
         sa.Column("name", sa.String(length=200), nullable=False),
         sa.Column("muscle_group", muscle_group_enum, nullable=False),
         sa.Column(
@@ -48,7 +48,7 @@ def upgrade() -> None:
 
     op.create_table(
         "user_settings",
-        sa.Column("user_id", sa.Integer(), nullable=False),
+        sa.Column("user_id", sa.Uuid(), nullable=False),
         sa.Column("language", language_enum, nullable=False),
         sa.Column("theme", theme_enum, nullable=False),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"], ondelete="CASCADE"),
@@ -57,8 +57,8 @@ def upgrade() -> None:
 
     op.create_table(
         "workout_templates",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("user_id", sa.Integer(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("user_id", sa.Uuid(), nullable=False),
         sa.Column("name", sa.String(length=200), nullable=False),
         sa.Column(
             "created_at",
@@ -73,9 +73,9 @@ def upgrade() -> None:
 
     op.create_table(
         "template_exercises",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("template_id", sa.Integer(), nullable=False),
-        sa.Column("exercise_id", sa.Integer(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("template_id", sa.Uuid(), nullable=False),
+        sa.Column("exercise_id", sa.Uuid(), nullable=False),
         sa.Column("position", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(["exercise_id"], ["exercises.id"]),
         sa.ForeignKeyConstraint(["template_id"], ["workout_templates.id"], ondelete="CASCADE"),
@@ -90,8 +90,8 @@ def upgrade() -> None:
 
     op.create_table(
         "template_sets",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("template_exercise_id", sa.Integer(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("template_exercise_id", sa.Uuid(), nullable=False),
         sa.Column("set_number", sa.Integer(), nullable=False),
         sa.Column("target_reps", sa.Integer(), nullable=False),
         sa.Column("target_weight", sa.Numeric(precision=6, scale=2), nullable=False),
@@ -108,9 +108,9 @@ def upgrade() -> None:
 
     op.create_table(
         "workout_sessions",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("template_id", sa.Integer(), nullable=True),
-        sa.Column("user_id", sa.Integer(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("template_id", sa.Uuid(), nullable=True),
+        sa.Column("user_id", sa.Uuid(), nullable=False),
         sa.Column(
             "started_at",
             sa.DateTime(timezone=True),
@@ -127,9 +127,9 @@ def upgrade() -> None:
 
     op.create_table(
         "session_exercises",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("session_id", sa.Integer(), nullable=False),
-        sa.Column("exercise_id", sa.Integer(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("session_id", sa.Uuid(), nullable=False),
+        sa.Column("exercise_id", sa.Uuid(), nullable=False),
         sa.Column("position", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(["exercise_id"], ["exercises.id"]),
         sa.ForeignKeyConstraint(["session_id"], ["workout_sessions.id"], ondelete="CASCADE"),
@@ -144,8 +144,8 @@ def upgrade() -> None:
 
     op.create_table(
         "session_sets",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("session_exercise_id", sa.Integer(), nullable=False),
+        sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("session_exercise_id", sa.Uuid(), nullable=False),
         sa.Column("set_number", sa.Integer(), nullable=False),
         sa.Column("reps", sa.Integer(), nullable=False),
         sa.Column("weight", sa.Numeric(precision=6, scale=2), nullable=False),

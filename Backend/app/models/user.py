@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, String, false, func, true
@@ -10,7 +11,7 @@ class User(Base):
     # "user" is a reserved word in PostgreSQL; SQLAlchemy quotes it automatically.
     __tablename__ = "user"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String)
     first_name: Mapped[str] = mapped_column(String(100), server_default="")

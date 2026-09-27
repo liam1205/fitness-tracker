@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, String, func
@@ -16,8 +17,8 @@ class Exercise(Base):
 
     __tablename__ = "exercises"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    created_by: Mapped[int | None] = mapped_column(
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    created_by: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("user.id", ondelete="SET NULL"), index=True
     )
     name: Mapped[str] = mapped_column(String(200))

@@ -12,9 +12,9 @@ import type { MuscleGroup } from './muscleGroup';
  */
 export interface TemplateExerciseRead {
   /** Unique identifier. */
-  id: number;
+  id: string;
   /** Id of the exercise in this slot. */
-  exercise_id: number;
+  exercise_id: string;
   /** Exercise name. */
   name: string;
   /** Primary muscle group targeted. */

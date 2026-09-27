@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -10,7 +12,7 @@ class UserSettings(Base):
 
     __tablename__ = "user_settings"
 
-    user_id: Mapped[int] = mapped_column(
+    user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("user.id", ondelete="CASCADE"), primary_key=True
     )
     language: Mapped[Language] = mapped_column(pg_enum(Language, "language_enum"))

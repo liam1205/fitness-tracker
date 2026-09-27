@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.enums import Language, Theme
@@ -5,11 +7,11 @@ from app.models.user_settings import UserSettings
 from app.schemas.user_settings import UserSettingsUpdate
 
 
-async def get_user_settings(db: AsyncSession, user_id: int) -> UserSettings | None:
+async def get_user_settings(db: AsyncSession, user_id: uuid.UUID) -> UserSettings | None:
     return await db.get(UserSettings, user_id)
 
 
-async def create_default_settings_for_user(db: AsyncSession, user_id: int) -> UserSettings:
+async def create_default_settings_for_user(db: AsyncSession, user_id: uuid.UUID) -> UserSettings:
     """Seed a user's settings with the app defaults."""
     settings = UserSettings(user_id=user_id, language=Language.ENGLISH, theme=Theme.SYSTEM)
     db.add(settings)
@@ -18,7 +20,7 @@ async def create_default_settings_for_user(db: AsyncSession, user_id: int) -> Us
 
 
 async def update_user_settings(
-    db: AsyncSession, user_id: int, payload: UserSettingsUpdate
+    db: AsyncSession, user_id: uuid.UUID, payload: UserSettingsUpdate
 ) -> UserSettings:
     settings = await get_user_settings(db, user_id)
     if settings is None:

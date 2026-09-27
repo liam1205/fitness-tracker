@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from decimal import Decimal
 
@@ -25,11 +26,13 @@ class WorkoutSession(Base):
 
     __tablename__ = "workout_sessions"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    template_id: Mapped[int | None] = mapped_column(
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    template_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("workout_templates.id", ondelete="SET NULL"), index=True
     )
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("user.id", ondelete="CASCADE"), index=True
+    )
     started_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -44,11 +47,11 @@ class SessionExercise(Base):
         UniqueConstraint("session_id", "position", name="uq_session_exercises_session_id_position"),
     )
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    session_id: Mapped[int] = mapped_column(
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    session_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("workout_sessions.id", ondelete="CASCADE")
     )
-    exercise_id: Mapped[int] = mapped_column(ForeignKey("exercises.id"), index=True)
+    exercise_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("exercises.id"), index=True)
     position: Mapped[int] = mapped_column(Integer)
 
 
@@ -64,11 +67,11 @@ class SessionSet(Base):
         ),
     )
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    session_exercise_id: Mapped[int] = mapped_column(
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    session_exercise_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("session_exercises.id", ondelete="CASCADE")
     )
     set_number: Mapped[int] = mapped_column(Integer)
-    reps: Mapped[int] = mapped_column(Integer)
-    weight: Mapped[Decimal] = mapped_column(Numeric(6, 2))
+    reps: Mapped[int | None] = mapped_column(Integer)
+    weight: Mapped[Decimal | None] = mapped_column(Numeric(6, 2))
     completed: Mapped[bool] = mapped_column(Boolean, server_default=false(), default=False)

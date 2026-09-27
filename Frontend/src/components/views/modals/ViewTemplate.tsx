@@ -186,14 +186,12 @@ const ViewTemplate = ({
         ></Input>
       </div>
       <Separator></Separator>
-      <div className="w-full h-full max-h-72 overflow-y-scroll overflow-x-hidden">
-        <ExerciseRowsEditor
-          rows={rows}
-          onRowsChange={setRows}
-          groupedExercises={groupedExercises}
-          containerRef={containerRef}
-        />
-      </div>
+      <ExerciseRowsEditor
+        rows={rows}
+        onRowsChange={setRows}
+        groupedExercises={groupedExercises}
+        containerRef={containerRef}
+      />
       <Separator></Separator>
       <HoverCard>
         <HoverCardTrigger asChild>

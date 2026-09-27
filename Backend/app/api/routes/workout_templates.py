@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -52,7 +54,7 @@ async def create_workout_template(
     summary="Get a workout template",
 )
 async def get_workout_template(
-    template_id: int,
+    template_id: uuid.UUID,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ) -> WorkoutTemplateRead:
@@ -71,7 +73,7 @@ async def get_workout_template(
     summary="Update a workout template",
 )
 async def update_workout_template(
-    template_id: int,
+    template_id: uuid.UUID,
     payload: WorkoutTemplateUpdate,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
@@ -102,7 +104,7 @@ async def update_workout_template(
     summary="Delete a workout template",
 )
 async def delete_workout_template(
-    template_id: int,
+    template_id: uuid.UUID,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ) -> None:

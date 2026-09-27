@@ -133,7 +133,7 @@ export function AppSideBar() {
 
   function handleCompleteSession(
     event: React.MouseEvent<HTMLButtonElement>,
-    sessionId: number,
+    sessionId: string,
   ) {
     event.stopPropagation();
     completeWorkoutSession({ sessionId });
@@ -210,7 +210,7 @@ export function AppSideBar() {
                     onClick={() => {
                       router.navigate({
                         to: "/workouts/$workoutId",
-                        params: { workoutId: session.id.toLocaleString() },
+                        params: { workoutId: session.id },
                       });
                       collapseSidebar();
                     }}

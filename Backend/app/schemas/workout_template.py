@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -8,7 +9,7 @@ from app.models.enums import MuscleGroup
 class TemplateExerciseCreate(BaseModel):
     """Payload for one exercise slot within a new workout template."""
 
-    exercise_id: int = Field(..., description="Id of the exercise to add.")
+    exercise_id: uuid.UUID = Field(..., description="Id of the exercise to add.")
     set_count: int = Field(..., gt=0, description="Number of planned sets.", examples=[3])
 
 
@@ -17,8 +18,8 @@ class TemplateExerciseRead(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: int = Field(..., description="Unique identifier.")
-    exercise_id: int = Field(..., description="Id of the exercise in this slot.")
+    id: uuid.UUID = Field(..., description="Unique identifier.")
+    exercise_id: uuid.UUID = Field(..., description="Id of the exercise in this slot.")
     name: str = Field(..., description="Exercise name.", examples=["Bench Press"])
     muscle_group: MuscleGroup = Field(..., description="Primary muscle group targeted.")
     position: int = Field(..., description="Display order within the template, 1-indexed.")
@@ -30,8 +31,8 @@ class WorkoutTemplateRead(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: int = Field(..., description="Unique identifier.", examples=[1])
-    user_id: int = Field(..., description="Id of the user who owns this template.")
+    id: uuid.UUID = Field(..., description="Unique identifier.")
+    user_id: uuid.UUID = Field(..., description="Id of the user who owns this template.")
     name: str = Field(..., description="Template name.", examples=["Push Day"])
     created_at: datetime = Field(..., description="When the template was created.")
     exercises: list[TemplateExerciseRead] = Field(..., description="Exercise slots, in order.")

@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
@@ -32,7 +33,7 @@ class UserRead(UserBase):
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: int = Field(..., description="Unique identifier.", examples=[1])
+    id: uuid.UUID = Field(..., description="Unique identifier.")
     is_active: bool = Field(..., description="Whether the account is active.")
     is_superuser: bool = Field(..., description="Whether the account has elevated privileges.")
     created_at: datetime = Field(..., description="When the account was created.")

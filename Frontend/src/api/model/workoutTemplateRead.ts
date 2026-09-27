@@ -12,9 +12,9 @@ import type { TemplateExerciseRead } from './templateExerciseRead';
  */
 export interface WorkoutTemplateRead {
   /** Unique identifier. */
-  id: number;
+  id: string;
   /** Id of the user who owns this template. */
-  user_id: number;
+  user_id: string;
   /** Template name. */
   name: string;
   /** When the template was created. */

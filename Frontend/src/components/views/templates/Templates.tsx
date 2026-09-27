@@ -34,7 +34,7 @@ export function Templates() {
   const { mutate: deleteWorkoutTemplate } = useDeleteWorkoutTemplate();
   const { mutate: startWorkoutSession } = useStartWorkoutSession();
 
-  function handleDeleteTemplate(templateId: number) {
+  function handleDeleteTemplate(templateId: string) {
     deleteWorkoutTemplate(
       { templateId },
       {

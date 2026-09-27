@@ -12,13 +12,13 @@ import type { MuscleGroup } from './muscleGroup';
  */
 export interface ExerciseRead {
   /** Unique identifier. */
-  id: number;
+  id: string;
   /** Exercise name. */
   name: string;
   /** Primary muscle group targeted. */
   muscle_group: MuscleGroup;
   /** Id of the user who created this exercise, if any. */
-  created_by?: number | null;
+  created_by?: string | null;
   /** When the exercise was created. */
   created_at: string;
 }

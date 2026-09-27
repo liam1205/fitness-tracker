@@ -41,11 +41,13 @@ import {
   InputGroupText,
 } from "@/components/ui/input-group";
 import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 export const MAX_EXERCISES = 12;
 
 export type TemplateExerciseRow = {
-  id: number;
+  id: string;
   exercise: ExerciseRead | null;
   sets: string;
 };
@@ -77,18 +79,14 @@ export function ExerciseRowsEditor({
   groupedExercises: ExerciseGroup[];
   containerRef: React.RefObject<HTMLDivElement | null>;
 }) {
-  const nextRowId = React.useRef(
-    rows.reduce((max, row) => Math.max(max, row.id + 1), 0),
-  );
-
   function addRow() {
     onRowsChange((rows) => {
       if (rows.length >= MAX_EXERCISES) return rows;
-      return [...rows, { id: nextRowId.current++, exercise: null, sets: "" }];
+      return [...rows, { id: crypto.randomUUID(), exercise: null, sets: "" }];
     });
   }
 
-  function updateRow(id: number, changes: Partial<TemplateExerciseRow>) {
+  function updateRow(id: string, changes: Partial<TemplateExerciseRow>) {
     onRowsChange((rows) =>
       rows.map((row) => (row.id === id ? { ...row, ...changes } : row)),
     );
@@ -113,7 +111,7 @@ export function ExerciseRowsEditor({
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 w-full h-full max-h-72 overflow-y-scroll overflow-x-hidden">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -164,6 +162,8 @@ function SortableExerciseRow({
     isDragging,
   } = useSortable({ id: row.id });
 
+  const isMobile = useIsMobile();
+
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -184,7 +184,12 @@ function SortableExerciseRow({
       >
         <GripVertical className="size-4" />
       </Button>
-      <div className="flex flex-col gap-1">
+      <div
+        className={cn(
+          "flex mx-2",
+          isMobile ? "flex-col gap-2 w-full" : "flex-row gap-3 items-center",
+        )}
+      >
         <Combobox
           items={groupedExercises}
           value={row.exercise}
@@ -192,7 +197,10 @@ function SortableExerciseRow({
           itemToStringLabel={(exercise) => exercise.name}
           isItemEqualToValue={(a, b) => a.id === b.id}
         >
-          <ComboboxInput placeholder="Select exercise" className="flex-1" />
+          <ComboboxInput
+            placeholder="Select exercise"
+            className="flex-1 w-full"
+          />
           <ComboboxContent container={containerRef}>
             <ComboboxEmpty>No exercises found.</ComboboxEmpty>
             <ComboboxList className={"w-24"}>
@@ -215,22 +223,38 @@ function SortableExerciseRow({
             </ComboboxList>
           </ComboboxContent>
         </Combobox>
-        <div className="flex gap-1 items-center justify-around">
-          <InputGroup className="w-2/5">
-            <InputGroupInput
-              type="number"
-              value={row.sets}
-              onChange={(e) => onUpdate({ sets: e.target.value })}
-            />
-            <InputGroupAddon align="inline-end">
-              <InputGroupText>Sets</InputGroupText>
-            </InputGroupAddon>
-          </InputGroup>
-          <Badge className="w-fit capitalize">
-            {row.exercise?.muscle_group}
-          </Badge>
-        </div>
+        {!isMobile && <SetsAndMuscleGroup row={row} onUpdate={onUpdate} />}
+        {isMobile && (
+          <div className="flex gap-2 items-center justify-start">
+            <SetsAndMuscleGroup row={row} onUpdate={onUpdate} />
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+function SetsAndMuscleGroup({
+  row,
+  onUpdate,
+}: {
+  row: TemplateExerciseRow;
+  onUpdate: (changes: Partial<TemplateExerciseRow>) => void;
+}) {
+  const isMobile = useIsMobile();
+  return (
+    <>
+      <InputGroup className="w-21">
+        <InputGroupInput
+          type="number"
+          value={row.sets}
+          onChange={(e) => onUpdate({ sets: e.target.value })}
+        />
+        <InputGroupAddon align="inline-end">
+          <InputGroupText>Sets</InputGroupText>
+        </InputGroupAddon>
+      </InputGroup>
+      <Badge className="w-fit capitalize">{row.exercise?.muscle_group}</Badge>
+    </>
   );
 }

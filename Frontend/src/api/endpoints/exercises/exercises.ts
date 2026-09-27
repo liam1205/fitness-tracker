@@ -220,7 +220,7 @@ export const useCreateExercise = <TError = ErrorType<HTTPValidationError>,
  * @summary Update an exercise
  */
 export const updateExercise = (
-    exerciseId: number,
+    exerciseId: string,
     exerciseUpdate: ExerciseUpdate,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
@@ -238,8 +238,8 @@ export const updateExercise = (
 
 
 export const getUpdateExerciseMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateExercise>>, TError,{exerciseId: number;data: ExerciseUpdate}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateExercise>>, TError,{exerciseId: number;data: ExerciseUpdate}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateExercise>>, TError,{exerciseId: string;data: ExerciseUpdate}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateExercise>>, TError,{exerciseId: string;data: ExerciseUpdate}, TContext> => {
 
 const mutationKey = ['updateExercise'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -251,7 +251,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateExercise>>, {exerciseId: number;data: ExerciseUpdate}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateExercise>>, {exerciseId: string;data: ExerciseUpdate}> = (props) => {
           const {exerciseId,data} = props ?? {};
 
           return  updateExercise(exerciseId,data,requestOptions)
@@ -272,11 +272,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Update an exercise
  */
 export const useUpdateExercise = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateExercise>>, TError,{exerciseId: number;data: ExerciseUpdate}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateExercise>>, TError,{exerciseId: string;data: ExerciseUpdate}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateExercise>>,
         TError,
-        {exerciseId: number;data: ExerciseUpdate},
+        {exerciseId: string;data: ExerciseUpdate},
         TContext
       > => {
       return useMutation(getUpdateExerciseMutationOptions(options), queryClient);
@@ -286,7 +286,7 @@ export const useUpdateExercise = <TError = ErrorType<HTTPValidationError>,
  * @summary Delete an exercise
  */
 export const deleteExercise = (
-    exerciseId: number,
+    exerciseId: string,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
 
@@ -301,8 +301,8 @@ export const deleteExercise = (
 
 
 export const getDeleteExerciseMutationOptions = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteExercise>>, TError,{exerciseId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteExercise>>, TError,{exerciseId: number}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteExercise>>, TError,{exerciseId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteExercise>>, TError,{exerciseId: string}, TContext> => {
 
 const mutationKey = ['deleteExercise'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -314,7 +314,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteExercise>>, {exerciseId: number}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteExercise>>, {exerciseId: string}> = (props) => {
           const {exerciseId} = props ?? {};
 
           return  deleteExercise(exerciseId,requestOptions)
@@ -335,11 +335,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary Delete an exercise
  */
 export const useDeleteExercise = <TError = ErrorType<HTTPValidationError>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteExercise>>, TError,{exerciseId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteExercise>>, TError,{exerciseId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteExercise>>,
         TError,
-        {exerciseId: number},
+        {exerciseId: string},
         TContext
       > => {
       return useMutation(getDeleteExerciseMutationOptions(options), queryClient);
