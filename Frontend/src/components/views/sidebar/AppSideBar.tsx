@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
 import {
+  BicepsFlexed,
   Dumbbell,
   House,
   ListChecks,
@@ -165,9 +166,9 @@ export function AppSideBar() {
             <SidebarMenuButton size="lg" asChild>
               <Link to="/">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground text-sm font-semibold">
-                  A
+                  <BicepsFlexed></BicepsFlexed>
                 </div>
-                <span className="font-semibold">App</span>
+                <span className="font-semibold">Your Workout Planner</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

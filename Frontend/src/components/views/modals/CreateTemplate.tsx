@@ -13,6 +13,7 @@ import {
   groupExercisesByMuscleGroup,
   type TemplateExerciseRow,
 } from "@/components/views/modals/TemplateExerciseRows";
+import { Save } from "lucide-react";
 
 export interface CreateTemplateHandle {
   /** Builds the create payload, or null if the form isn't valid yet. */
@@ -45,6 +46,7 @@ export function useCreateTemplateModal() {
       content: <CreateTemplate ref={formRef}></CreateTemplate>,
       rightButtons: [
         {
+          icon: <Save></Save>,
           label: "Save",
           onClick: handleSave,
         },

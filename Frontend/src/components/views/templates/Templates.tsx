@@ -11,7 +11,14 @@ import {
 } from "@/api/endpoints/workout-templates/workout-templates";
 import { useStartWorkoutSession } from "@/api/endpoints/workout-sessions/workout-sessions";
 import type { WorkoutTemplateRead } from "@/api/model";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useViewTemplateModal } from "../modals/ViewTemplate";
+import { dateString } from "@/lib/utils";
 
 /**
  * Workout templates: reusable exercise plans a user can start a workout from.
@@ -63,47 +71,12 @@ export function Templates() {
       <h1 className="text-4xl font-bold tracking-tight">Templates</h1>
       <div className="flex flex-col gap-3">
         {data?.map((template) => (
-          <Card
-            size="sm"
-            className="hover:bg-background hover:cursor-pointer active:bg-background"
-            onClick={() => openViewTemplateModal(template)}
-          >
-            <CardHeader className="flex flex-row justify-between">
-              <span className=" font-semibold">{template.name}</span>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button size={"xs"} variant={"ghost"}>
-                    <Ellipsis></Ellipsis>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem
-                      className="flex flex-ro gap-2"
-                      onClick={() => openViewTemplateModal(template)}
-                    >
-                      <Eye className="size-3"></Eye>
-                      View
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="flex flex-ro gap-2"
-                      onClick={() => handleStartWorkout(template)}
-                    >
-                      <Play className="size-3"></Play>
-                      Start Workout
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      variant="destructive"
-                      className="flex flex-ro gap-2"
-                      onClick={() => handleDeleteTemplate(template.id)}
-                    >
-                      <X className="size-3"></X>
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
+          <Card size="sm">
+            <CardHeader>
+              <CardTitle>{template.name}</CardTitle>
+              <CardDescription className="flex justify-start">
+                Created on {dateString(new Date(template.created_at))}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-0.5">
@@ -119,6 +92,27 @@ export function Templates() {
                 ))}
               </div>
             </CardContent>
+            <CardFooter className="flex flex-row">
+              <div className="flex flex-row w-2/3 justify-start gap-1">
+                <Button
+                  variant={"destructive"}
+                  onClick={() => handleDeleteTemplate(template.id)}
+                >
+                  <X className="size-2.5"></X> Delete
+                </Button>
+              </div>
+              <div className="flex flex-row w-2/3 justify-end gap-1">
+                <Button
+                  variant={"outline"}
+                  onClick={() => handleStartWorkout(template)}
+                >
+                  <Play className="size-2.5"></Play> Start Workout
+                </Button>
+                <Button onClick={() => openViewTemplateModal(template)}>
+                  <Eye className="size-2.5"></Eye> View
+                </Button>
+              </div>
+            </CardFooter>
           </Card>
         ))}
       </div>

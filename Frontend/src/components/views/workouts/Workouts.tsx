@@ -1,10 +1,18 @@
-import { Plus, TimelineIcon, Timer, X } from "lucide-react";
+import {
+  Check,
+  Eye,
+  Loader,
+  Play,
+  Square,
+  Timer,
+  Trash,
+  X,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useCreateWorkoutModal } from "@/components/views/modals/CreateWorkout";
+import { useStartWorkoutModal } from "@/components/views/modals/StartWorkoutModal";
 import type { WorkoutSessionRead } from "@/api/model";
 import { useListCompletedWorkoutSessions } from "@/api/endpoints/workout-sessions/workout-sessions";
-import { useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -13,14 +21,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useRouter } from "@tanstack/react-router";
+import { dateString, timeSpent } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 
 /**
  * Logged workouts: the history of completed training sessions.
  */
 export function Workouts() {
-  const { openCreateWorkoutModal } = useCreateWorkoutModal();
+  const { openStartWorkoutModal } = useStartWorkoutModal();
   const { data: workout_sessions } = useListCompletedWorkoutSessions();
 
   return (
@@ -32,10 +42,10 @@ export function Workouts() {
       <Button
         size={"lg"}
         className="fixed bottom-6 left-1/2 -translate-x-1/2 shadow-lg"
-        onClick={openCreateWorkoutModal}
+        onClick={openStartWorkoutModal}
       >
-        <Plus />
-        Create workout
+        <Play />
+        Start workout
       </Button>
     </div>
   );
@@ -52,16 +62,7 @@ const Workout = ({ session }: WorkoutProps) => {
     ? new Date(session.completed_at)
     : new Date();
   return (
-    <Card
-      size="sm"
-      className="hover:bg-background hover:cursor-pointer active:bg-background"
-      onClick={() =>
-        router.navigate({
-          to: "/workouts/$workoutId",
-          params: { workoutId: session.id.toLocaleString() },
-        })
-      }
-    >
+    <Card size="sm">
       <CardHeader>
         <CardTitle>{session.template_name}</CardTitle>
         <CardDescription className="flex justify-start">
@@ -78,25 +79,46 @@ const Workout = ({ session }: WorkoutProps) => {
           ))}
         </div>
       </CardContent>
-      <CardFooter className="flex flex-row gap-2 text-sm">
-        <Timer className="size-4" />
-        {timeSpent(started, completed)} min
+      <CardFooter className="flex flex-row">
+        <div className="flex flex-row items-center justify-start gap-4 text-sm w-4/7">
+          <div className="flex flex-row justify-start items-center gap-2 text-sm">
+            <Timer id="timer-icon" className="size-3.5" />
+            <Label htmlFor="timer-icon">
+              {timeSpent(started, completed)} min
+            </Label>
+          </div>
+          {!session.completed_at ? (
+            <Badge variant={"default"}>
+              <Loader className="size-2.5"></Loader>Running
+            </Badge>
+          ) : (
+            <Badge variant={"success"}>
+              <Check className="size-2.5"></Check>Completed
+            </Badge>
+          )}
+          <Button variant="destructive">
+            <Trash className="size-2.5"></Trash> Delete
+          </Button>
+        </div>
+        <div className="flex flex-row justify-end gap-2 text-sm w-3/7">
+          {!session.completed_at && (
+            <Button variant="outline">
+              <Square className="size-2.5"></Square> Stop
+            </Button>
+          )}
+          <Button
+            variant="default"
+            onClick={() =>
+              router.navigate({
+                to: "/workouts/$workoutId",
+                params: { workoutId: session.id.toLocaleString() },
+              })
+            }
+          >
+            <Eye className="size-2.5"></Eye> View
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );
-};
-
-const dateString = (date: Date) => {
-  const day = date.getDate();
-  const month = date.toLocaleString("en-US", { month: "long" });
-  const year = date.getFullYear();
-
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-
-  return `${day}. ${month} ${year} at ${hours}:${minutes}`;
-};
-
-const timeSpent = (startDate: Date, endDate: Date) => {
-  return Math.round((endDate.getTime() - startDate.getTime()) / 60_000);
 };

@@ -2,14 +2,14 @@ import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useCreateTemplateModal } from "@/components/views/modals/CreateTemplate";
-import { useCreateWorkoutModal } from "@/components/views/modals/CreateWorkout";
+import { useStartWorkoutModal } from "@/components/views/modals/StartWorkoutModal";
 import { useAuth } from "@/lib/auth";
 import { useCreateExerciseModal } from "../modals/CreateExercises";
 
 export function Home() {
   const { user } = useAuth();
   const { openCreateTemplateModal } = useCreateTemplateModal();
-  const { openCreateWorkoutModal } = useCreateWorkoutModal();
+  const { openStartWorkoutModal } = useStartWorkoutModal();
   const { openCreateExerciseModal } = useCreateExerciseModal();
 
   return (
@@ -33,7 +33,7 @@ export function Home() {
         <Button
           size={"lg"}
           className="shadow-lg"
-          onClick={openCreateWorkoutModal}
+          onClick={openStartWorkoutModal}
         >
           <Plus />
           Create workout

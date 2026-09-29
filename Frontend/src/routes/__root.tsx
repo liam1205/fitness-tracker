@@ -1,18 +1,23 @@
-import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { Button } from '@/components/ui/button'
-import { auth } from '@/lib/auth'
+import {
+  createRootRouteWithContext,
+  Link,
+  Outlet,
+} from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/auth";
+import { Loader } from "lucide-react";
 
 /** Values made available to every route's `beforeLoad`/`loader` via `context`. */
 export interface RouterContext {
-  auth: typeof auth
+  auth: typeof auth;
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootLayout,
   notFoundComponent: NotFound,
   errorComponent: ErrorBoundary,
-})
+});
 
 /**
  * The root renders nothing but the matched route: unauthenticated visitors get
@@ -25,7 +30,7 @@ function RootLayout() {
       <Outlet />
       <TanStackRouterDevtools position="bottom-right" />
     </>
-  )
+  );
 }
 
 function NotFound() {
@@ -37,7 +42,7 @@ function NotFound() {
         <Link to="/">Go home</Link>
       </Button>
     </div>
-  )
+  );
 }
 
 function ErrorBoundary({ error }: { error: Error }) {
@@ -49,7 +54,9 @@ function ErrorBoundary({ error }: { error: Error }) {
       <p className="max-w-prose text-sm text-muted-foreground">
         {error.message}
       </p>
-      <Button onClick={() => window.location.reload()}>Reload</Button>
+      <Button onClick={() => window.location.reload()}>
+        <Loader></Loader>Reload
+      </Button>
     </div>
-  )
+  );
 }

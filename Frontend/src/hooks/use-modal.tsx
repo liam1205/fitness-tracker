@@ -12,9 +12,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 
 export interface ModalButton {
   label: React.ReactNode;
+  /** Optional icon rendered before the label, e.g. `<Trash />`. */
+  icon?: React.ReactNode;
   onClick?: () => void;
   variant?: VariantProps<typeof buttonVariants>["variant"];
   disabled?: boolean;
@@ -30,6 +33,8 @@ export interface ModalOptions {
   rightButtons?: ModalButton[];
   /** Label for the always-present close button. Defaults to "Close". */
   closeLabel?: string;
+  /** Icon for the close button. Defaults to an "x" icon. */
+  closeIcon?: React.ReactNode;
   /** Show the "x" icon button in the top-right corner. Defaults to true. */
   showCloseIcon?: boolean;
   /** Extra classes applied to the dialog content, e.g. to widen it. */
@@ -42,6 +47,20 @@ interface ModalContextValue {
   openModal: (options: ModalOptions) => void;
   updateModal: (patch: Partial<ModalOptions>) => void;
   closeModal: () => void;
+}
+
+function renderButton(button: ModalButton, index: number) {
+  return (
+    <Button
+      key={index}
+      variant={button.variant}
+      disabled={button.disabled}
+      onClick={button.onClick}
+    >
+      {button.icon}
+      {button.label}
+    </Button>
+  );
 }
 
 const ModalContext = React.createContext<ModalContextValue | null>(null);
@@ -102,35 +121,18 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
 
             {modal.content}
 
-            <DialogFooter className="items-between sm:justify-between">
-              <div className="flex flex-row items-start gap-2">
+            <DialogFooter className="flex flex-row items-between sm:justify-between">
+              <div className="flex flex-row justify-start gap-1 w-1/2">
                 <DialogClose asChild>
                   <Button variant="outline">
+                    {modal.closeIcon ?? <X />}
                     {modal.closeLabel ?? "Close"}
                   </Button>
                 </DialogClose>
-                {modal.leftButtons?.map((button, index) => (
-                  <Button
-                    key={index}
-                    variant={button.variant}
-                    disabled={button.disabled}
-                    onClick={button.onClick}
-                  >
-                    {button.label}
-                  </Button>
-                ))}
+                {modal.leftButtons?.map(renderButton)}
               </div>
-              <div className="flex flex-row items-end gap-2">
-                {modal.rightButtons?.map((button, index) => (
-                  <Button
-                    key={index}
-                    variant={button.variant}
-                    disabled={button.disabled}
-                    onClick={button.onClick}
-                  >
-                    {button.label}
-                  </Button>
-                ))}
+              <div className="flex flex-row justify-end gap-1 w-1/2">
+                {modal.rightButtons?.map(renderButton)}
               </div>
             </DialogFooter>
           </DialogContent>

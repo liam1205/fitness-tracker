@@ -19,7 +19,7 @@ import {
   groupExercisesByMuscleGroup,
   type TemplateExerciseRow,
 } from "@/components/views/modals/TemplateExerciseRows";
-import { Info, Play } from "lucide-react";
+import { Info, Play, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   HoverCard,
@@ -79,13 +79,14 @@ export function useViewTemplateModal() {
       content: <ViewTemplate ref={formRef} template={template}></ViewTemplate>,
       rightButtons: [
         {
+          icon: <Save></Save>,
           label: "Save",
           onClick: handleSave,
         },
         {
           label: (
             <>
-              <Play className="size-3"></Play>Start Workout
+              <Play className="size-2.5"></Play>Start Workout
             </>
           ),
           variant: "outline",
