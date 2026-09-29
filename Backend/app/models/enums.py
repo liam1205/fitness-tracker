@@ -24,7 +24,7 @@ class MuscleGroup(str, Enum):
     ABS = "abs"
     CALVES = "calves"
     QUADS = "quads"
-
+    HAMS = "hamstrings"
 
 def pg_enum(enum_cls: type[Enum], name: str) -> SAEnum:
     """Build a native Postgres enum column type backed by a Python str-enum.
