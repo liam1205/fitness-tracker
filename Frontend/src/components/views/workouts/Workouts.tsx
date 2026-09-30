@@ -22,7 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useRouter } from "@tanstack/react-router";
-import { dateString, timeSpent } from "@/lib/utils";
+import { dateString, timeSpentMin } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 
@@ -84,7 +84,7 @@ const Workout = ({ session }: WorkoutProps) => {
           <div className="flex flex-row justify-start items-center gap-2 text-sm">
             <Timer id="timer-icon" className="size-3.5" />
             <Label htmlFor="timer-icon">
-              {timeSpent(started, completed)} min
+              {timeSpentMin(started, completed)} min
             </Label>
           </div>
           {!session.completed_at ? (

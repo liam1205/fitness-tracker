@@ -215,22 +215,21 @@ export function AppSideBar() {
                       });
                       collapseSidebar();
                     }}
+                    className="flex flex-row gap-1"
                   >
                     <SidebarMenuButton className="flex justify-between w-full">
                       <span>{session.template_name ?? "Workout"}</span>
-                      <div className="flex justify-center items-center mr-2">
-                        <Button
-                          className="size-1"
-                          variant={"destructive"}
-                          size={"icon"}
-                          onClick={(event) =>
-                            handleCompleteSession(event, session.id)
-                          }
-                        >
-                          <Square></Square>
-                        </Button>
-                      </div>
+                      <div className="flex justify-center items-center mr-2"></div>
                     </SidebarMenuButton>
+                    <Button
+                      variant={"destructive"}
+                      size={"icon"}
+                      onClick={(event) =>
+                        handleCompleteSession(event, session.id)
+                      }
+                    >
+                      <Square></Square>
+                    </Button>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>

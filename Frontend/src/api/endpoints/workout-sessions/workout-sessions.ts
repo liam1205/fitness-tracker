@@ -27,7 +27,8 @@ import type {
 import type {
   HTTPValidationError,
   WorkoutSessionRead,
-  WorkoutSessionStart
+  WorkoutSessionStart,
+  WorkoutSessionUpdate
 } from '../../model';
 
 import { customInstance } from '../../http-client';
@@ -333,6 +334,72 @@ export function useGetWorkoutSession<TData = Awaited<ReturnType<typeof getWorkou
 
 
 /**
+ * Update a workout session owned by the current user. Omitted fields are left unchanged.
+ * @summary Update a workout session
+ */
+export const updateWorkoutSession = (
+    sessionId: string,
+    workoutSessionUpdate: WorkoutSessionUpdate,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<WorkoutSessionRead>(
+      {url: `/api/v1/workout-sessions/${sessionId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: workoutSessionUpdate, signal
+    },
+      options);
+    }
+
+
+
+
+export const getUpdateWorkoutSessionMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkoutSession>>, TError,{sessionId: string;data: WorkoutSessionUpdate}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateWorkoutSession>>, TError,{sessionId: string;data: WorkoutSessionUpdate}, TContext> => {
+
+const mutationKey = ['updateWorkoutSession'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateWorkoutSession>>, {sessionId: string;data: WorkoutSessionUpdate}> = (props) => {
+          const {sessionId,data} = props ?? {};
+
+          return  updateWorkoutSession(sessionId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateWorkoutSessionMutationResult = NonNullable<Awaited<ReturnType<typeof updateWorkoutSession>>>
+    export type UpdateWorkoutSessionMutationBody = WorkoutSessionUpdate
+    export type UpdateWorkoutSessionMutationError = ErrorType<HTTPValidationError>
+
+    /**
+ * @summary Update a workout session
+ */
+export const useUpdateWorkoutSession = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkoutSession>>, TError,{sessionId: string;data: WorkoutSessionUpdate}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateWorkoutSession>>,
+        TError,
+        {sessionId: string;data: WorkoutSessionUpdate},
+        TContext
+      > => {
+      return useMutation(getUpdateWorkoutSessionMutationOptions(options), queryClient);
+    }
+    /**
  * Start a new workout session copying the exercises of a template owned by the current user.
  * @summary Start a workout session from a template
  */

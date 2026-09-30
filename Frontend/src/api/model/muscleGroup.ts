@@ -18,4 +18,5 @@ export const MuscleGroup = {
   abs: 'abs',
   calves: 'calves',
   quads: 'quads',
+  hamstrings: 'hamstrings',
 } as const;

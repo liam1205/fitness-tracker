@@ -2,13 +2,18 @@ import uuid
 from collections import defaultdict
 from datetime import UTC, datetime
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.exercise import Exercise
 from app.models.workout_session import SessionExercise, SessionSet, WorkoutSession
 from app.models.workout_template import TemplateExercise, WorkoutTemplate
-from app.schemas.workout_session import SessionExerciseRead, SessionSetRead, WorkoutSessionRead
+from app.schemas.workout_session import (
+    SessionExerciseRead,
+    SessionSetRead,
+    WorkoutSessionRead,
+    WorkoutSessionUpdate,
+)
 
 
 async def _get_exercises_for_sessions(
@@ -166,6 +171,69 @@ async def complete_workout_session_for_user(
         return None
 
     session.completed_at = datetime.now(UTC)
+    await db.flush()
+    await db.refresh(session)
+
+    exercises_by_session = await _get_exercises_for_sessions(db, [session.id])
+    template_name = await _get_template_name(db, session.template_id)
+    return WorkoutSessionRead(
+        id=session.id,
+        user_id=session.user_id,
+        template_id=session.template_id,
+        template_name=template_name,
+        started_at=session.started_at,
+        completed_at=session.completed_at,
+        exercises=exercises_by_session[session.id],
+    )
+
+
+async def update_workout_session_for_user(
+    db: AsyncSession, user_id: uuid.UUID, session_id: uuid.UUID, payload: WorkoutSessionUpdate
+) -> WorkoutSessionRead | None:
+    """Update a workout session owned by ``user_id``. Returns ``None`` if not found.
+
+    Omitted fields are left unchanged; ``template_id`` and ``completed_at`` can
+    be cleared by sending ``null``. When ``exercises`` is provided, the existing
+    exercise slots and their sets are replaced wholesale, with ``position`` and
+    ``set_number`` reassigned from list order.
+    """
+    session = await _get_session_for_user(db, user_id, session_id)
+    if session is None:
+        return None
+
+    fields = payload.model_fields_set
+    if "template_id" in fields:
+        session.template_id = payload.template_id
+    if "started_at" in fields:
+        session.started_at = payload.started_at
+    if "completed_at" in fields:
+        session.completed_at = payload.completed_at
+
+    if payload.exercises is not None:
+        existing_ids = select(SessionExercise.id).where(SessionExercise.session_id == session.id)
+        await db.execute(
+            delete(SessionSet).where(SessionSet.session_exercise_id.in_(existing_ids))
+        )
+        await db.execute(delete(SessionExercise).where(SessionExercise.session_id == session.id))
+        for position, exercise_payload in enumerate(payload.exercises, start=1):
+            session_exercise = SessionExercise(
+                session_id=session.id,
+                exercise_id=exercise_payload.exercise_id,
+                position=position,
+            )
+            db.add(session_exercise)
+            await db.flush()
+            for set_number, set_payload in enumerate(exercise_payload.sets, start=1):
+                db.add(
+                    SessionSet(
+                        session_exercise_id=session_exercise.id,
+                        set_number=set_number,
+                        reps=set_payload.reps,
+                        weight=set_payload.weight,
+                        completed=set_payload.completed,
+                    )
+                )
+
     await db.flush()
     await db.refresh(session)
 

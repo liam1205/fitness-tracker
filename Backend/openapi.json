@@ -802,6 +802,58 @@
             }
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "workout-sessions"
+        ],
+        "summary": "Update a workout session",
+        "description": "Update a workout session owned by the current user. Omitted fields are left unchanged.",
+        "operationId": "update_workout_session",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkoutSessionUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutSessionRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/workout-sessions/start": {
@@ -1066,7 +1118,8 @@
           "triceps",
           "abs",
           "calves",
-          "quads"
+          "quads",
+          "hamstrings"
         ],
         "title": "MuscleGroup"
       },
@@ -1169,6 +1222,30 @@
         "title": "SessionExerciseRead",
         "description": "An exercise slot within a workout session, as returned by the API."
       },
+      "SessionExerciseUpdate": {
+        "properties": {
+          "exercise_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Exercise Id",
+            "description": "Id of the exercise in this slot."
+          },
+          "sets": {
+            "items": {
+              "$ref": "#/components/schemas/SessionSetUpdate"
+            },
+            "type": "array",
+            "title": "Sets",
+            "description": "Sets for this exercise, in order."
+          }
+        },
+        "type": "object",
+        "required": [
+          "exercise_id"
+        ],
+        "title": "SessionExerciseUpdate",
+        "description": "An exercise slot within a session, as submitted when updating a session."
+      },
       "SessionSetRead": {
         "properties": {
           "id": {
@@ -1220,6 +1297,48 @@
         ],
         "title": "SessionSetRead",
         "description": "A single performed set within a session exercise, as returned by the API."
+      },
+      "SessionSetUpdate": {
+        "properties": {
+          "reps": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reps",
+            "description": "Reps performed, once recorded."
+          },
+          "weight": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight",
+            "description": "Weight used, once recorded."
+          },
+          "completed": {
+            "type": "boolean",
+            "title": "Completed",
+            "description": "Whether this set has been marked done.",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "SessionSetUpdate",
+        "description": "A set within a session exercise, as submitted when updating a session."
       },
       "TemplateExerciseCreate": {
         "properties": {
@@ -1615,6 +1734,67 @@
         ],
         "title": "WorkoutSessionStart",
         "description": "Payload for starting a new workout session from a template."
+      },
+      "WorkoutSessionUpdate": {
+        "properties": {
+          "template_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Id",
+            "description": "Id of the template this session is associated with."
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At",
+            "description": "When the session was started."
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At",
+            "description": "When the session was completed."
+          },
+          "exercises": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/SessionExerciseUpdate"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exercises",
+            "description": "Replacement exercise slots, in order."
+          }
+        },
+        "type": "object",
+        "title": "WorkoutSessionUpdate",
+        "description": "Payload for updating a workout session. Omitted fields are left unchanged.\n\n``template_id`` and ``completed_at`` may be set to ``null`` explicitly to\nclear them (e.g. reopening a completed session). When ``exercises`` is\nprovided, it replaces the entire set of exercise slots and their sets;\n``position`` and ``set_number`` are assigned from list order."
       },
       "WorkoutTemplateCreate": {
         "properties": {

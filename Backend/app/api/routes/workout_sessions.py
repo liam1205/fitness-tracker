@@ -6,7 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import crud
 from app.api.deps import CurrentUser
 from app.db import get_db
-from app.schemas.workout_session import WorkoutSessionRead, WorkoutSessionStart
+from app.schemas.workout_session import (
+    WorkoutSessionRead,
+    WorkoutSessionStart,
+    WorkoutSessionUpdate,
+)
 
 router = APIRouter(prefix="/workout-sessions", tags=["workout-sessions"])
 
@@ -89,6 +93,46 @@ async def complete_workout_session(
     """Mark a workout session owned by the current user as completed."""
     session = await crud.workout_session.complete_workout_session_for_user(
         db, user.id, session_id
+    )
+    if session is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Workout session not found"
+        )
+    return session
+
+
+@router.patch(
+    "/{session_id}",
+    response_model=WorkoutSessionRead,
+    summary="Update a workout session",
+)
+async def update_workout_session(
+    session_id: uuid.UUID,
+    payload: WorkoutSessionUpdate,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+) -> WorkoutSessionRead:
+    """Update a workout session owned by the current user. Omitted fields are left unchanged."""
+    if payload.template_id is not None:
+        template = await crud.workout_template.get_workout_template_for_user(
+            db, user.id, payload.template_id
+        )
+        if template is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template not found")
+
+    if payload.exercises is not None:
+        for exercise_payload in payload.exercises:
+            exercise = await crud.exercise.get_exercise_for_user(
+                db, user.id, exercise_payload.exercise_id
+            )
+            if exercise is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Exercise {exercise_payload.exercise_id} not found",
+                )
+
+    session = await crud.workout_session.update_workout_session_for_user(
+        db, user.id, session_id, payload
     )
     if session is None:
         raise HTTPException(
