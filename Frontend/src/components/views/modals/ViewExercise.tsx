@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useModal } from "@/hooks/use-modal";
-import { Save } from "lucide-react";
+import { Save, Trash } from "lucide-react";
 
 /**
  * Modal for viewing and editing an existing exercise.
@@ -97,6 +97,7 @@ export function useViewExerciseModal() {
       ),
       rightButtons: [
         {
+          icon: <Trash></Trash>,
           label: "Delete",
           onClick: handleDelete,
           variant: "destructive",

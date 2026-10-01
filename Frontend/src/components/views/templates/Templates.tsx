@@ -1,4 +1,4 @@
-import { Ellipsis, Eye, Play, Plus, X } from "lucide-react";
+import { Ellipsis, Eye, Play, Plus, Trash, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -98,7 +98,7 @@ export function Templates() {
                   variant={"destructive"}
                   onClick={() => handleDeleteTemplate(template.id)}
                 >
-                  <X className="size-2.5"></X> Delete
+                  <Trash className="size-2.5"></Trash> Delete
                 </Button>
               </div>
               <div className="flex flex-row w-2/3 justify-end gap-1">

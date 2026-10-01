@@ -80,7 +80,7 @@ const Workout = ({ session }: WorkoutProps) => {
         </div>
       </CardContent>
       <CardFooter className="flex flex-row">
-        <div className="flex flex-row items-center justify-start gap-4 text-sm w-4/7">
+        <div className="flex flex-row items-center justify-start gap-4 text-sm w-5/7">
           <div className="flex flex-row justify-start items-center gap-2 text-sm">
             <Timer id="timer-icon" className="size-3.5" />
             <Label htmlFor="timer-icon">
@@ -100,7 +100,7 @@ const Workout = ({ session }: WorkoutProps) => {
             <Trash className="size-2.5"></Trash> Delete
           </Button>
         </div>
-        <div className="flex flex-row justify-end gap-2 text-sm w-3/7">
+        <div className="flex flex-row justify-end gap-2 text-sm w-2/7">
           {!session.completed_at && (
             <Button variant="outline">
               <Square className="size-2.5"></Square> Stop

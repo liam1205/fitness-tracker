@@ -13,10 +13,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { SessionSetRead } from "@/api/model/sessionSetRead";
 import { Input } from "@/components/ui/input";
 import { Toggle } from "@/components/ui/toggle";
-import { Check, CheckIcon, CircleDashed } from "lucide-react";
+import { Check, CheckIcon, CircleDashed, Square } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn, formatDuration, timeSpentSec } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const Workout = () => {
   const { workoutId: sessionId } = useParams({
@@ -100,7 +101,25 @@ const Workout = () => {
     <div className="space-y-4">
       <h1 className="text-4xl font-bold tracking-tight flex flex-row justify-between items-center">
         {data?.template_name}
-        <Badge className="w-20">{formatDuration(time)}</Badge>
+        <div className="flex flex-row justify-end items-center gap-2">
+          {!data?.completed_at && (
+            <Button
+              className="font-normal"
+              variant={"secondary"}
+              disabled={
+                data?.exercises.filter(
+                  (exercise) =>
+                    exercise.sets.filter((set) => set.completed === true)
+                      .length === exercise.sets.length,
+                ).length !== data?.exercises.length
+              }
+            >
+              <Square></Square>
+              Complete workout
+            </Button>
+          )}
+          <Badge className="w-20">{formatDuration(time)}</Badge>
+        </div>
       </h1>
       <div className="flex flex-col gap-3">
         {data?.exercises.map((exercise) => (
@@ -154,22 +173,26 @@ const Set = ({ set, disabled, onSave }: SetProps) => {
   const [attempted, setAttempted] = useState(false);
   const parsedReps = Number.parseInt(reps, 10);
   const parsedWeight = Number.parseFloat(weight);
-  const weightInvalid = attempted && Number.isNaN(parsedWeight);
+  const weightEmpty = weight.trim() === "";
+  const weightInvalid = attempted && !weightEmpty && Number.isNaN(parsedWeight);
   const repsInvalid = attempted && Number.isNaN(parsedReps);
 
   // Weight and reps are saved along with the completion toggle, so the
   // values typed in are what gets persisted when the set is marked done.
-  // A set can only be marked done once both are filled in (otherwise the
-  // empty inputs are flagged as required); un-marking is always allowed.
+  // A set can only be marked done once reps are filled in and the weight is
+  // either empty (defaults to 0) or a valid number; un-marking is always allowed.
   const toggle = (completed: boolean) => {
-    if (completed && (Number.isNaN(parsedWeight) || Number.isNaN(parsedReps))) {
+    if (
+      completed &&
+      (Number.isNaN(parsedReps) || (!weightEmpty && Number.isNaN(parsedWeight)))
+    ) {
       setAttempted(true);
       return;
     }
     setAttempted(false);
     onSave({
       reps: Number.isNaN(parsedReps) ? null : parsedReps,
-      weight: weight.trim() === "" ? null : weight.trim(),
+      weight: weightEmpty ? (completed ? "0" : null) : weight.trim(),
       completed,
     });
   };
@@ -183,7 +206,6 @@ const Set = ({ set, disabled, onSave }: SetProps) => {
           inputMode="decimal"
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
-          required
           aria-invalid={weightInvalid}
           className="w-fit"
         ></Input>

@@ -28,13 +28,13 @@ export const formatDuration = (totalSec: number) => {
   const seconds = totalSec % 60;
 
   return [
-    days > 0 && `${pad(days)}`,
-    hours > 0 && `${pad(hours)}`,
-    minutes > 0 && `${pad(minutes)}`,
-    `${pad(seconds)}`,
+    days > 0 && `${pad(days)}d`,
+    hours > 0 && `${pad(hours)}h`,
+    minutes > 0 && `${pad(minutes)}m`,
+    `${pad(seconds)}s`,
   ]
     .filter(Boolean)
-    .join(":");
+    .join(" ");
 };
 
 export const timeSpentMin = (startDate: Date, endDate: Date) => {
