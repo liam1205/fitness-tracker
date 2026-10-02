@@ -23,6 +23,12 @@ export interface WorkoutSessionRead {
   started_at: string;
   /** When the session was completed, if it has been. */
   completed_at?: string | null;
+  /** Whether the session is currently paused. */
+  is_paused: boolean;
+  /** When the current pause began, if the session is paused. */
+  paused_at?: string | null;
+  /** Net time spent working out, in seconds: elapsed time since ``started_at`` (until ``completed_at``, or now if still in progress) minus all pauses. */
+  active_seconds: number;
   /** Exercise slots, in order. */
   exercises: SessionExerciseRead[];
 }

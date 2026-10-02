@@ -51,6 +51,17 @@ class WorkoutSessionRead(BaseModel):
     completed_at: datetime | None = Field(
         None, description="When the session was completed, if it has been."
     )
+    is_paused: bool = Field(..., description="Whether the session is currently paused.")
+    paused_at: datetime | None = Field(
+        None, description="When the current pause began, if the session is paused."
+    )
+    active_seconds: int = Field(
+        ...,
+        description=(
+            "Net time spent working out, in seconds: elapsed time since ``started_at`` "
+            "(until ``completed_at``, or now if still in progress) minus all pauses."
+        ),
+    )
     exercises: list[SessionExerciseRead] = Field(..., description="Exercise slots, in order.")
 
 

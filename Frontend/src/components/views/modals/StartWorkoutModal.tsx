@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { useModal, type ModalButton } from "@/hooks/use-modal";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { Play } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,6 +22,7 @@ import { toast } from "sonner";
 export function useStartWorkoutModal() {
   const { openModal, updateModal, closeModal } = useModal();
   const { mutate: startWorkoutSession, isPending } = useStartWorkoutSession();
+  const navigate = useNavigate();
 
   const queryClient = useQueryClient();
 
@@ -36,11 +38,15 @@ export function useStartWorkoutModal() {
             startWorkoutSession(
               { data: { template_id: templateId } },
               {
-                onSuccess: () => {
+                onSuccess: (workout) => {
                   queryClient.invalidateQueries({
                     queryKey: getListActiveWorkoutSessionsQueryKey(),
                   });
                   toast.success("Workout started.");
+                  navigate({
+                    to: "/workouts/$workoutId",
+                    params: { workoutId: workout.id },
+                  });
                   closeModal();
                 },
               },

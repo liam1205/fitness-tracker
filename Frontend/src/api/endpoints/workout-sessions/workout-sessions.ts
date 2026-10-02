@@ -465,7 +465,135 @@ export const useStartWorkoutSession = <TError = ErrorType<HTTPValidationError>,
       return useMutation(getStartWorkoutSessionMutationOptions(options), queryClient);
     }
     /**
+ * Pause an in-progress workout session. Responds with 409 if it is completed or paused.
+ * @summary Pause a workout session
+ */
+export const pauseWorkoutSession = (
+    sessionId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<WorkoutSessionRead>(
+      {url: `/api/v1/workout-sessions/${sessionId}/pause`, method: 'POST', signal
+    },
+      options);
+    }
+
+
+
+
+export const getPauseWorkoutSessionMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pauseWorkoutSession>>, TError,{sessionId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof pauseWorkoutSession>>, TError,{sessionId: string}, TContext> => {
+
+const mutationKey = ['pauseWorkoutSession'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof pauseWorkoutSession>>, {sessionId: string}> = (props) => {
+          const {sessionId} = props ?? {};
+
+          return  pauseWorkoutSession(sessionId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PauseWorkoutSessionMutationResult = NonNullable<Awaited<ReturnType<typeof pauseWorkoutSession>>>
+
+    export type PauseWorkoutSessionMutationError = ErrorType<HTTPValidationError>
+
+    /**
+ * @summary Pause a workout session
+ */
+export const usePauseWorkoutSession = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pauseWorkoutSession>>, TError,{sessionId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof pauseWorkoutSession>>,
+        TError,
+        {sessionId: string},
+        TContext
+      > => {
+      return useMutation(getPauseWorkoutSessionMutationOptions(options), queryClient);
+    }
+    /**
+ * Resume a paused workout session. Responds with 409 if it isn't paused.
+ * @summary Resume a paused workout session
+ */
+export const resumeWorkoutSession = (
+    sessionId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<WorkoutSessionRead>(
+      {url: `/api/v1/workout-sessions/${sessionId}/resume`, method: 'POST', signal
+    },
+      options);
+    }
+
+
+
+
+export const getResumeWorkoutSessionMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resumeWorkoutSession>>, TError,{sessionId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof resumeWorkoutSession>>, TError,{sessionId: string}, TContext> => {
+
+const mutationKey = ['resumeWorkoutSession'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resumeWorkoutSession>>, {sessionId: string}> = (props) => {
+          const {sessionId} = props ?? {};
+
+          return  resumeWorkoutSession(sessionId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResumeWorkoutSessionMutationResult = NonNullable<Awaited<ReturnType<typeof resumeWorkoutSession>>>
+
+    export type ResumeWorkoutSessionMutationError = ErrorType<HTTPValidationError>
+
+    /**
+ * @summary Resume a paused workout session
+ */
+export const useResumeWorkoutSession = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resumeWorkoutSession>>, TError,{sessionId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof resumeWorkoutSession>>,
+        TError,
+        {sessionId: string},
+        TContext
+      > => {
+      return useMutation(getResumeWorkoutSessionMutationOptions(options), queryClient);
+    }
+    /**
  * Mark a workout session owned by the current user as completed.
+ *
+ * A paused session must be resumed first; otherwise responds with 409.
  * @summary Complete a workout session
  */
 export const completeWorkoutSession = (

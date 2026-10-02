@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import crud
 from app.api.deps import CurrentUser
 from app.db import get_db
+from app.crud.workout_session import SessionStateError
 from app.schemas.workout_session import (
     WorkoutSessionRead,
     WorkoutSessionStart,
@@ -81,6 +82,54 @@ async def start_workout_session(
 
 
 @router.post(
+    "/{session_id}/pause",
+    response_model=WorkoutSessionRead,
+    summary="Pause a workout session",
+)
+async def pause_workout_session(
+    session_id: uuid.UUID,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+) -> WorkoutSessionRead:
+    """Pause an in-progress workout session. Responds with 409 if it is completed or paused."""
+    try:
+        session = await crud.workout_session.pause_workout_session_for_user(
+            db, user.id, session_id
+        )
+    except SessionStateError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    if session is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Workout session not found"
+        )
+    return session
+
+
+@router.post(
+    "/{session_id}/resume",
+    response_model=WorkoutSessionRead,
+    summary="Resume a paused workout session",
+)
+async def resume_workout_session(
+    session_id: uuid.UUID,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+) -> WorkoutSessionRead:
+    """Resume a paused workout session. Responds with 409 if it isn't paused."""
+    try:
+        session = await crud.workout_session.resume_workout_session_for_user(
+            db, user.id, session_id
+        )
+    except SessionStateError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    if session is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Workout session not found"
+        )
+    return session
+
+
+@router.post(
     "/{session_id}/complete",
     response_model=WorkoutSessionRead,
     summary="Complete a workout session",
@@ -90,10 +139,16 @@ async def complete_workout_session(
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ) -> WorkoutSessionRead:
-    """Mark a workout session owned by the current user as completed."""
-    session = await crud.workout_session.complete_workout_session_for_user(
-        db, user.id, session_id
-    )
+    """Mark a workout session owned by the current user as completed.
+
+    A paused session must be resumed first; otherwise responds with 409.
+    """
+    try:
+        session = await crud.workout_session.complete_workout_session_for_user(
+            db, user.id, session_id
+        )
+    except SessionStateError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
     if session is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Workout session not found"
@@ -131,9 +186,12 @@ async def update_workout_session(
                     detail=f"Exercise {exercise_payload.exercise_id} not found",
                 )
 
-    session = await crud.workout_session.update_workout_session_for_user(
-        db, user.id, session_id, payload
-    )
+    try:
+        session = await crud.workout_session.update_workout_session_for_user(
+            db, user.id, session_id, payload
+        )
+    except SessionStateError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
     if session is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Workout session not found"

@@ -9,6 +9,8 @@ import {
   ListChecks,
   LogOut,
   NotebookTabs,
+  Pause,
+  Play,
   Square,
 } from "lucide-react";
 import {
@@ -16,13 +18,13 @@ import {
   useGetUserSettings,
   useUpdateUserSettings,
 } from "@/api/endpoints/user-settings/user-settings";
+import { useListActiveWorkoutSessions } from "@/api/endpoints/workout-sessions/workout-sessions";
+import type { Theme, WorkoutSessionRead } from "@/api/model";
 import {
-  getListActiveWorkoutSessionsQueryKey,
-  getListCompletedWorkoutSessionsQueryKey,
-  useCompleteWorkoutSession,
-  useListActiveWorkoutSessions,
-} from "@/api/endpoints/workout-sessions/workout-sessions";
-import type { Theme } from "@/api/model";
+  canCompleteSession,
+  useSessionControls,
+} from "@/hooks/use-session-controls";
+import { CompleteBlockedTooltip } from "@/components/views/workout/CompleteBlockedTooltip";
 import {
   Sidebar,
   SidebarContent,
@@ -98,21 +100,12 @@ export function AppSideBar() {
       },
     },
   });
-  const { mutate: completeWorkoutSession } = useCompleteWorkoutSession({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: getListActiveWorkoutSessionsQueryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: getListCompletedWorkoutSessionsQueryKey(),
-        });
-      },
-      onError: (err) => {
-        toastError(err, "Couldn't complete the workout session.");
-      },
-    },
-  });
+  const {
+    pause: pauseWorkoutSession,
+    resume: resumeWorkoutSession,
+    complete: completeWorkoutSession,
+    isPending: isSessionActionPending,
+  } = useSessionControls();
 
   // The server is the source of truth for a signed-in user's theme, but only
   // apply it once on load — otherwise this fires again after every local
@@ -132,12 +125,24 @@ export function AppSideBar() {
     updateSettings({ data: { theme: value } });
   }
 
-  function handleCompleteSession(
+  function handleTogglePause(
     event: React.MouseEvent<HTMLButtonElement>,
-    sessionId: string,
+    session: WorkoutSessionRead,
   ) {
     event.stopPropagation();
-    completeWorkoutSession({ sessionId });
+    if (session.is_paused) {
+      resumeWorkoutSession(session.id);
+    } else {
+      pauseWorkoutSession(session.id);
+    }
+  }
+
+  function handleCompleteSession(
+    event: React.MouseEvent<HTMLButtonElement>,
+    session: WorkoutSessionRead,
+  ) {
+    event.stopPropagation();
+    completeWorkoutSession(session);
   }
 
   function collapseSidebar() {
@@ -219,17 +224,38 @@ export function AppSideBar() {
                   >
                     <SidebarMenuButton className="flex justify-between">
                       <span>{session.template_name ?? "Workout"}</span>
-                      <div className="flex justify-center items-center mr-2"></div>
+                      <div className="flex justify-center items-center mr-2">
+                        {session.is_paused && (
+                          <Pause className="size-3.5 text-muted-foreground"></Pause>
+                        )}
+                      </div>
                     </SidebarMenuButton>
                     <Button
-                      variant={"destructive"}
+                      variant={"outline"}
                       size={"icon"}
-                      onClick={(event) =>
-                        handleCompleteSession(event, session.id)
-                      }
+                      disabled={isSessionActionPending}
+                      aria-label={session.is_paused ? "Resume" : "Pause"}
+                      onClick={(event) => handleTogglePause(event, session)}
                     >
-                      <Square></Square>
+                      {session.is_paused ? <Play></Play> : <Pause></Pause>}
                     </Button>
+                    <CompleteBlockedTooltip
+                      blocked={!canCompleteSession(session)}
+                    >
+                      <Button
+                        variant={"destructive"}
+                        size={"icon"}
+                        disabled={
+                          isSessionActionPending || !canCompleteSession(session)
+                        }
+                        aria-label="Complete"
+                        onClick={(event) =>
+                          handleCompleteSession(event, session)
+                        }
+                      >
+                        <Square></Square>
+                      </Button>
+                    </CompleteBlockedTooltip>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>

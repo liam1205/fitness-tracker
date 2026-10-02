@@ -22,7 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useRouter } from "@tanstack/react-router";
-import { dateString, timeSpentMin } from "@/lib/utils";
+import { dateString } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 
@@ -58,9 +58,6 @@ type WorkoutProps = {
 const Workout = ({ session }: WorkoutProps) => {
   const router = useRouter();
   const started = new Date(session.started_at);
-  const completed = session.completed_at
-    ? new Date(session.completed_at)
-    : new Date();
   return (
     <Card size="sm">
       <CardHeader>
@@ -84,7 +81,7 @@ const Workout = ({ session }: WorkoutProps) => {
           <div className="flex flex-row justify-start items-center gap-2 text-sm">
             <Timer id="timer-icon" className="size-3.5" />
             <Label htmlFor="timer-icon">
-              {timeSpentMin(started, completed)} min
+              {Math.round(session.active_seconds / 60)} min
             </Label>
           </div>
           {!session.completed_at ? (

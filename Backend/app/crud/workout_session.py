@@ -1,12 +1,18 @@
 import uuid
 from collections import defaultdict
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import delete, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.exercise import Exercise
-from app.models.workout_session import SessionExercise, SessionSet, WorkoutSession
+from app.models.workout_session import (
+    SessionExercise,
+    SessionPause,
+    SessionSet,
+    WorkoutSession,
+)
 from app.models.workout_template import TemplateExercise, WorkoutTemplate
 from app.schemas.workout_session import (
     SessionExerciseRead,
@@ -68,6 +74,77 @@ async def _get_exercises_for_sessions(
     return exercises_by_session
 
 
+class SessionStateError(Exception):
+    """Raised when an operation isn't valid for the session's current state."""
+
+
+async def _get_pauses_for_sessions(
+    db: AsyncSession, session_ids: list[uuid.UUID]
+) -> dict[uuid.UUID, list[SessionPause]]:
+    pauses_by_session: dict[uuid.UUID, list[SessionPause]] = defaultdict(list)
+    if not session_ids:
+        return pauses_by_session
+
+    pauses = (
+        await db.execute(
+            select(SessionPause)
+            .where(SessionPause.session_id.in_(session_ids))
+            .order_by(SessionPause.paused_at)
+        )
+    ).scalars()
+    for pause in pauses:
+        pauses_by_session[pause.session_id].append(pause)
+    return pauses_by_session
+
+
+async def _get_open_pause(db: AsyncSession, session_id: uuid.UUID) -> SessionPause | None:
+    result = await db.execute(
+        select(SessionPause).where(
+            SessionPause.session_id == session_id, SessionPause.resumed_at.is_(None)
+        )
+    )
+    return result.scalar_one_or_none()
+
+
+def _active_seconds(session: WorkoutSession, pauses: list[SessionPause], now: datetime) -> int:
+    """Net seconds spent working out: elapsed time minus pauses.
+
+    An open pause counts up to the end of the session (or ``now`` if it is still
+    in progress). Each pause is clamped to ``[started_at, end]`` so that edits to
+    ``started_at``/``completed_at`` can't produce a negative or inflated total.
+    """
+    end = session.completed_at or now
+    paused = timedelta()
+    for pause in pauses:
+        pause_start = max(pause.paused_at, session.started_at)
+        pause_end = min(pause.resumed_at or end, end)
+        if pause_end > pause_start:
+            paused += pause_end - pause_start
+    return max(0, int((end - session.started_at - paused).total_seconds()))
+
+
+def _to_read(
+    session: WorkoutSession,
+    template_name: str | None,
+    exercises: list[SessionExerciseRead],
+    pauses: list[SessionPause],
+    now: datetime,
+) -> WorkoutSessionRead:
+    open_pause = next((pause for pause in pauses if pause.resumed_at is None), None)
+    return WorkoutSessionRead(
+        id=session.id,
+        user_id=session.user_id,
+        template_id=session.template_id,
+        template_name=template_name,
+        started_at=session.started_at,
+        completed_at=session.completed_at,
+        is_paused=open_pause is not None,
+        paused_at=open_pause.paused_at if open_pause else None,
+        active_seconds=_active_seconds(session, pauses, now),
+        exercises=exercises,
+    )
+
+
 async def _list_workout_sessions_for_user(
     db: AsyncSession, user_id: uuid.UUID, *, completed: bool
 ) -> list[WorkoutSessionRead]:
@@ -85,19 +162,18 @@ async def _list_workout_sessions_for_user(
         )
     ).all()
 
-    exercises_by_session = await _get_exercises_for_sessions(
-        db, [session.id for session, _ in rows]
-    )
+    session_ids = [session.id for session, _ in rows]
+    exercises_by_session = await _get_exercises_for_sessions(db, session_ids)
+    pauses_by_session = await _get_pauses_for_sessions(db, session_ids)
+    now = datetime.now(UTC)
 
     return [
-        WorkoutSessionRead(
-            id=session.id,
-            user_id=session.user_id,
-            template_id=session.template_id,
-            template_name=template_name,
-            started_at=session.started_at,
-            completed_at=session.completed_at,
-            exercises=exercises_by_session[session.id],
+        _to_read(
+            session,
+            template_name,
+            exercises_by_session[session.id],
+            pauses_by_session[session.id],
+            now,
         )
         for session, template_name in rows
     ]
@@ -137,6 +213,19 @@ async def _get_template_name(db: AsyncSession, template_id: uuid.UUID | None) ->
     return result.scalar_one_or_none()
 
 
+async def _build_session_read(db: AsyncSession, session: WorkoutSession) -> WorkoutSessionRead:
+    exercises_by_session = await _get_exercises_for_sessions(db, [session.id])
+    pauses_by_session = await _get_pauses_for_sessions(db, [session.id])
+    template_name = await _get_template_name(db, session.template_id)
+    return _to_read(
+        session,
+        template_name,
+        exercises_by_session[session.id],
+        pauses_by_session[session.id],
+        datetime.now(UTC),
+    )
+
+
 async def get_workout_session_for_user(
     db: AsyncSession, user_id: uuid.UUID, session_id: uuid.UUID
 ) -> WorkoutSessionRead | None:
@@ -145,17 +234,7 @@ async def get_workout_session_for_user(
     if session is None:
         return None
 
-    exercises_by_session = await _get_exercises_for_sessions(db, [session.id])
-    template_name = await _get_template_name(db, session.template_id)
-    return WorkoutSessionRead(
-        id=session.id,
-        user_id=session.user_id,
-        template_id=session.template_id,
-        template_name=template_name,
-        started_at=session.started_at,
-        completed_at=session.completed_at,
-        exercises=exercises_by_session[session.id],
-    )
+    return await _build_session_read(db, session)
 
 
 async def complete_workout_session_for_user(
@@ -164,27 +243,67 @@ async def complete_workout_session_for_user(
     """Mark a workout session owned by ``user_id`` as completed, returning it with updated state.
 
     ``completed_at`` is set to the current time regardless of its previous
-    value. Returns ``None`` if no such session exists for this user.
+    value. Returns ``None`` if no such session exists for this user. Raises
+    ``SessionStateError`` if the session is paused; it must be resumed first.
     """
     session = await _get_session_for_user(db, user_id, session_id)
     if session is None:
         return None
+    if await _get_open_pause(db, session.id) is not None:
+        raise SessionStateError("Resume the workout session before completing it")
 
     session.completed_at = datetime.now(UTC)
     await db.flush()
     await db.refresh(session)
 
-    exercises_by_session = await _get_exercises_for_sessions(db, [session.id])
-    template_name = await _get_template_name(db, session.template_id)
-    return WorkoutSessionRead(
-        id=session.id,
-        user_id=session.user_id,
-        template_id=session.template_id,
-        template_name=template_name,
-        started_at=session.started_at,
-        completed_at=session.completed_at,
-        exercises=exercises_by_session[session.id],
-    )
+    return await _build_session_read(db, session)
+
+
+async def pause_workout_session_for_user(
+    db: AsyncSession, user_id: uuid.UUID, session_id: uuid.UUID
+) -> WorkoutSessionRead | None:
+    """Pause an in-progress workout session owned by ``user_id``.
+
+    Returns ``None`` if no such session exists for this user. Raises
+    ``SessionStateError`` if the session is completed or already paused.
+    """
+    session = await _get_session_for_user(db, user_id, session_id)
+    if session is None:
+        return None
+    if session.completed_at is not None:
+        raise SessionStateError("Workout session is already completed")
+    if await _get_open_pause(db, session.id) is not None:
+        raise SessionStateError("Workout session is already paused")
+
+    try:
+        async with db.begin_nested():
+            db.add(SessionPause(session_id=session.id, paused_at=datetime.now(UTC)))
+    except IntegrityError:
+        # A concurrent request opened a pause between our check and the insert.
+        raise SessionStateError("Workout session is already paused") from None
+
+    return await _build_session_read(db, session)
+
+
+async def resume_workout_session_for_user(
+    db: AsyncSession, user_id: uuid.UUID, session_id: uuid.UUID
+) -> WorkoutSessionRead | None:
+    """Resume a paused workout session owned by ``user_id``.
+
+    Returns ``None`` if no such session exists for this user. Raises
+    ``SessionStateError`` if the session isn't paused.
+    """
+    session = await _get_session_for_user(db, user_id, session_id)
+    if session is None:
+        return None
+    open_pause = await _get_open_pause(db, session.id)
+    if open_pause is None:
+        raise SessionStateError("Workout session is not paused")
+
+    open_pause.resumed_at = datetime.now(UTC)
+    await db.flush()
+
+    return await _build_session_read(db, session)
 
 
 async def update_workout_session_for_user(
@@ -195,13 +314,20 @@ async def update_workout_session_for_user(
     Omitted fields are left unchanged; ``template_id`` and ``completed_at`` can
     be cleared by sending ``null``. When ``exercises`` is provided, the existing
     exercise slots and their sets are replaced wholesale, with ``position`` and
-    ``set_number`` reassigned from list order.
+    ``set_number`` reassigned from list order. Raises ``SessionStateError`` when
+    setting ``completed_at`` on a paused session.
     """
     session = await _get_session_for_user(db, user_id, session_id)
     if session is None:
         return None
 
     fields = payload.model_fields_set
+    if (
+        "completed_at" in fields
+        and payload.completed_at is not None
+        and await _get_open_pause(db, session.id) is not None
+    ):
+        raise SessionStateError("Resume the workout session before completing it")
     if "template_id" in fields:
         session.template_id = payload.template_id
     if "started_at" in fields:
@@ -237,17 +363,7 @@ async def update_workout_session_for_user(
     await db.flush()
     await db.refresh(session)
 
-    exercises_by_session = await _get_exercises_for_sessions(db, [session.id])
-    template_name = await _get_template_name(db, session.template_id)
-    return WorkoutSessionRead(
-        id=session.id,
-        user_id=session.user_id,
-        template_id=session.template_id,
-        template_name=template_name,
-        started_at=session.started_at,
-        completed_at=session.completed_at,
-        exercises=exercises_by_session[session.id],
-    )
+    return await _build_session_read(db, session)
 
 
 async def start_workout_session_from_template(
@@ -323,12 +439,4 @@ async def start_workout_session_from_template(
         )
 
     await db.refresh(session)
-    return WorkoutSessionRead(
-        id=session.id,
-        user_id=session.user_id,
-        template_id=session.template_id,
-        template_name=template.name,
-        started_at=session.started_at,
-        completed_at=session.completed_at,
-        exercises=exercises,
-    )
+    return _to_read(session, template.name, exercises, [], datetime.now(UTC))

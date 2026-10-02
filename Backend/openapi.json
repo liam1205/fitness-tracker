@@ -898,13 +898,101 @@
         }
       }
     },
+    "/api/v1/workout-sessions/{session_id}/pause": {
+      "post": {
+        "tags": [
+          "workout-sessions"
+        ],
+        "summary": "Pause a workout session",
+        "description": "Pause an in-progress workout session. Responds with 409 if it is completed or paused.",
+        "operationId": "pause_workout_session",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutSessionRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workout-sessions/{session_id}/resume": {
+      "post": {
+        "tags": [
+          "workout-sessions"
+        ],
+        "summary": "Resume a paused workout session",
+        "description": "Resume a paused workout session. Responds with 409 if it isn't paused.",
+        "operationId": "resume_workout_session",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkoutSessionRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/workout-sessions/{session_id}/complete": {
       "post": {
         "tags": [
           "workout-sessions"
         ],
         "summary": "Complete a workout session",
-        "description": "Mark a workout session owned by the current user as completed.",
+        "description": "Mark a workout session owned by the current user as completed.\n\nA paused session must be resumed first; otherwise responds with 409.",
         "operationId": "complete_workout_session",
         "parameters": [
           {
@@ -1700,6 +1788,29 @@
             "title": "Completed At",
             "description": "When the session was completed, if it has been."
           },
+          "is_paused": {
+            "type": "boolean",
+            "title": "Is Paused",
+            "description": "Whether the session is currently paused."
+          },
+          "paused_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paused At",
+            "description": "When the current pause began, if the session is paused."
+          },
+          "active_seconds": {
+            "type": "integer",
+            "title": "Active Seconds",
+            "description": "Net time spent working out, in seconds: elapsed time since ``started_at`` (until ``completed_at``, or now if still in progress) minus all pauses."
+          },
           "exercises": {
             "items": {
               "$ref": "#/components/schemas/SessionExerciseRead"
@@ -1714,6 +1825,8 @@
           "id",
           "user_id",
           "started_at",
+          "is_paused",
+          "active_seconds",
           "exercises"
         ],
         "title": "WorkoutSessionRead",

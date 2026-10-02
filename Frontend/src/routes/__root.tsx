@@ -6,7 +6,7 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
-import { Loader } from "lucide-react";
+import { Loader, RotateCcw } from "lucide-react";
 
 /** Values made available to every route's `beforeLoad`/`loader` via `context`. */
 export interface RouterContext {
@@ -55,7 +55,8 @@ function ErrorBoundary({ error }: { error: Error }) {
         {error.message}
       </p>
       <Button onClick={() => window.location.reload()}>
-        <Loader></Loader>Reload
+        <RotateCcw />
+        Reload
       </Button>
     </div>
   );

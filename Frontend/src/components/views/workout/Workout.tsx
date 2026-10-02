@@ -13,10 +13,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { SessionSetRead } from "@/api/model/sessionSetRead";
 import { Input } from "@/components/ui/input";
 import { Toggle } from "@/components/ui/toggle";
-import { Check, CheckIcon, CircleDashed, Square } from "lucide-react";
+import {
+  Check,
+  CheckIcon,
+  CircleDashed,
+  Pause,
+  Play,
+  Square,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { cn, formatDuration, timeSpentSec } from "@/lib/utils";
+import { cn, formatDuration } from "@/lib/utils";
+import {
+  canCompleteSession,
+  useSessionControls,
+} from "@/hooks/use-session-controls";
+import { CompleteBlockedTooltip } from "@/components/views/workout/CompleteBlockedTooltip";
 import { Button } from "@/components/ui/button";
 
 const Workout = () => {
@@ -25,6 +37,12 @@ const Workout = () => {
   });
   const { data } = useGetWorkoutSession(sessionId);
   const [time, setTime] = useState(0);
+  const {
+    pause,
+    resume,
+    complete,
+    isPending: isControlPending,
+  } = useSessionControls();
   const queryClient = useQueryClient();
   const sessionQueryKey = getGetWorkoutSessionQueryKey(sessionId);
 
@@ -78,47 +96,68 @@ const Workout = () => {
     updateWorkoutSession({ sessionId, data: { exercises } });
   };
 
+  // The server reports the net time (pauses excluded) as of the last fetch.
+  // While running, tick on top of that; when paused or finished it stands
+  // still. The effect re-anchors whenever a response brings a new value.
+  const activeSeconds = data?.active_seconds;
+  const isPaused = data?.is_paused;
+  const isCompleted = !!data?.completed_at;
   useEffect(() => {
-    if (!data?.started_at) {
+    if (activeSeconds === undefined) {
       setTime(0);
       return;
     }
 
-    const start = new Date(data.started_at);
-
-    // Finished workout: show the final duration and don't tick.
-    if (data.completed_at) {
-      setTime(timeSpentSec(start, new Date(data.completed_at)));
+    if (isCompleted || isPaused) {
+      setTime(activeSeconds);
       return;
     }
 
-    const update = () => setTime(timeSpentSec(start, new Date()));
+    const anchor = Date.now();
+    const update = () =>
+      setTime(activeSeconds + Math.floor((Date.now() - anchor) / 1000));
     update();
     const id = setInterval(update, 1000);
     return () => clearInterval(id);
-  }, [data?.started_at, data?.completed_at]);
+  }, [activeSeconds, isPaused, isCompleted]);
+
   return (
     <div className="space-y-4">
       <h1 className="text-4xl font-bold tracking-tight flex flex-row justify-between items-center">
         {data?.template_name}
         <div className="flex flex-row justify-end items-center gap-2">
-          {!data?.completed_at && (
+          {data && !data.completed_at && (
             <Button
               className="font-normal"
-              variant={"secondary"}
-              disabled={
-                data?.exercises.filter(
-                  (exercise) =>
-                    exercise.sets.filter((set) => set.completed === true)
-                      .length === exercise.sets.length,
-                ).length !== data?.exercises.length
+              variant={"outline"}
+              disabled={isControlPending}
+              onClick={() =>
+                data.is_paused ? resume(data.id) : pause(data.id)
               }
             >
-              <Square></Square>
-              Complete workout
+              {data.is_paused ? <Play></Play> : <Pause></Pause>}
+              {data.is_paused ? "Resume" : "Pause"}
             </Button>
           )}
-          <Badge className="w-20">{formatDuration(time)}</Badge>
+          {data && !data.completed_at && (
+            <CompleteBlockedTooltip blocked={!canCompleteSession(data)}>
+              <Button
+                className="font-normal"
+                variant={"secondary"}
+                onClick={() => complete(data)}
+                disabled={isControlPending || !canCompleteSession(data)}
+              >
+                <Square></Square>
+                Complete workout
+              </Button>
+            </CompleteBlockedTooltip>
+          )}
+          <Badge
+            variant={data?.is_paused ? "secondary" : "default"}
+            className="w-20"
+          >
+            {formatDuration(time)}
+          </Badge>
         </div>
       </h1>
       <div className="flex flex-col gap-3">

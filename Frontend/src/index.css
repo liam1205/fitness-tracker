@@ -71,9 +71,9 @@
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   /* Status accents. `--destructive` doubles as the error accent. */
-  --success: oklch(52.7% 0.154 150.069);
-  --warning: oklch(0.667 0.155 70);
-  --info: oklch(0.581 0.153 253);
+  --success: #50c878;
+  --warning: #ff8559;
+  --info: #6395ee;
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -110,7 +110,7 @@
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   /* Lifted lightness so the accents stay legible on the dark surface. */
-  --success: #80ef80;
+  --success: #50c878;
   --warning: #ff8559;
   --info: #6395ee;
   --border: oklch(1 0 0 / 10%);

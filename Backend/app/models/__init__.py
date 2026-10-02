@@ -2,12 +2,18 @@
 from app.models.exercise import Exercise
 from app.models.user import User
 from app.models.user_settings import UserSettings
-from app.models.workout_session import SessionExercise, SessionSet, WorkoutSession
+from app.models.workout_session import (
+    SessionExercise,
+    SessionPause,
+    SessionSet,
+    WorkoutSession,
+)
 from app.models.workout_template import TemplateExercise, WorkoutTemplate
 
 __all__ = [
     "Exercise",
     "SessionExercise",
+    "SessionPause",
     "SessionSet",
     "TemplateExercise",
     "User",

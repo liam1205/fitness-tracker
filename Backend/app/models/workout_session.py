@@ -6,11 +6,13 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     ForeignKey,
+    Index,
     Integer,
     Numeric,
     UniqueConstraint,
     false,
     func,
+    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -37,6 +39,31 @@ class WorkoutSession(Base):
         DateTime(timezone=True), server_default=func.now()
     )
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class SessionPause(Base):
+    """A pause interval within a workout session.
+
+    A session is paused while it has a row with ``resumed_at`` unset. The
+    partial unique index guarantees at most one such open pause per session.
+    """
+
+    __tablename__ = "session_pauses"
+    __table_args__ = (
+        Index(
+            "uq_session_pauses_open_per_session",
+            "session_id",
+            unique=True,
+            postgresql_where=text("resumed_at IS NULL"),
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    session_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("workout_sessions.id", ondelete="CASCADE"), index=True
+    )
+    paused_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    resumed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class SessionExercise(Base):

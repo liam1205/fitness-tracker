@@ -16,10 +16,6 @@ export const dateString = (date: Date) => {
   return `${day}. ${month} ${year} at ${hours}:${minutes}`;
 };
 
-export const timeSpentSec = (startDate: Date, endDate: Date) => {
-  return Math.round((endDate.getTime() - startDate.getTime()) / 1_000);
-};
-
 export const formatDuration = (totalSec: number) => {
   const pad = (n: number) => String(n).padStart(2, "0");
   const days = Math.floor(totalSec / 86_400);
@@ -35,8 +31,4 @@ export const formatDuration = (totalSec: number) => {
   ]
     .filter(Boolean)
     .join(" ");
-};
-
-export const timeSpentMin = (startDate: Date, endDate: Date) => {
-  return Math.round((endDate.getTime() - startDate.getTime()) / 60_000);
 };

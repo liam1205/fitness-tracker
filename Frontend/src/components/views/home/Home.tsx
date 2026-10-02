@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Play, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useCreateTemplateModal } from "@/components/views/modals/CreateTemplate";
@@ -23,6 +23,7 @@ export function Home() {
       </p>
       <div className="fixed inset-x-0 bottom-6 flex flex-wrap justify-center gap-3 px-4">
         <Button
+          variant={"secondary"}
           size={"lg"}
           className="shadow-lg"
           onClick={openCreateTemplateModal}
@@ -35,10 +36,11 @@ export function Home() {
           className="shadow-lg"
           onClick={openStartWorkoutModal}
         >
-          <Plus />
-          Create workout
+          <Play />
+          Start workout
         </Button>
         <Button
+          variant={"secondary"}
           size={"lg"}
           className="shadow-lg"
           onClick={openCreateExerciseModal}
