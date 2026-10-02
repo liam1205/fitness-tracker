@@ -9,7 +9,10 @@ import {
   useDeleteWorkoutTemplate,
   useListWorkoutTemplates,
 } from "@/api/endpoints/workout-templates/workout-templates";
-import { useStartWorkoutSession } from "@/api/endpoints/workout-sessions/workout-sessions";
+import {
+  getListActiveWorkoutSessionsQueryKey,
+  useStartWorkoutSession,
+} from "@/api/endpoints/workout-sessions/workout-sessions";
 import type { WorkoutTemplateRead } from "@/api/model";
 import {
   Card,
@@ -19,22 +22,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useViewTemplateModal } from "../modals/ViewTemplate";
 import { dateString } from "@/lib/utils";
+import { useNavigate } from "@tanstack/react-router";
 
 /**
  * Workout templates: reusable exercise plans a user can start a workout from.
  */
 export function Templates() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { openCreateTemplateModal } = useCreateTemplateModal();
   const { openViewTemplateModal } = useViewTemplateModal();
@@ -59,8 +55,15 @@ export function Templates() {
     startWorkoutSession(
       { data: { template_id: template.id } },
       {
-        onSuccess: () => {
+        onSuccess: (result) => {
           toast.success(`Started "${template.name}".`);
+          queryClient.invalidateQueries({
+            queryKey: getListActiveWorkoutSessionsQueryKey(),
+          });
+          navigate({
+            to: "/workouts/$workoutId",
+            params: { workoutId: result.id },
+          });
         },
       },
     );
@@ -81,7 +84,7 @@ export function Templates() {
             <CardContent>
               <div className="flex flex-col gap-0.5">
                 {template.exercises.map((exercise) => (
-                  <span className="flex flex-row items-center gap-1 text-sm text-accent-foreground">
+                  <span className="flex flex-row items-center gap-2 text-sm text-accent-foreground">
                     {exercise.set_count}
                     <X className="size-2.5"></X>
                     {exercise.name}{" "}
@@ -93,7 +96,7 @@ export function Templates() {
               </div>
             </CardContent>
             <CardFooter className="flex flex-row">
-              <div className="flex flex-row w-2/3 justify-start gap-1">
+              <div className="flex flex-row w-2/3 justify-start gap-2">
                 <Button
                   variant={"destructive"}
                   onClick={() => handleDeleteTemplate(template.id)}
@@ -101,7 +104,7 @@ export function Templates() {
                   <Trash className="size-2.5"></Trash> Delete
                 </Button>
               </div>
-              <div className="flex flex-row w-2/3 justify-end gap-1">
+              <div className="flex flex-row w-2/3 justify-end gap-2">
                 <Button
                   variant={"outline"}
                   onClick={() => handleStartWorkout(template)}

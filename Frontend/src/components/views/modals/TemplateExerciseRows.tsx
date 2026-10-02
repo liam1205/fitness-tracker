@@ -25,15 +25,13 @@ import {
   Combobox,
   ComboboxCollection,
   ComboboxContent,
-  ComboboxEmpty,
   ComboboxGroup,
   ComboboxInput,
   ComboboxItem,
   ComboboxLabel,
   ComboboxList,
 } from "@/components/ui/combobox";
-import { Input } from "@/components/ui/input";
-import { GripVertical, InfoIcon, Plus } from "lucide-react";
+import { GripVertical, Plus } from "lucide-react";
 import {
   InputGroup,
   InputGroupAddon,
@@ -111,7 +109,7 @@ export function ExerciseRowsEditor({
   }
 
   return (
-    <div className="flex flex-col gap-2 w-full h-full max-h-72 overflow-y-scroll overflow-x-hidden">
+    <div className="flex flex-col gap-2 w-full h-full max-h-72 overflow-y-auto overflow-x-hidden">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -202,19 +200,20 @@ function SortableExerciseRow({
             className="flex-1 w-full"
           />
           <ComboboxContent container={containerRef}>
-            <ComboboxEmpty>No exercises found.</ComboboxEmpty>
-            <ComboboxList className={"w-24"}>
+            <ComboboxList>
               {(group: ExerciseGroup) => (
                 <ComboboxGroup key={group.value} items={group.items}>
-                  <ComboboxLabel>{group.value}</ComboboxLabel>
+                  <ComboboxLabel className={"capitalize"}>
+                    {group.value}
+                  </ComboboxLabel>
                   <ComboboxCollection>
                     {(exercise: ExerciseRead) => (
                       <ComboboxItem
                         key={exercise.id}
                         value={exercise}
-                        className="min-w-0"
+                        className="min-w-0 w-full"
                       >
-                        <span className="truncate">{exercise.name}</span>
+                        <span className="w-full">{exercise.name}</span>
                       </ComboboxItem>
                     )}
                   </ComboboxCollection>

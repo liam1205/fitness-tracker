@@ -110,9 +110,9 @@
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   /* Lifted lightness so the accents stay legible on the dark surface. */
-  --success: oklch(76.8% 0.233 130.85);
-  --warning: oklch(0.795 0.152 78);
-  --info: oklch(0.706 0.135 253);
+  --success: #80ef80;
+  --warning: #ff8559;
+  --info: #6395ee;
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);

@@ -1,4 +1,7 @@
-import { useStartWorkoutSession } from "@/api/endpoints/workout-sessions/workout-sessions";
+import {
+  getListActiveWorkoutSessionsQueryKey,
+  useStartWorkoutSession,
+} from "@/api/endpoints/workout-sessions/workout-sessions";
 import { useListWorkoutTemplates } from "@/api/endpoints/workout-templates/workout-templates";
 import {
   Select,
@@ -8,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useModal, type ModalButton } from "@/hooks/use-modal";
+import { useQueryClient } from "@tanstack/react-query";
 import { Play } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,6 +21,8 @@ import { toast } from "sonner";
 export function useStartWorkoutModal() {
   const { openModal, updateModal, closeModal } = useModal();
   const { mutate: startWorkoutSession, isPending } = useStartWorkoutSession();
+
+  const queryClient = useQueryClient();
 
   function openStartWorkoutModal() {
     function startButtons(templateId?: string): ModalButton[] {
@@ -31,6 +37,9 @@ export function useStartWorkoutModal() {
               { data: { template_id: templateId } },
               {
                 onSuccess: () => {
+                  queryClient.invalidateQueries({
+                    queryKey: getListActiveWorkoutSessionsQueryKey(),
+                  });
                   toast.success("Workout started.");
                   closeModal();
                 },

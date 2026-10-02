@@ -217,7 +217,7 @@ export function AppSideBar() {
                     }}
                     className="flex flex-row gap-1"
                   >
-                    <SidebarMenuButton className="flex justify-between w-full">
+                    <SidebarMenuButton className="flex justify-between">
                       <span>{session.template_name ?? "Workout"}</span>
                       <div className="flex justify-center items-center mr-2"></div>
                     </SidebarMenuButton>
@@ -241,7 +241,7 @@ export function AppSideBar() {
         <SidebarMenu className="gap-2">
           <SidebarMenuItem>
             <Select value={theme} onValueChange={handleThemeChange}>
-              <SelectTrigger className="w-full max-w-48">
+              <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

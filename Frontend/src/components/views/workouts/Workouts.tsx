@@ -89,11 +89,11 @@ const Workout = ({ session }: WorkoutProps) => {
           </div>
           {!session.completed_at ? (
             <Badge variant={"default"}>
-              <Loader className="size-2.5"></Loader>Running
+              <Loader className="size-2"></Loader>Running
             </Badge>
           ) : (
             <Badge variant={"success"}>
-              <Check className="size-2.5"></Check>Completed
+              <Check className="size-2"></Check>Completed
             </Badge>
           )}
           <Button variant="destructive">
