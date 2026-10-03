@@ -334,6 +334,69 @@ export function useGetWorkoutSession<TData = Awaited<ReturnType<typeof getWorkou
 
 
 /**
+ * Delete a workout session owned by the current user.
+ * @summary Delete a workout session
+ */
+export const deleteWorkoutSession = (
+    sessionId: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<void>(
+      {url: `/api/v1/workout-sessions/${sessionId}`, method: 'DELETE', signal
+    },
+      options);
+    }
+
+
+
+
+export const getDeleteWorkoutSessionMutationOptions = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkoutSession>>, TError,{sessionId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkoutSession>>, TError,{sessionId: string}, TContext> => {
+
+const mutationKey = ['deleteWorkoutSession'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkoutSession>>, {sessionId: string}> = (props) => {
+          const {sessionId} = props ?? {};
+
+          return  deleteWorkoutSession(sessionId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteWorkoutSessionMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkoutSession>>>
+
+    export type DeleteWorkoutSessionMutationError = ErrorType<HTTPValidationError>
+
+    /**
+ * @summary Delete a workout session
+ */
+export const useDeleteWorkoutSession = <TError = ErrorType<HTTPValidationError>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkoutSession>>, TError,{sessionId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteWorkoutSession>>,
+        TError,
+        {sessionId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteWorkoutSessionMutationOptions(options), queryClient);
+    }
+    /**
  * Update a workout session owned by the current user. Omitted fields are left unchanged.
  * @summary Update a workout session
  */

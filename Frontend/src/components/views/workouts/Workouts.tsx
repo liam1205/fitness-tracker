@@ -10,9 +10,15 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
 import { useStartWorkoutModal } from "@/components/views/modals/StartWorkoutModal";
 import type { WorkoutSessionRead } from "@/api/model";
-import { useListCompletedWorkoutSessions } from "@/api/endpoints/workout-sessions/workout-sessions";
+import {
+  getListActiveWorkoutSessionsQueryKey,
+  getListCompletedWorkoutSessionsQueryKey,
+  useDeleteWorkoutSession,
+  useListCompletedWorkoutSessions,
+} from "@/api/endpoints/workout-sessions/workout-sessions";
 import {
   Card,
   CardContent,
@@ -57,7 +63,27 @@ type WorkoutProps = {
 
 const Workout = ({ session }: WorkoutProps) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { mutate: deleteWorkoutSession, isPending: isDeleting } =
+    useDeleteWorkoutSession();
   const started = new Date(session.started_at);
+
+  function handleDelete() {
+    deleteWorkoutSession(
+      { sessionId: session.id },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: getListCompletedWorkoutSessionsQueryKey(),
+          });
+          queryClient.invalidateQueries({
+            queryKey: getListActiveWorkoutSessionsQueryKey(),
+          });
+        },
+      },
+    );
+  }
+
   return (
     <Card size="sm">
       <CardHeader>
@@ -93,7 +119,11 @@ const Workout = ({ session }: WorkoutProps) => {
               <Check className="size-2"></Check>Completed
             </Badge>
           )}
-          <Button variant="destructive">
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={isDeleting}
+          >
             <Trash className="size-2.5"></Trash> Delete
           </Button>
         </div>

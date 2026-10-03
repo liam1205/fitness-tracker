@@ -803,6 +803,41 @@
           }
         }
       },
+      "delete": {
+        "tags": [
+          "workout-sessions"
+        ],
+        "summary": "Delete a workout session",
+        "description": "Delete a workout session owned by the current user.",
+        "operationId": "delete_workout_session",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
       "patch": {
         "tags": [
           "workout-sessions"

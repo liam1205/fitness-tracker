@@ -156,6 +156,24 @@ async def complete_workout_session(
     return session
 
 
+@router.delete(
+    "/{session_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete a workout session",
+)
+async def delete_workout_session(
+    session_id: uuid.UUID,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    """Delete a workout session owned by the current user."""
+    deleted = await crud.workout_session.delete_workout_session_for_user(db, user.id, session_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Workout session not found"
+        )
+
+
 @router.patch(
     "/{session_id}",
     response_model=WorkoutSessionRead,

@@ -366,6 +366,26 @@ async def update_workout_session_for_user(
     return await _build_session_read(db, session)
 
 
+async def delete_workout_session_for_user(
+    db: AsyncSession, user_id: uuid.UUID, session_id: uuid.UUID
+) -> bool:
+    """Delete a workout session owned by ``user_id``, along with its pauses, exercises and sets.
+
+    Returns ``False`` if no such session exists for this user.
+    """
+    session = await _get_session_for_user(db, user_id, session_id)
+    if session is None:
+        return False
+
+    existing_ids = select(SessionExercise.id).where(SessionExercise.session_id == session.id)
+    await db.execute(delete(SessionSet).where(SessionSet.session_exercise_id.in_(existing_ids)))
+    await db.execute(delete(SessionExercise).where(SessionExercise.session_id == session.id))
+    await db.execute(delete(SessionPause).where(SessionPause.session_id == session.id))
+    await db.delete(session)
+    await db.flush()
+    return True
+
+
 async def start_workout_session_from_template(
     db: AsyncSession, user_id: uuid.UUID, template_id: uuid.UUID
 ) -> WorkoutSessionRead | None:

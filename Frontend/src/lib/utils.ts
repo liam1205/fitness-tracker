@@ -6,12 +6,14 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const dateString = (date: Date) => {
-  const day = date.getDate();
-  const month = date.toLocaleString("en-US", { month: "long" });
-  const year = date.getFullYear();
+  const day = date.getDate().toLocaleString().padStart(2, "0");
+  const month = date
+    .toLocaleString("en-US", { month: "long" })
+    .padStart(2, "0");
+  const year = date.getFullYear().toLocaleString();
 
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
+  const hours = date.getHours().toLocaleString().padStart(2, "0");
+  const minutes = date.getMinutes().toLocaleString().padStart(2, "0");
 
   return `${day}. ${month} ${year} at ${hours}:${minutes}`;
 };
