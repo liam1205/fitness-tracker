@@ -40,20 +40,17 @@ export function Exercises() {
     <div className="space-y-4 pb-12">
       <h1 className="text-4xl font-bold tracking-tight">Exercises</h1>
       <Accordion
-        className="rounded-lg border"
         type="single"
+        collapsible
+        defaultValue="chest"
         key={Object.keys(groupedExercises).join(",")}
       >
         {Object.entries(groupedExercises).map(([muscleGroup, exercises]) => (
-          <AccordionItem
-            key={muscleGroup}
-            value={muscleGroup}
-            className="border-b"
-          >
-            <AccordionTrigger className="px-4 text-sm font-semibold capitalize tracking-wide text-muted-foreground">
+          <AccordionItem key={muscleGroup} value={muscleGroup}>
+            <AccordionTrigger>
               {muscleGroup} ({exercises.length})
             </AccordionTrigger>
-            <AccordionContent className="flex flex-col gap-3 p-2">
+            <AccordionContent className="gap-1">
               {exercises.map((exercise) => (
                 <Item key={exercise.id} variant={"outline"}>
                   <ItemMedia></ItemMedia>

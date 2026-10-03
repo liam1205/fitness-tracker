@@ -17,6 +17,7 @@ import {
   getListActiveWorkoutSessionsQueryKey,
   getListCompletedWorkoutSessionsQueryKey,
   useDeleteWorkoutSession,
+  useListActiveWorkoutSessions,
   useListCompletedWorkoutSessions,
 } from "@/api/endpoints/workout-sessions/workout-sessions";
 import {
@@ -31,20 +32,43 @@ import { useRouter } from "@tanstack/react-router";
 import { dateString } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 /**
  * Logged workouts: the history of completed training sessions.
  */
 export function Workouts() {
   const { openStartWorkoutModal } = useStartWorkoutModal();
-  const { data: workout_sessions } = useListCompletedWorkoutSessions();
+  const { data: workoutSessionsCompleted } = useListCompletedWorkoutSessions();
+  const { data: workoutSessionsNotCompleted } = useListActiveWorkoutSessions();
 
   return (
     <div className="space-y-4">
       <h1 className="text-4xl font-bold tracking-tight">Workouts</h1>
-      {workout_sessions?.map((session) => (
-        <Workout session={session}></Workout>
-      ))}
+      <Accordion type="single" defaultValue="active" collapsible>
+        <AccordionItem value="active">
+          <AccordionTrigger>Active Sessions</AccordionTrigger>
+          <AccordionContent>
+            {workoutSessionsNotCompleted?.map((session) => (
+              <Workout session={session}></Workout>
+            ))}
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem key={"completed"} value={"completed"}>
+          <AccordionTrigger>Completed Sessions</AccordionTrigger>
+          <AccordionContent>
+            {workoutSessionsCompleted?.map((session) => (
+              <Workout session={session}></Workout>
+            ))}
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
       <Button
         size={"lg"}
         className="fixed bottom-6 left-1/2 -translate-x-1/2 shadow-lg"
