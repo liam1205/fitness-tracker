@@ -25,6 +25,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  GetDailySessionCountsParams,
   GetWeeklyMuscleGroupSetsParams,
   HTTPValidationError,
   WeeklyMuscleGroupSets,
@@ -325,6 +326,102 @@ export function useGetWeeklyMuscleGroupSets<TData = Awaited<ReturnType<typeof ge
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWeeklyMuscleGroupSetsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * Return the current user's session counts per day, grouped into Monday-to-Sunday weeks.
+ *
+ * Weeks are ordered oldest first; the current week only runs up to today.
+ * @summary Get the number of workout sessions per day over recent calendar weeks
+ */
+export const getDailySessionCounts = (
+    params?: GetDailySessionCountsParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<number[][]>(
+      {url: `/api/v1/workout-sessions/daily-counts`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+
+
+
+
+export const getGetDailySessionCountsQueryKey = (params?: GetDailySessionCountsParams,) => {
+    return [
+    `/api/v1/workout-sessions/daily-counts`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetDailySessionCountsQueryOptions = <TData = Awaited<ReturnType<typeof getDailySessionCounts>>, TError = ErrorType<HTTPValidationError>>(params?: GetDailySessionCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDailySessionCounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDailySessionCountsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDailySessionCounts>>> = ({ signal }) => getDailySessionCounts(params, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDailySessionCounts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetDailySessionCountsQueryResult = NonNullable<Awaited<ReturnType<typeof getDailySessionCounts>>>
+export type GetDailySessionCountsQueryError = ErrorType<HTTPValidationError>
+
+
+export function useGetDailySessionCounts<TData = Awaited<ReturnType<typeof getDailySessionCounts>>, TError = ErrorType<HTTPValidationError>>(
+ params: undefined |  GetDailySessionCountsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDailySessionCounts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDailySessionCounts>>,
+          TError,
+          Awaited<ReturnType<typeof getDailySessionCounts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDailySessionCounts<TData = Awaited<ReturnType<typeof getDailySessionCounts>>, TError = ErrorType<HTTPValidationError>>(
+ params?: GetDailySessionCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDailySessionCounts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDailySessionCounts>>,
+          TError,
+          Awaited<ReturnType<typeof getDailySessionCounts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDailySessionCounts<TData = Awaited<ReturnType<typeof getDailySessionCounts>>, TError = ErrorType<HTTPValidationError>>(
+ params?: GetDailySessionCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDailySessionCounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get the number of workout sessions per day over recent calendar weeks
+ */
+
+export function useGetDailySessionCounts<TData = Awaited<ReturnType<typeof getDailySessionCounts>>, TError = ErrorType<HTTPValidationError>>(
+ params?: GetDailySessionCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDailySessionCounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetDailySessionCountsQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

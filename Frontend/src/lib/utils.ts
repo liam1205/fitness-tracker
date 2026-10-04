@@ -34,3 +34,18 @@ export const formatDuration = (totalSec: number) => {
     .filter(Boolean)
     .join(" ");
 };
+
+export const getCurrentWeekNumber = (date = new Date()) => {
+  const target = new Date(date.valueOf());
+
+  // Shift to Thursday of the current week (ISO weeks start on Monday, and week 1 contains the year's first Thursday)
+  target.setUTCDate(target.getUTCDate() + 4 - (target.getUTCDay() || 7));
+
+  // Get first day of the year
+  const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
+
+  // Calculate full weeks to target Thursday
+  return Math.ceil(
+    ((target.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
+  );
+};

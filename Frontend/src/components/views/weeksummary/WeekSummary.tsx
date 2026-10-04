@@ -2,6 +2,11 @@ import { useGetWeeklyMuscleGroupSets } from "@/api/endpoints/workout-sessions/wo
 import type { MuscleGroupSetCount } from "@/api/model";
 import { Badge } from "@/components/ui/badge";
 import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import {
   createDataTableColumnHelper,
   DataTable,
   type DataTableColumnDef,
@@ -34,27 +39,62 @@ const columns: DataTableColumnDef<MuscleGroupSetCount>[] = [
   }),
   columnHelper.accessor("completed_sets", {
     header: "Sets",
-    cell: (info) => (
-      <Badge variant={setsColorClass(info.row.original)}>
-        {info.getValue()}
-      </Badge>
-    ),
-    meta: { className: "text-right" },
+    cell: (info) => {
+      return !info.row.original.mev ||
+        !info.row.original.mav ||
+        !info.row.original.mrv ? (
+        <Badge variant={setsColorClass(info.row.original)}>
+          {info.getValue()}
+        </Badge>
+      ) : (
+        <HoverCard>
+          <HoverCardTrigger>
+            <Badge variant={setsColorClass(info.row.original)}>
+              {info.getValue()}
+            </Badge>
+          </HoverCardTrigger>
+          <HoverCardContent>
+            <ol className="list-inside list-decimal space-y-2 text-sm">
+              <p>
+                <span className="bg-accent">
+                  {info.row.original.mev - info.row.original.completed_sets}{" "}
+                  sets
+                </span>{" "}
+                missing to reach{" "}
+                <span className="bg-accent">Minimum Effective Volume</span> for{" "}
+                {info.row.original.muscle_group}.
+              </p>
+              <p>
+                <span className="bg-accent">
+                  {info.row.original.mav - info.row.original.completed_sets} -{" "}
+                  {info.row.original.mrv - info.row.original.completed_sets}{" "}
+                  sets
+                </span>{" "}
+                missing to reach{" "}
+                <span className="bg-accent">Maximum Adaptive Volume</span> for{" "}
+                {info.row.original.muscle_group}.
+              </p>
+            </ol>
+          </HoverCardContent>
+        </HoverCard>
+      );
+    },
+    meta: { className: "text-center" },
   }),
   columnHelper.accessor("mev", {
     header: "MEV",
     cell: (info) => optionalSets(info.getValue()),
-    meta: { className: "text-right" },
+    meta: { className: "text-center" },
   }),
   columnHelper.accessor("mav", {
     header: "MAV",
     cell: (info) => optionalSets(info.getValue()),
-    meta: { className: "text-right" },
+    meta: { className: "text-center" },
   }),
   columnHelper.accessor("mrv", {
     header: "MRV",
     cell: (info) => optionalSets(info.getValue()),
-    meta: { className: "text-right" },
+    meta: { className: "text-center" },
   }),
 ];
 

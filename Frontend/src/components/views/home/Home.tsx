@@ -12,15 +12,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useGetWeeklyMuscleGroupSets } from "@/api/endpoints";
 import WeekSummary from "../weeksummary/WeekSummary";
+import { getCurrentWeekNumber } from "@/lib/utils";
+import ActivityOverview from "../activity-overview/ActivityOverview";
 
 export function Home() {
   const { user } = useAuth();
   const { openCreateTemplateModal } = useCreateTemplateModal();
   const { openStartWorkoutModal } = useStartWorkoutModal();
   const { openCreateExerciseModal } = useCreateExerciseModal();
-  const { data: setsOfTheWeek } = useGetWeeklyMuscleGroupSets();
 
   return (
     <div className="space-y-4">
@@ -31,7 +31,7 @@ export function Home() {
         <Card>
           <CardHeader>
             <CardTitle>This week's summary</CardTitle>
-            <CardDescription>Calendar week </CardDescription>
+            <CardDescription>CW {getCurrentWeekNumber()}</CardDescription>
           </CardHeader>
           <CardContent>
             <WeekSummary></WeekSummary>
@@ -41,7 +41,9 @@ export function Home() {
           <CardHeader>
             <CardTitle>Your activity</CardTitle>
           </CardHeader>
-          <CardContent className="flex "></CardContent>
+          <CardContent className="flex">
+            <ActivityOverview></ActivityOverview>
+          </CardContent>
         </Card>
         <Card>
           <CardHeader>

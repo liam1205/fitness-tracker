@@ -64,6 +64,27 @@ async def get_weekly_muscle_group_sets(
 
 
 @router.get(
+    "/daily-counts",
+    response_model=list[list[int]],
+    summary="Get the number of workout sessions per day over recent calendar weeks",
+)
+async def get_daily_session_counts(
+    user: CurrentUser,
+    weeks: int = Query(
+        1,
+        ge=1,
+        description="How many calendar weeks to look at: 1 is only the current week, 4 the current and the three before.",
+    ),
+    db: AsyncSession = Depends(get_db),
+) -> list[list[int]]:
+    """Return the current user's session counts per day, grouped into Monday-to-Sunday weeks.
+
+    Weeks are ordered oldest first; the current week only runs up to today.
+    """
+    return await crud.workout_session.get_daily_session_counts_for_user(db, user.id, weeks)
+
+
+@router.get(
     "/{session_id}",
     response_model=WorkoutSessionRead,
     summary="Get a workout session by ID",

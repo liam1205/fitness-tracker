@@ -9,6 +9,7 @@
 export * from './exerciseCreate';
 export * from './exerciseRead';
 export * from './exerciseUpdate';
+export * from './getDailySessionCountsParams';
 export * from './getWeeklyMuscleGroupSetsParams';
 export * from './healthResponse';
 export * from './hTTPValidationError';
