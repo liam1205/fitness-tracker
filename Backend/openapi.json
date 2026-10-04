@@ -760,6 +760,53 @@
         }
       }
     },
+    "/api/v1/workout-sessions/weekly-sets": {
+      "get": {
+        "tags": [
+          "workout-sessions"
+        ],
+        "summary": "Get completed sets per muscle group for a calendar week",
+        "description": "Return how many sets were completed per muscle group in a Monday-to-Sunday week.",
+        "operationId": "get_weekly_muscle_group_sets",
+        "parameters": [
+          {
+            "name": "weeks_ago",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Which calendar week to look at: 0 is the current week, 1 the last, 10 ten weeks ago.",
+              "default": 0,
+              "title": "Weeks Ago"
+            },
+            "description": "Which calendar week to look at: 0 is the current week, 1 the last, 10 ten weeks ago."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyMuscleGroupSets"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/workout-sessions/{session_id}": {
       "get": {
         "tags": [
@@ -1245,6 +1292,63 @@
           "hamstrings"
         ],
         "title": "MuscleGroup"
+      },
+      "MuscleGroupSetCount": {
+        "properties": {
+          "muscle_group": {
+            "$ref": "#/components/schemas/MuscleGroup",
+            "description": "Muscle group the sets were performed for."
+          },
+          "completed_sets": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Completed Sets",
+            "description": "Number of sets marked as completed."
+          },
+          "mev": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mev",
+            "description": "Minimum effective volume: weekly sets needed to grow, if defined."
+          },
+          "mav": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mav",
+            "description": "Maximum adaptive volume: weekly sets for optimal growth, if defined."
+          },
+          "mrv": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mrv",
+            "description": "Maximum recoverable volume: weekly sets beyond which recovery suffers."
+          }
+        },
+        "type": "object",
+        "required": [
+          "muscle_group",
+          "completed_sets"
+        ],
+        "title": "MuscleGroupSetCount",
+        "description": "Number of completed sets for one muscle group."
       },
       "Page_ExerciseRead_": {
         "properties": {
@@ -1764,6 +1868,38 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "WeeklyMuscleGroupSets": {
+        "properties": {
+          "week_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Week Start",
+            "description": "Monday of the calendar week."
+          },
+          "week_end": {
+            "type": "string",
+            "format": "date",
+            "title": "Week End",
+            "description": "Sunday of the calendar week."
+          },
+          "muscle_groups": {
+            "items": {
+              "$ref": "#/components/schemas/MuscleGroupSetCount"
+            },
+            "type": "array",
+            "title": "Muscle Groups",
+            "description": "Completed set count for every muscle group, including those with 0."
+          }
+        },
+        "type": "object",
+        "required": [
+          "week_start",
+          "week_end",
+          "muscle_groups"
+        ],
+        "title": "WeeklyMuscleGroupSets",
+        "description": "Completed sets per muscle group for one calendar week (Monday to Sunday, UTC)."
       },
       "WorkoutSessionRead": {
         "properties": {

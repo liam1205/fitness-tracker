@@ -1,11 +1,13 @@
 import uuid
 from collections import defaultdict
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, time, timedelta
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.data.default_mev_mav_mrv import DEFAULT_MAV, DEFAULT_MEV, DEFAULT_MRV
+from app.models.enums import MuscleGroup
 from app.models.exercise import Exercise
 from app.models.workout_session import (
     SessionExercise,
@@ -15,11 +17,18 @@ from app.models.workout_session import (
 )
 from app.models.workout_template import TemplateExercise, WorkoutTemplate
 from app.schemas.workout_session import (
+    MuscleGroupSetCount,
     SessionExerciseRead,
     SessionSetRead,
+    WeeklyMuscleGroupSets,
     WorkoutSessionRead,
     WorkoutSessionUpdate,
 )
+
+
+_MEV = {group: sets for sets, group in DEFAULT_MEV}
+_MAV = {group: sets for sets, group in DEFAULT_MAV}
+_MRV = {group: sets for sets, group in DEFAULT_MRV}
 
 
 async def _get_exercises_for_sessions(
@@ -191,6 +200,56 @@ async def list_completed_workout_sessions_for_user(
 ) -> list[WorkoutSessionRead]:
     """Return all completed workout sessions (``completed_at`` set) owned by ``user_id``."""
     return await _list_workout_sessions_for_user(db, user_id, completed=True)
+
+
+async def get_weekly_muscle_group_sets_for_user(
+    db: AsyncSession, user_id: uuid.UUID, weeks_ago: int
+) -> WeeklyMuscleGroupSets:
+    """Count completed sets per muscle group in a calendar week for ``user_id``.
+
+    Weeks run from Monday 00:00 to the following Monday 00:00 (UTC);
+    ``weeks_ago`` of 0 is the current week, 1 the previous one, and so on. A
+    set belongs to the week its session was started in, regardless of whether
+    the session itself has been completed. Every muscle group is returned,
+    with 0 for those without completed sets. Each entry also carries the
+    default MEV/MAV/MRV weekly set thresholds (``None`` where none are defined).
+    """
+    today = datetime.now(UTC).date()
+    week_start = today - timedelta(days=today.weekday() + 7 * weeks_ago)
+    week_end = week_start + timedelta(days=6)
+    range_start = datetime.combine(week_start, time.min, tzinfo=UTC)
+    range_end = range_start + timedelta(days=7)
+
+    rows = await db.execute(
+        select(Exercise.muscle_group, func.count(SessionSet.id))
+        .select_from(SessionSet)
+        .join(SessionExercise, SessionExercise.id == SessionSet.session_exercise_id)
+        .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
+        .join(Exercise, Exercise.id == SessionExercise.exercise_id)
+        .where(
+            WorkoutSession.user_id == user_id,
+            WorkoutSession.started_at >= range_start,
+            WorkoutSession.started_at < range_end,
+            SessionSet.completed.is_(True),
+        )
+        .group_by(Exercise.muscle_group)
+    )
+    counts = {muscle_group: count for muscle_group, count in rows.all()}
+
+    return WeeklyMuscleGroupSets(
+        week_start=week_start,
+        week_end=week_end,
+        muscle_groups=[
+            MuscleGroupSetCount(
+                muscle_group=group,
+                completed_sets=counts.get(group, 0),
+                mev=_MEV.get(group),
+                mav=_MAV.get(group),
+                mrv=_MRV.get(group),
+            )
+            for group in MuscleGroup
+        ],
+    )
 
 
 async def _get_session_for_user(

@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import crud
@@ -8,6 +8,7 @@ from app.api.deps import CurrentUser
 from app.db import get_db
 from app.crud.workout_session import SessionStateError
 from app.schemas.workout_session import (
+    WeeklyMuscleGroupSets,
     WorkoutSessionRead,
     WorkoutSessionStart,
     WorkoutSessionUpdate,
@@ -40,6 +41,26 @@ async def list_completed_workout_sessions(
 ) -> list[WorkoutSessionRead]:
     """Return the current user's workout sessions that have been completed."""
     return await crud.workout_session.list_completed_workout_sessions_for_user(db, user.id)
+
+
+@router.get(
+    "/weekly-sets",
+    response_model=WeeklyMuscleGroupSets,
+    summary="Get completed sets per muscle group for a calendar week",
+)
+async def get_weekly_muscle_group_sets(
+    user: CurrentUser,
+    weeks_ago: int = Query(
+        0,
+        ge=0,
+        description="Which calendar week to look at: 0 is the current week, 1 the last, 10 ten weeks ago.",
+    ),
+    db: AsyncSession = Depends(get_db),
+) -> WeeklyMuscleGroupSets:
+    """Return how many sets were completed per muscle group in a Monday-to-Sunday week."""
+    return await crud.workout_session.get_weekly_muscle_group_sets_for_user(
+        db, user.id, weeks_ago
+    )
 
 
 @router.get(

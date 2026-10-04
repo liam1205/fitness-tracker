@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -63,6 +63,32 @@ class WorkoutSessionRead(BaseModel):
         ),
     )
     exercises: list[SessionExerciseRead] = Field(..., description="Exercise slots, in order.")
+
+
+class MuscleGroupSetCount(BaseModel):
+    """Number of completed sets for one muscle group."""
+
+    muscle_group: MuscleGroup = Field(..., description="Muscle group the sets were performed for.")
+    completed_sets: int = Field(..., ge=0, description="Number of sets marked as completed.")
+    mev: int | None = Field(
+        None, description="Minimum effective volume: weekly sets needed to grow, if defined."
+    )
+    mav: int | None = Field(
+        None, description="Maximum adaptive volume: weekly sets for optimal growth, if defined."
+    )
+    mrv: int | None = Field(
+        None, description="Maximum recoverable volume: weekly sets beyond which recovery suffers."
+    )
+
+
+class WeeklyMuscleGroupSets(BaseModel):
+    """Completed sets per muscle group for one calendar week (Monday to Sunday, UTC)."""
+
+    week_start: date = Field(..., description="Monday of the calendar week.")
+    week_end: date = Field(..., description="Sunday of the calendar week.")
+    muscle_groups: list[MuscleGroupSetCount] = Field(
+        ..., description="Completed set count for every muscle group, including those with 0."
+    )
 
 
 class WorkoutSessionStart(BaseModel):
