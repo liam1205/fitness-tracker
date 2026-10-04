@@ -275,7 +275,10 @@ export function DataTable<TData extends RowData>({
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className={cell.column.columnDef.meta?.className}
+                      className={cn(
+                        cell.column.columnDef.meta?.className,
+                        "text-sm",
+                      )}
                     >
                       <table.FlexRender cell={cell} />
                     </TableCell>
