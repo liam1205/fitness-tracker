@@ -285,6 +285,39 @@ async def get_daily_session_counts_for_user(
     return [counts[i : i + 7] for i in range(0, len(counts), 7)]
 
 
+async def get_weekly_completed_session_counts_for_user(
+    db: AsyncSession, user_id: uuid.UUID, weeks: int
+) -> list[int]:
+    """Count completed workout sessions per week over the last ``weeks`` calendar weeks for ``user_id``.
+
+    Weeks run from Monday 00:00 to the following Monday 00:00 (UTC); ``weeks``
+    of 1 covers only the current week. Returns one count per week, oldest
+    first. Only sessions with ``completed_at`` set are counted, and a session
+    belongs to the week it was started in.
+    """
+    today = datetime.now(UTC).date()
+    first_day = today - timedelta(days=today.weekday() + 7 * (weeks - 1))
+    range_start = datetime.combine(first_day, time.min, tzinfo=UTC)
+    range_end = range_start + timedelta(weeks=weeks)
+
+    started_ats = (
+        await db.execute(
+            select(WorkoutSession.started_at).where(
+                WorkoutSession.user_id == user_id,
+                WorkoutSession.completed_at.is_not(None),
+                WorkoutSession.started_at >= range_start,
+                WorkoutSession.started_at < range_end,
+            )
+        )
+    ).scalars()
+
+    counts = [0] * weeks
+    for started_at in started_ats:
+        counts[(started_at.astimezone(UTC).date() - first_day).days // 7] += 1
+
+    return counts
+
+
 async def _get_session_for_user(
     db: AsyncSession, user_id: uuid.UUID, session_id: uuid.UUID
 ) -> WorkoutSession | None:

@@ -18,12 +18,18 @@ import { cn } from "@/lib/utils";
 const WEEKS = 5;
 const WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
 
-const ActivityOverview = () => {
+type Props = {
+  currentWeek: (weeks: number) => void;
+};
+
+const ActivityOverview = ({ currentWeek }: Props) => {
   const { data: activity } = useGetDailySessionCounts({ weeks: WEEKS });
   const firstMonday = startOfISOWeek(subWeeks(new Date(), WEEKS - 1));
 
+  currentWeek(WEEKS);
+
   return (
-    <div className="mx-auto grid grid-cols-[auto_repeat(7,1rem)] items-center gap-1.5 text-xs">
+    <div className="mx-auto grid grid-cols-[auto_repeat(7,1rem)] items-center gap-2 text-xs">
       <span />
       {WEEKDAYS.map((day, i) => (
         <span key={i} className="text-center text-muted-foreground">
@@ -49,7 +55,7 @@ const ActivityOverview = () => {
                         count === undefined &&
                           "border border-dashed border-foreground/20",
                         count === 0 && "bg-foreground/10",
-                        count === 1 && "bg-success",
+                        count === 1 && "bg-info",
                         count !== undefined && count >= 2 && "bg-success",
                         isToday(date) &&
                           "ring-2 ring-ring ring-offset-0 ring-offset-card",

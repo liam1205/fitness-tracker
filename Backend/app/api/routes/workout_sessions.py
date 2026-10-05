@@ -85,6 +85,29 @@ async def get_daily_session_counts(
 
 
 @router.get(
+    "/weekly-counts",
+    response_model=list[int],
+    summary="Get the number of completed workout sessions per week over recent calendar weeks",
+)
+async def get_weekly_completed_session_counts(
+    user: CurrentUser,
+    weeks: int = Query(
+        1,
+        ge=1,
+        description="How many calendar weeks to look at: 1 is only the current week, 4 the current and the three before.",
+    ),
+    db: AsyncSession = Depends(get_db),
+) -> list[int]:
+    """Return the current user's completed session counts per Monday-to-Sunday week.
+
+    Weeks are ordered oldest first; a session counts towards the week it was started in.
+    """
+    return await crud.workout_session.get_weekly_completed_session_counts_for_user(
+        db, user.id, weeks
+    )
+
+
+@router.get(
     "/{session_id}",
     response_model=WorkoutSessionRead,
     summary="Get a workout session by ID",

@@ -15,6 +15,8 @@ import {
 import WeekSummary from "../weeksummary/WeekSummary";
 import { getCurrentWeekNumber } from "@/lib/utils";
 import ActivityOverview from "../activity-overview/ActivityOverview";
+import ActivityOverviewGraph from "../activity-overview/ActivityOverviewGraph";
+import { useState } from "react";
 
 export function Home() {
   const { user } = useAuth();
@@ -22,12 +24,49 @@ export function Home() {
   const { openStartWorkoutModal } = useStartWorkoutModal();
   const { openCreateExerciseModal } = useCreateExerciseModal();
 
+  const [graphWeeks, setGraphWeeks] = useState<number>();
+  const [activityWeeks, setActivityWeeks] = useState<number>();
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-10">
       <h1 className="text-4xl font-bold tracking-tight">
-        Welcome{user ? `, ${user.name}` : ""}
+        Welcome
+        {user ? (
+          <>
+            ,{" "}
+            <span className="rounded-xl px-2  bg-foreground text-background">
+              {user.name}
+            </span>
+          </>
+        ) : (
+          <></>
+        )}
       </h1>
       <div className="w-full h-full flex flex-col gap-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Your activity</CardTitle>
+            <CardDescription>
+              Completed workouts in the last {activityWeeks} weeks
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex">
+            <ActivityOverview currentWeek={setActivityWeeks}></ActivityOverview>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Activity Graph</CardTitle>
+            <CardDescription>
+              Amounts of workout sessions in the last {graphWeeks} weeks
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex ">
+            <ActivityOverviewGraph
+              currentWeek={setGraphWeeks}
+            ></ActivityOverviewGraph>
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader>
             <CardTitle>This week's summary</CardTitle>
@@ -36,20 +75,6 @@ export function Home() {
           <CardContent>
             <WeekSummary></WeekSummary>
           </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Your activity</CardTitle>
-          </CardHeader>
-          <CardContent className="flex">
-            <ActivityOverview></ActivityOverview>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Your activity - graph</CardTitle>
-          </CardHeader>
-          <CardContent className="flex "></CardContent>
         </Card>
       </div>
       <div className="fixed inset-x-0 bottom-6 flex flex-wrap justify-center gap-3 px-4">

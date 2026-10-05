@@ -26,6 +26,7 @@ import type {
 
 import type {
   GetDailySessionCountsParams,
+  GetWeeklyCompletedSessionCountsParams,
   GetWeeklyMuscleGroupSetsParams,
   HTTPValidationError,
   WeeklyMuscleGroupSets,
@@ -422,6 +423,102 @@ export function useGetDailySessionCounts<TData = Awaited<ReturnType<typeof getDa
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetDailySessionCountsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+/**
+ * Return the current user's completed session counts per Monday-to-Sunday week.
+ *
+ * Weeks are ordered oldest first; a session counts towards the week it was started in.
+ * @summary Get the number of completed workout sessions per week over recent calendar weeks
+ */
+export const getWeeklyCompletedSessionCounts = (
+    params?: GetWeeklyCompletedSessionCountsParams,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+
+
+      return customInstance<number[]>(
+      {url: `/api/v1/workout-sessions/weekly-counts`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+
+
+
+
+export const getGetWeeklyCompletedSessionCountsQueryKey = (params?: GetWeeklyCompletedSessionCountsParams,) => {
+    return [
+    `/api/v1/workout-sessions/weekly-counts`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetWeeklyCompletedSessionCountsQueryOptions = <TData = Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>, TError = ErrorType<HTTPValidationError>>(params?: GetWeeklyCompletedSessionCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWeeklyCompletedSessionCountsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>> = ({ signal }) => getWeeklyCompletedSessionCounts(params, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetWeeklyCompletedSessionCountsQueryResult = NonNullable<Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>>
+export type GetWeeklyCompletedSessionCountsQueryError = ErrorType<HTTPValidationError>
+
+
+export function useGetWeeklyCompletedSessionCounts<TData = Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>, TError = ErrorType<HTTPValidationError>>(
+ params: undefined |  GetWeeklyCompletedSessionCountsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>,
+          TError,
+          Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWeeklyCompletedSessionCounts<TData = Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>, TError = ErrorType<HTTPValidationError>>(
+ params?: GetWeeklyCompletedSessionCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>,
+          TError,
+          Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWeeklyCompletedSessionCounts<TData = Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>, TError = ErrorType<HTTPValidationError>>(
+ params?: GetWeeklyCompletedSessionCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get the number of completed workout sessions per week over recent calendar weeks
+ */
+
+export function useGetWeeklyCompletedSessionCounts<TData = Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>, TError = ErrorType<HTTPValidationError>>(
+ params?: GetWeeklyCompletedSessionCountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWeeklyCompletedSessionCounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetWeeklyCompletedSessionCountsQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

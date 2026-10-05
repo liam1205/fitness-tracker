@@ -861,6 +861,57 @@
         }
       }
     },
+    "/api/v1/workout-sessions/weekly-counts": {
+      "get": {
+        "tags": [
+          "workout-sessions"
+        ],
+        "summary": "Get the number of completed workout sessions per week over recent calendar weeks",
+        "description": "Return the current user's completed session counts per Monday-to-Sunday week.\n\nWeeks are ordered oldest first; a session counts towards the week it was started in.",
+        "operationId": "get_weekly_completed_session_counts",
+        "parameters": [
+          {
+            "name": "weeks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "How many calendar weeks to look at: 1 is only the current week, 4 the current and the three before.",
+              "default": 1,
+              "title": "Weeks"
+            },
+            "description": "How many calendar weeks to look at: 1 is only the current week, 4 the current and the three before."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  },
+                  "title": "Response Get Weekly Completed Session Counts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/workout-sessions/{session_id}": {
       "get": {
         "tags": [
