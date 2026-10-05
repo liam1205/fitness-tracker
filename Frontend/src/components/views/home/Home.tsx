@@ -34,7 +34,7 @@ export function Home() {
         {user ? (
           <>
             ,{" "}
-            <span className="rounded-xl px-2  bg-foreground text-background">
+            <span className="rounded-xl px-2 bg-foreground text-background">
               {user.name}
             </span>
           </>

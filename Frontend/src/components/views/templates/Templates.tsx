@@ -25,11 +25,13 @@ import {
 import { useViewTemplateModal } from "../modals/ViewTemplate";
 import { dateString } from "@/lib/utils";
 import { useNavigate } from "@tanstack/react-router";
+import { useAuth } from "@/lib/auth";
 
 /**
  * Workout templates: reusable exercise plans a user can start a workout from.
  */
 export function Templates() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { openCreateTemplateModal } = useCreateTemplateModal();
@@ -71,7 +73,12 @@ export function Templates() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-4xl font-bold tracking-tight">Templates</h1>
+      <h1 className="text-4xl font-bold tracking-tight">
+        {user?.firstName}'s{" "}
+        <span className="rounded-xl px-2 bg-foreground text-background">
+          Templates
+        </span>
+      </h1>
       <div className="flex flex-col gap-3">
         {data?.map((template) => (
           <Card size="sm">

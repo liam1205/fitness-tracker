@@ -38,18 +38,25 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useAuth } from "@/lib/auth";
 
 /**
  * Logged workouts: the history of completed training sessions.
  */
 export function Workouts() {
+  const { user } = useAuth();
   const { openStartWorkoutModal } = useStartWorkoutModal();
   const { data: workoutSessionsCompleted } = useListCompletedWorkoutSessions();
   const { data: workoutSessionsNotCompleted } = useListActiveWorkoutSessions();
 
   return (
     <div className="space-y-4">
-      <h1 className="text-4xl font-bold tracking-tight">Workouts</h1>
+      <h1 className="text-4xl font-bold tracking-tight">
+        {user?.firstName}'s{" "}
+        <span className="rounded-xl px-2 bg-foreground text-background">
+          Workouts
+        </span>
+      </h1>
       <Accordion type="single" defaultValue="active" collapsible>
         <AccordionItem value="active">
           <AccordionTrigger>Active Sessions</AccordionTrigger>

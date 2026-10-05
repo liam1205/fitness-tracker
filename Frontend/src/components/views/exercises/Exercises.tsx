@@ -20,11 +20,13 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
+import { useAuth } from "@/lib/auth";
 
 /**
  * Exercise library: the catalog of exercises a user can add to templates and workouts.
  */
 export function Exercises() {
+  const { user } = useAuth();
   const { openCreateExerciseModal } = useCreateExerciseModal();
   const { data } = useListExercises({ page: 1, page_size: 100 });
   const { openViewExerciseModal } = useViewExerciseModal();
@@ -38,7 +40,12 @@ export function Exercises() {
 
   return (
     <div className="space-y-4 pb-12">
-      <h1 className="text-4xl font-bold tracking-tight">Exercises</h1>
+      <h1 className="text-4xl font-bold tracking-tight">
+        {user?.firstName}'s{" "}
+        <span className="rounded-xl px-2 bg-foreground text-background">
+          Exercises
+        </span>
+      </h1>
       <Accordion
         type="single"
         collapsible

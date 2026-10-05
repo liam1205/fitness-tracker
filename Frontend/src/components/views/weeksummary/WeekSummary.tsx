@@ -53,26 +53,30 @@ const columns: DataTableColumnDef<MuscleGroupSetCount>[] = [
               {info.getValue()}
             </Badge>
           </HoverCardTrigger>
-          <HoverCardContent>
+          <HoverCardContent className="min-w-fit">
             <ol className="list-inside list-decimal space-y-2 text-sm">
               <p>
-                <span className="bg-accent">
+                <span className="rounded-md px-2 bg-foreground text-background">
                   {info.row.original.mev - info.row.original.completed_sets}{" "}
                   sets
                 </span>{" "}
                 missing to reach{" "}
-                <span className="bg-accent">Minimum Effective Volume</span> for{" "}
-                {info.row.original.muscle_group}.
+                <span className="rounded-md px-2 bg-foreground text-background">
+                  Minimum Effective Volume
+                </span>{" "}
+                for {info.row.original.muscle_group}.
               </p>
               <p>
-                <span className="bg-accent">
+                <span className="rounded-md px-2 bg-foreground text-background">
                   {info.row.original.mav - info.row.original.completed_sets} -{" "}
                   {info.row.original.mrv - info.row.original.completed_sets}{" "}
                   sets
                 </span>{" "}
                 missing to reach{" "}
-                <span className="bg-accent">Maximum Adaptive Volume</span> for{" "}
-                {info.row.original.muscle_group}.
+                <span className="rounded-md px-2 bg-foreground text-background">
+                  Maximum Adaptive Volume
+                </span>{" "}
+                for {info.row.original.muscle_group}.
               </p>
             </ol>
           </HoverCardContent>
