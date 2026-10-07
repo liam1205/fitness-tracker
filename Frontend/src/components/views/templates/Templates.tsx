@@ -26,6 +26,7 @@ import { useViewTemplateModal } from "../modals/ViewTemplate";
 import { dateString } from "@/lib/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
+import EmptyIndicator from "../empty-indicator/EmptyIndicator";
 
 /**
  * Workout templates: reusable exercise plans a user can start a workout from.
@@ -80,6 +81,11 @@ export function Templates() {
         </span>
       </h1>
       <div className="flex flex-col gap-3">
+        {data?.length === 0 && (
+          <EmptyIndicator
+            message={<>No templates available.</>}
+          ></EmptyIndicator>
+        )}
         {data?.map((template) => (
           <Card size="sm">
             <CardHeader>

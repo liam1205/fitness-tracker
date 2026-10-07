@@ -39,6 +39,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useAuth } from "@/lib/auth";
+import EmptyIndicator from "../empty-indicator/EmptyIndicator";
 
 /**
  * Logged workouts: the history of completed training sessions.
@@ -57,10 +58,15 @@ export function Workouts() {
           Workouts
         </span>
       </h1>
-      <Accordion type="single" defaultValue="active" collapsible>
+      <Accordion type="single" defaultValue={"active"} collapsible>
         <AccordionItem value="active">
           <AccordionTrigger>Active Sessions</AccordionTrigger>
           <AccordionContent>
+            {workoutSessionsNotCompleted?.length === 0 && (
+              <EmptyIndicator
+                message={<>No active sessions available.</>}
+              ></EmptyIndicator>
+            )}
             {workoutSessionsNotCompleted?.map((session) => (
               <Workout session={session}></Workout>
             ))}
@@ -69,6 +75,11 @@ export function Workouts() {
         <AccordionItem key={"completed"} value={"completed"}>
           <AccordionTrigger>Completed Sessions</AccordionTrigger>
           <AccordionContent>
+            {workoutSessionsCompleted?.length === 0 && (
+              <EmptyIndicator
+                message={<>No completed sessions available.</>}
+              ></EmptyIndicator>
+            )}
             {workoutSessionsCompleted?.map((session) => (
               <Workout session={session}></Workout>
             ))}

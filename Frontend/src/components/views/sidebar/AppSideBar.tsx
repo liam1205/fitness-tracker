@@ -173,7 +173,13 @@ export function AppSideBar() {
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground text-sm font-semibold">
                   <BicepsFlexed></BicepsFlexed>
                 </div>
-                <span className="font-semibold">Your Workout Planner</span>
+                <span className="font-semibold">
+                  {user?.firstName}
+                  {"'s "}
+                  <span className="rounded-md px-1 bg-foreground text-background">
+                    Workout Planner
+                  </span>
+                </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
