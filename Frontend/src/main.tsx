@@ -13,6 +13,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { ModalProvider } from '@/hooks/use-modal'
 import { auth } from '@/lib/auth'
 import { toastError } from '@/lib/errors'
+import '@/lib/i18n'
 import { routeTree } from './routeTree.gen'
 import './index.css'
 

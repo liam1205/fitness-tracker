@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
+import { useTranslation } from "react-i18next";
 import {
   BicepsFlexed,
   Dumbbell,
@@ -19,7 +20,7 @@ import {
   useUpdateUserSettings,
 } from "@/api/endpoints/user-settings/user-settings";
 import { useListActiveWorkoutSessions } from "@/api/endpoints/workout-sessions/workout-sessions";
-import type { Theme, WorkoutSessionRead } from "@/api/model";
+import type { Language, Theme, WorkoutSessionRead } from "@/api/model";
 import {
   canCompleteSession,
   useSessionControls,
@@ -42,6 +43,7 @@ import {
 import type { User } from "@/lib/auth";
 import { auth, useAuth } from "@/lib/auth";
 import { toastError } from "@/lib/errors";
+import { currentLanguageSetting, LANGUAGE_TO_LOCALE } from "@/lib/i18n";
 import {
   Select,
   SelectContent,
@@ -67,6 +69,12 @@ const THEMES = [
   { label: "System", value: "system" },
 ] as const;
 
+// Language names stay in their own language so users can always find theirs.
+const LANGUAGES = [
+  { label: "English", value: "english" },
+  { label: "Deutsch", value: "german" },
+] as const;
+
 /**
  * Up to two initials for the footer avatar, e.g. "Ada Lovelace" -> "AL". Falls
  * back to the email so the box is never empty for users without a name.
@@ -87,6 +95,8 @@ export function AppSideBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { isMobile, setOpenMobile } = useSidebar();
   const { theme, setTheme } = useTheme();
+  // Subscribing via the hook re-renders the select when the language changes.
+  const { i18n } = useTranslation();
   const queryClient = useQueryClient();
   const { data: userSettings } = useGetUserSettings();
   const { data: activeSessions } = useListActiveWorkoutSessions();
@@ -107,22 +117,32 @@ export function AppSideBar() {
     isPending: isSessionActionPending,
   } = useSessionControls();
 
-  // The server is the source of truth for a signed-in user's theme, but only
-  // apply it once on load — otherwise this fires again after every local
-  // change and reverts it before the mutation has a chance to persist.
-  const hasSyncedTheme = useRef(false);
+  // The server is the source of truth for a signed-in user's theme and
+  // language, but only apply them once on load — otherwise this fires again
+  // after every local change and reverts it before the mutation has a chance
+  // to persist.
+  const hasSyncedSettings = useRef(false);
   useEffect(() => {
-    if (userSettings && !hasSyncedTheme.current) {
-      hasSyncedTheme.current = true;
+    if (userSettings && !hasSyncedSettings.current) {
+      hasSyncedSettings.current = true;
       if (userSettings.theme !== theme) {
         setTheme(userSettings.theme);
       }
+      const locale = LANGUAGE_TO_LOCALE[userSettings.language];
+      if (locale !== i18n.resolvedLanguage) {
+        void i18n.changeLanguage(locale);
+      }
     }
-  }, [userSettings, theme, setTheme]);
+  }, [userSettings, theme, setTheme, i18n]);
 
   function handleThemeChange(value: Theme) {
     setTheme(value);
     updateSettings({ data: { theme: value } });
+  }
+
+  function handleLanguageChange(value: Language) {
+    void i18n.changeLanguage(LANGUAGE_TO_LOCALE[value]);
+    updateSettings({ data: { language: value } });
   }
 
   function handleTogglePause(
@@ -282,6 +302,26 @@ export function AppSideBar() {
                   {THEMES.map((theme) => (
                     <SelectItem key={theme.value} value={theme.value}>
                       {theme.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Select
+              value={currentLanguageSetting()}
+              onValueChange={handleLanguageChange}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Languages</SelectLabel>
+                  {LANGUAGES.map((language) => (
+                    <SelectItem key={language.value} value={language.value}>
+                      {language.label}
                     </SelectItem>
                   ))}
                 </SelectGroup>

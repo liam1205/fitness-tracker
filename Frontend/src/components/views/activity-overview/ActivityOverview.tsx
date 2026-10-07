@@ -7,7 +7,7 @@ import {
   startOfISOWeek,
   subWeeks,
 } from "date-fns";
-import { useGetDailySessionCounts } from "@/api/endpoints";
+import { useGetDailySessionCounts } from "@/api/endpoints/workout-sessions/workout-sessions";
 import {
   Tooltip,
   TooltipContent,
