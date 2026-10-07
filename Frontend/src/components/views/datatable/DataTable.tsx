@@ -54,6 +54,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import i18n from "@/lib/i18n";
+import { useTranslation } from "react-i18next";
 
 type DataTableColumnMeta = {
   /** Applied to the column's header and body cells, e.g. "text-right". */
@@ -132,9 +134,9 @@ export function DataTable<TData extends RowData>({
   data = EMPTY_DATA,
   getRowId,
   isLoading = false,
-  emptyMessage = "No results.",
+  emptyMessage,
   enableSearch = false,
-  searchPlaceholder = "Search...",
+  searchPlaceholder,
   enableColumnVisibility = false,
   enableRowSelection = false,
   selectionActions,
@@ -143,6 +145,7 @@ export function DataTable<TData extends RowData>({
   onRowClick,
   className,
 }: DataTableProps<TData>) {
+  const { t } = useTranslation();
   const tableColumns = React.useMemo(
     () => (enableRowSelection ? [selectColumn<TData>(), ...columns] : columns),
     [columns, enableRowSelection],
@@ -186,7 +189,9 @@ export function DataTable<TData extends RowData>({
               <InputGroupInput
                 value={table.state.globalFilter ?? ""}
                 onChange={(event) => table.setGlobalFilter(event.target.value)}
-                placeholder={searchPlaceholder}
+                placeholder={
+                  searchPlaceholder ?? t("dataTable.searchPlaceholder")
+                }
               />
             </InputGroup>
           )}
@@ -198,7 +203,7 @@ export function DataTable<TData extends RowData>({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
-                    Columns <ChevronDown />
+                    {t("dataTable.columns")} <ChevronDown />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-44">
@@ -291,7 +296,7 @@ export function DataTable<TData extends RowData>({
                   colSpan={visibleColumns.length}
                   className="h-24 text-center text-muted-foreground"
                 >
-                  {emptyMessage}
+                  {emptyMessage ?? t("dataTable.noResults")}
                 </TableCell>
               </TableRow>
             )}
@@ -303,19 +308,25 @@ export function DataTable<TData extends RowData>({
         <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
           <div>
             {enableRowSelection &&
-              `${selectedRows.length} of ${table.getFilteredRowModel().rows.length} row(s) selected`}
+              t("dataTable.rowsSelected", {
+                selected: selectedRows.length,
+                count: table.getFilteredRowModel().rows.length,
+              })}
           </div>
           {pageCount > 1 && (
             <div className="flex items-center gap-2">
               <span>
-                Page {table.state.pagination.pageIndex + 1} of {pageCount}
+                {t("dataTable.pageOf", {
+                  page: table.state.pagination.pageIndex + 1,
+                  pageCount,
+                })}
               </span>
               <Button
                 variant="outline"
                 size="icon-sm"
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
-                aria-label="Previous page"
+                aria-label={t("common.a11y.previousPage")}
               >
                 <ChevronLeft />
               </Button>
@@ -324,7 +335,7 @@ export function DataTable<TData extends RowData>({
                 size="icon-sm"
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
-                aria-label="Next page"
+                aria-label={t("common.a11y.nextPage")}
               >
                 <ChevronRight />
               </Button>
@@ -371,7 +382,7 @@ function selectColumn<TData extends RowData>(): DataTableColumnDef<TData> {
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label={i18n.t("dataTable.selectAll")}
       />
     ),
     cell: ({ row }) => (
@@ -381,7 +392,7 @@ function selectColumn<TData extends RowData>(): DataTableColumnDef<TData> {
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         // Don't trigger onRowClick when toggling selection.
         onClick={(event) => event.stopPropagation()}
-        aria-label="Select row"
+        aria-label={i18n.t("dataTable.selectRow")}
       />
     ),
     enableSorting: false,

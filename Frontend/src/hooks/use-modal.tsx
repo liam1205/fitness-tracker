@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export interface ModalButton {
   label: React.ReactNode;
@@ -70,6 +71,7 @@ const ModalContext = React.createContext<ModalContextValue | null>(null);
  * to the other providers in main.tsx.
  */
 export function ModalProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   const [modal, setModal] = React.useState<ModalOptions | null>(null);
   const [open, setOpen] = React.useState(false);
 
@@ -126,7 +128,7 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
                 <DialogClose asChild>
                   <Button variant="outline">
                     {modal.closeIcon ?? <X />}
-                    {modal.closeLabel ?? "Close"}
+                    {modal.closeLabel ?? t("common.actions.close")}
                   </Button>
                 </DialogClose>
                 {modal.leftButtons?.map(renderButton)}

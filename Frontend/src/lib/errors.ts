@@ -1,5 +1,6 @@
 import { isAxiosError } from 'axios'
 import { toast } from 'sonner'
+import i18n from '@/lib/i18n'
 
 /**
  * Turn anything thrown — an axios failure, an `Error`, a stray string — into a
@@ -24,7 +25,7 @@ export function getErrorMessage(err: unknown, fallback: string): string {
       if (msg) return msg
     }
     // No body to read from: the request never reached the backend.
-    if (!err.response) return 'Could not reach the server. Check your connection.'
+    if (!err.response) return i18n.t('common.errors.unreachable')
   }
   if (err instanceof Error && err.message) return err.message
   if (typeof err === 'string' && err) return err

@@ -1,1 +1,241 @@
-{}
+{
+  "common": {
+    "actions": {
+      "save": "Save",
+      "close": "Close",
+      "delete": "Delete",
+      "reload": "Reload",
+      "goHome": "Go home"
+    },
+    "fields": {
+      "name": "Name",
+      "muscleGroup": "Muscle Group",
+      "sets": "Sets",
+      "reps": "Reps",
+      "weight": "Weight",
+      "selectMuscleGroup": "Select a muscle group"
+    },
+    "muscleGroups": {
+      "chest": "Chest",
+      "back": "Back",
+      "shoulders": "Shoulders",
+      "biceps": "Biceps",
+      "triceps": "Triceps",
+      "abs": "Abs",
+      "calves": "Calves",
+      "quads": "Quads",
+      "hamstrings": "Hamstrings"
+    },
+    "a11y": {
+      "toggleSidebar": "Toggle Sidebar",
+      "sidebar": "Sidebar",
+      "sidebarDescription": "Displays the mobile sidebar.",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "previousPage": "Go to previous page",
+      "nextPage": "Go to next page"
+    },
+    "dateTime": "{{day}}. {{month}} {{year}} at {{time}}",
+    "notFound": "This page could not be found.",
+    "errors": {
+      "generic": "Something went wrong.",
+      "somethingWentWrong": "Something went wrong",
+      "loadingData": "Something went wrong loading data.",
+      "unreachable": "Could not reach the server. Check your connection.",
+      "signInFailed": "Sign in failed.",
+      "signUpFailed": "Sign up failed.",
+      "logOutFailed": "Log out failed."
+    }
+  },
+  "activity": {
+    "calendarWeek": "CW {{week}}",
+    "dayFormat": "EEE, d MMM",
+    "dayTooltip_one": "{{date}} · {{count}} session",
+    "dayTooltip_other": "{{date}} · {{count}} sessions",
+    "graph": {
+      "sessions": "Sessions"
+    }
+  },
+  "auth": {
+    "signin": {
+      "title": "Sign in",
+      "description": "Enter your credentials to access the app.",
+      "cta": "Sign in"
+    },
+    "signup": {
+      "title": "Create account",
+      "description": "Sign up to get started.",
+      "cta": "Sign up"
+    },
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password"
+    },
+    "placeholders": {
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "email": "you@example.com"
+    },
+    "validation": {
+      "nameRequired": "Enter your first and last name.",
+      "emailRequired": "Enter your email address.",
+      "passwordRequired": "Enter your password.",
+      "passwordMismatch": "Passwords do not match."
+    },
+    "pending": "Please wait…",
+    "haveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?"
+  },
+  "dataTable": {
+    "noResults": "No results.",
+    "noData": "No data available.",
+    "searchPlaceholder": "Search...",
+    "columns": "Columns",
+    "rowsSelected_one": "{{selected}} of {{count}} row selected",
+    "rowsSelected_other": "{{selected}} of {{count}} rows selected",
+    "pageOf": "Page {{page}} of {{pageCount}}",
+    "selectAll": "Select all",
+    "selectRow": "Select row"
+  },
+  "exercises": {
+    "heading": "{{name}}'s <highlight>Exercises</highlight>",
+    "view": "View",
+    "create": "Create exercise",
+    "createModal": {
+      "title": "Create exercise",
+      "subtitle": "Add a new exercise to your library."
+    },
+    "viewModal": {
+      "title": "Exercise",
+      "subtitle": "Modify this exercise"
+    }
+  },
+  "home": {
+    "welcome": "Welcome",
+    "welcomeUser": "Welcome, <name>{{name}}</name>",
+    "activity": {
+      "title": "Your activity",
+      "description_one": "Completed workouts in the last week",
+      "description_other": "Completed workouts in the last {{count}} weeks"
+    },
+    "activityGraph": {
+      "title": "Activity Graph",
+      "description_one": "Amounts of workout sessions in the last week",
+      "description_other": "Amounts of workout sessions in the last {{count}} weeks"
+    },
+    "weekSummary": {
+      "title": "This week's summary"
+    },
+    "actions": {
+      "createTemplate": "Create template",
+      "startWorkout": "Start workout",
+      "createExercise": "Create exercise"
+    }
+  },
+  "sidebar": {
+    "brand": "{{name}}'s <highlight>Workout Planner</highlight>",
+    "nav": {
+      "home": "Home",
+      "templates": "Templates",
+      "workouts": "Workouts",
+      "exercises": "Exercises"
+    },
+    "activeSessions": {
+      "title": "Active sessions",
+      "untitled": "Workout",
+      "pause": "Pause",
+      "resume": "Resume",
+      "complete": "Complete"
+    },
+    "themes": {
+      "label": "Themes",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "languages": {
+      "label": "Languages",
+      "english": "English",
+      "german": "Deutsch"
+    },
+    "logOut": "Log out"
+  },
+  "templates": {
+    "heading": "{{name}}'s <highlight>Templates</highlight>",
+    "empty": "No templates available.",
+    "createdOn": "Created on {{date}}",
+    "startWorkout": "Start Workout",
+    "view": "View",
+    "create": "Create template",
+    "workoutStarted": "Started \"{{name}}\".",
+    "createModal": {
+      "title": "Create workout template",
+      "subtitle": "Build a reusable workout template."
+    },
+    "viewModal": {
+      "subtitle": "Modify your template."
+    },
+    "validation": {
+      "missingName": "Template requires a name.",
+      "missingExercise": "Template requires at least one exercise.",
+      "missingNameAndExercise": "Template requires a name and at least one exercise."
+    },
+    "setsByMuscleGroup": "Sets by muscle group",
+    "setCount_one": "{{count}} Set",
+    "setCount_other": "{{count}} Sets",
+    "rows": {
+      "addExercise": "Add exercise",
+      "selectExercise": "Select exercise"
+    }
+  },
+  "weekSummary": {
+    "columns": {
+      "mev": "MEV",
+      "mav": "MAV",
+      "mrv": "MRV"
+    },
+    "mevMissing_one": "<count>{{count}} set</count> missing to reach <term>Minimum Effective Volume</term> for {{muscleGroup}}.",
+    "mevMissing_other": "<count>{{count}} sets</count> missing to reach <term>Minimum Effective Volume</term> for {{muscleGroup}}.",
+    "mavMissing": "<count>{{min}} - {{max}} sets</count> missing to reach <term>Maximum Adaptive Volume</term> for {{muscleGroup}}."
+  },
+  "workout": {
+    "pause": "Pause",
+    "resume": "Resume",
+    "complete": "Complete workout",
+    "completeBlocked": "Complete all sets in the workout to finish it.",
+    "errors": {
+      "saveSet": "Couldn't save the set.",
+      "pause": "Couldn't pause the workout.",
+      "resume": "Couldn't resume the workout.",
+      "complete": "Couldn't complete the workout."
+    }
+  },
+  "workouts": {
+    "title": "{{name}}'s <highlight>Workouts</highlight>",
+    "activeSessions": "Active Sessions",
+    "completedSessions": "Completed Sessions",
+    "noActiveSessions": "No active sessions available.",
+    "noCompletedSessions": "No completed sessions available.",
+    "startWorkout": "Start workout",
+    "startedOn": "Started on {{date}}",
+    "durationMinutes": "{{minutes}} min",
+    "status": {
+      "running": "Running",
+      "completed": "Completed"
+    },
+    "actions": {
+      "stop": "Stop",
+      "view": "View"
+    },
+    "startModal": {
+      "title": "Start workout",
+      "subtitle": "Pick a template to start a training session from.",
+      "start": "Start",
+      "selectTemplate": "Select a template",
+      "started": "Workout started."
+    }
+  }
+}

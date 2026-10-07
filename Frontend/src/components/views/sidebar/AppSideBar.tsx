@@ -2,17 +2,21 @@ import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import {
   BicepsFlexed,
   Dumbbell,
   House,
+  Lightbulb,
   ListChecks,
   LogOut,
+  Moon,
   NotebookTabs,
   Pause,
   Play,
+  Settings,
   Square,
+  Sun,
 } from "lucide-react";
 import {
   getGetUserSettingsQueryKey,
@@ -57,23 +61,20 @@ import { Button } from "@/components/ui/button";
 
 /** Primary navigation. Add entries here as protected routes are added. */
 const NAV_ITEMS = [
-  { to: "/", label: "Home", icon: House },
-  { to: "/templates", label: "Templates", icon: NotebookTabs },
-  { to: "/workouts", label: "Workouts", icon: Dumbbell },
-  { to: "/exercises", label: "Exercises", icon: ListChecks },
+  { to: "/", labelKey: "sidebar.nav.home", icon: House },
+  { to: "/templates", labelKey: "sidebar.nav.templates", icon: NotebookTabs },
+  { to: "/workouts", labelKey: "sidebar.nav.workouts", icon: Dumbbell },
+  { to: "/exercises", labelKey: "sidebar.nav.exercises", icon: ListChecks },
 ] as const;
 
 const THEMES = [
-  { label: "Light", value: "light" },
-  { label: "Dark", value: "dark" },
-  { label: "System", value: "system" },
+  { value: "light", icon: <Sun /> },
+  { value: "dark", icon: <Moon /> },
+  { value: "system", icon: <Settings /> },
 ] as const;
 
 // Language names stay in their own language so users can always find theirs.
-const LANGUAGES = [
-  { label: "English", value: "english" },
-  { label: "Deutsch", value: "german" },
-] as const;
+const LANGUAGES = ["english", "german"] as const;
 
 /**
  * Up to two initials for the footer avatar, e.g. "Ada Lovelace" -> "AL". Falls
@@ -96,7 +97,7 @@ export function AppSideBar() {
   const { isMobile, setOpenMobile } = useSidebar();
   const { theme, setTheme } = useTheme();
   // Subscribing via the hook re-renders the select when the language changes.
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const { data: userSettings } = useGetUserSettings();
   const { data: activeSessions } = useListActiveWorkoutSessions();
@@ -177,7 +178,7 @@ export function AppSideBar() {
     try {
       await auth.logout();
     } catch (err) {
-      toastError(err, "Log out failed.");
+      toastError(err, t("common.errors.logOutFailed"));
     } finally {
       await router.navigate({ to: "/login" });
     }
@@ -194,11 +195,15 @@ export function AppSideBar() {
                   <BicepsFlexed></BicepsFlexed>
                 </div>
                 <span className="font-semibold">
-                  {user?.firstName}
-                  {"'s "}
-                  <span className="rounded-md px-1 bg-foreground text-background">
-                    Workout Planner
-                  </span>
+                  <Trans
+                    i18nKey="sidebar.brand"
+                    values={{ name: user?.firstName ?? "" }}
+                    components={{
+                      highlight: (
+                        <span className="rounded-md px-1 bg-foreground text-background" />
+                      ),
+                    }}
+                  />
                 </span>
               </Link>
             </SidebarMenuButton>
@@ -217,11 +222,11 @@ export function AppSideBar() {
                     <SidebarMenuButton
                       asChild
                       isActive={pathname === item.to}
-                      tooltip={item.label}
+                      tooltip={t(item.labelKey)}
                     >
                       <Link to={item.to} onClick={collapseSidebar}>
                         <Icon />
-                        <span>{item.label}</span>
+                        <span>{t(item.labelKey)}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -233,7 +238,9 @@ export function AppSideBar() {
 
         {activeSessions && activeSessions.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel>Active sessions</SidebarGroupLabel>
+            <SidebarGroupLabel>
+              {t("sidebar.activeSessions.title")}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {activeSessions.map((session) => (
@@ -249,7 +256,10 @@ export function AppSideBar() {
                     className="flex flex-row gap-1"
                   >
                     <SidebarMenuButton className="flex justify-between">
-                      <span>{session.template_name ?? "Workout"}</span>
+                      <span>
+                        {session.template_name ??
+                          t("sidebar.activeSessions.untitled")}
+                      </span>
                       <div className="flex justify-center items-center mr-2">
                         {session.is_paused && (
                           <Pause className="size-3.5 text-muted-foreground"></Pause>
@@ -260,7 +270,11 @@ export function AppSideBar() {
                       variant={"outline"}
                       size={"icon"}
                       disabled={isSessionActionPending}
-                      aria-label={session.is_paused ? "Resume" : "Pause"}
+                      aria-label={
+                        session.is_paused
+                          ? t("sidebar.activeSessions.resume")
+                          : t("sidebar.activeSessions.pause")
+                      }
                       onClick={(event) => handleTogglePause(event, session)}
                     >
                       {session.is_paused ? <Play></Play> : <Pause></Pause>}
@@ -274,7 +288,7 @@ export function AppSideBar() {
                         disabled={
                           isSessionActionPending || !canCompleteSession(session)
                         }
-                        aria-label="Complete"
+                        aria-label={t("sidebar.activeSessions.complete")}
                         onClick={(event) =>
                           handleCompleteSession(event, session)
                         }
@@ -298,10 +312,11 @@ export function AppSideBar() {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>Themes</SelectLabel>
+                  <SelectLabel>{t("sidebar.themes.label")}</SelectLabel>
                   {THEMES.map((theme) => (
                     <SelectItem key={theme.value} value={theme.value}>
-                      {theme.label}
+                      {theme.icon}
+                      {t(`sidebar.themes.${theme.value}`)}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -318,10 +333,10 @@ export function AppSideBar() {
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>Languages</SelectLabel>
+                  <SelectLabel>{t("sidebar.languages.label")}</SelectLabel>
                   {LANGUAGES.map((language) => (
-                    <SelectItem key={language.value} value={language.value}>
-                      {language.label}
+                    <SelectItem key={language} value={language}>
+                      {t(`sidebar.languages.${language}`)}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -363,9 +378,12 @@ export function AppSideBar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={() => void logout()} tooltip="Log out">
+            <SidebarMenuButton
+              onClick={() => void logout()}
+              tooltip={t("sidebar.logOut")}
+            >
               <LogOut />
-              <span>Log out</span>
+              <span>{t("sidebar.logOut")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

@@ -4,6 +4,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useTranslation } from "react-i18next";
 
 type CompleteBlockedTooltipProps = {
   /** Whether completing is currently blocked because sets are still open. */
@@ -19,6 +20,7 @@ export function CompleteBlockedTooltip({
   blocked,
   children,
 }: CompleteBlockedTooltipProps) {
+  const { t } = useTranslation();
   if (!blocked) return children;
 
   return (
@@ -33,9 +35,7 @@ export function CompleteBlockedTooltip({
           {children}
         </span>
       </TooltipTrigger>
-      <TooltipContent>
-        Complete all sets in the workout to finish it.
-      </TooltipContent>
+      <TooltipContent>{t("workout.completeBlocked")}</TooltipContent>
     </Tooltip>
   );
 }

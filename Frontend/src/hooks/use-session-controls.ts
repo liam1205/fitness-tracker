@@ -9,6 +9,7 @@ import {
 } from "@/api/endpoints/workout-sessions/workout-sessions";
 import type { WorkoutSessionRead } from "@/api/model/workoutSessionRead";
 import { toastError } from "@/lib/errors";
+import { useTranslation } from "react-i18next";
 
 /** A session can only be completed once every set of every exercise is done. */
 export function canCompleteSession(
@@ -25,6 +26,7 @@ export function canCompleteSession(
  * resumes it first.
  */
 export function useSessionControls() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const pauseMutation = usePauseWorkoutSession();
   const resumeMutation = useResumeWorkoutSession();
@@ -63,14 +65,14 @@ export function useSessionControls() {
     run(
       sessionId,
       () => pauseMutation.mutateAsync({ sessionId }),
-      "Couldn't pause the workout.",
+      t("workout.errors.pause"),
     );
 
   const resume = (sessionId: string) =>
     run(
       sessionId,
       () => resumeMutation.mutateAsync({ sessionId }),
-      "Couldn't resume the workout.",
+      t("workout.errors.resume"),
     );
 
   const complete = (session: Pick<WorkoutSessionRead, "id" | "is_paused">) =>
@@ -82,7 +84,7 @@ export function useSessionControls() {
         }
         return completeMutation.mutateAsync({ sessionId: session.id });
       },
-      "Couldn't complete the workout.",
+      t("workout.errors.complete"),
     );
 
   const isPending =

@@ -1,5 +1,5 @@
 import { useGetWeeklyMuscleGroupSets } from "@/api/endpoints/workout-sessions/workout-sessions";
-import type { MuscleGroupSetCount } from "@/api/model";
+import type { MuscleGroup, MuscleGroupSetCount } from "@/api/model";
 import { Badge } from "@/components/ui/badge";
 import {
   HoverCard,
@@ -11,6 +11,9 @@ import {
   DataTable,
   type DataTableColumnDef,
 } from "@/components/views/datatable/DataTable";
+import { useMemo } from "react";
+import { Trans, useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 
 const columnHelper = createDataTableColumnHelper<MuscleGroupSetCount>();
 
@@ -32,13 +35,23 @@ const setsColorClass = ({
   return "secondary";
 };
 
-const columns: DataTableColumnDef<MuscleGroupSetCount>[] = [
+const highlight = (
+  <span className="rounded-md px-2 bg-foreground text-background" />
+);
+
+const buildColumns = (
+  t: TFunction,
+): DataTableColumnDef<MuscleGroupSetCount>[] => [
   columnHelper.accessor("muscle_group", {
-    header: "Muscle Group",
-    cell: (info) => <span className="capitalize">{info.getValue()}</span>,
+    header: t("common.fields.muscleGroup"),
+    cell: (info) => (
+      <span className="capitalize">
+        {t(`common.muscleGroups.${info.getValue() as MuscleGroup}`)}
+      </span>
+    ),
   }),
   columnHelper.accessor("completed_sets", {
-    header: "Sets",
+    header: t("common.fields.sets"),
     cell: (info) => {
       return !info.row.original.mev ||
         !info.row.original.mav ||
@@ -56,27 +69,33 @@ const columns: DataTableColumnDef<MuscleGroupSetCount>[] = [
           <HoverCardContent className="min-w-fit">
             <ol className="list-inside list-decimal space-y-2 text-sm">
               <p>
-                <span className="rounded-md px-2 bg-foreground text-background">
-                  {info.row.original.mev - info.row.original.completed_sets}{" "}
-                  sets
-                </span>{" "}
-                missing to reach{" "}
-                <span className="rounded-md px-2 bg-foreground text-background">
-                  Minimum Effective Volume
-                </span>{" "}
-                for {info.row.original.muscle_group}.
+                <Trans
+                  i18nKey="weekSummary.mevMissing"
+                  count={
+                    info.row.original.mev - info.row.original.completed_sets
+                  }
+                  values={{
+                    muscleGroup: t(
+                      `common.muscleGroups.${info.row.original.muscle_group}`,
+                    ),
+                  }}
+                  components={{ count: highlight, term: highlight }}
+                />
               </p>
               <p>
-                <span className="rounded-md px-2 bg-foreground text-background">
-                  {info.row.original.mav - info.row.original.completed_sets} -{" "}
-                  {info.row.original.mrv - info.row.original.completed_sets}{" "}
-                  sets
-                </span>{" "}
-                missing to reach{" "}
-                <span className="rounded-md px-2 bg-foreground text-background">
-                  Maximum Adaptive Volume
-                </span>{" "}
-                for {info.row.original.muscle_group}.
+                <Trans
+                  i18nKey="weekSummary.mavMissing"
+                  values={{
+                    min:
+                      info.row.original.mav - info.row.original.completed_sets,
+                    max:
+                      info.row.original.mrv - info.row.original.completed_sets,
+                    muscleGroup: t(
+                      `common.muscleGroups.${info.row.original.muscle_group}`,
+                    ),
+                  }}
+                  components={{ count: highlight, term: highlight }}
+                />
               </p>
             </ol>
           </HoverCardContent>
@@ -86,24 +105,27 @@ const columns: DataTableColumnDef<MuscleGroupSetCount>[] = [
     meta: { className: "text-center" },
   }),
   columnHelper.accessor("mev", {
-    header: "MEV",
+    header: t("weekSummary.columns.mev"),
     cell: (info) => optionalSets(info.getValue()),
     meta: { className: "text-center" },
   }),
   columnHelper.accessor("mav", {
-    header: "MAV",
+    header: t("weekSummary.columns.mav"),
     cell: (info) => optionalSets(info.getValue()),
     meta: { className: "text-center" },
   }),
   columnHelper.accessor("mrv", {
-    header: "MRV",
+    header: t("weekSummary.columns.mrv"),
     cell: (info) => optionalSets(info.getValue()),
     meta: { className: "text-center" },
   }),
 ];
 
 const WeekSummary = () => {
+  const { t } = useTranslation();
   const { data: setsOfTheWeek, isLoading } = useGetWeeklyMuscleGroupSets();
+  // Built per language so headers stay plain strings (keeps the sort toggle).
+  const columns = useMemo(() => buildColumns(t), [t]);
   return (
     <DataTable
       columns={columns}

@@ -1,11 +1,13 @@
 import { cn } from "@/lib/utils";
 import type React from "react";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   message?: string | React.ReactNode;
 };
 
 const EmptyIndicator = ({ message }: Props) => {
+  const { t } = useTranslation();
   return (
     <div
       className={cn(
@@ -13,7 +15,7 @@ const EmptyIndicator = ({ message }: Props) => {
       )}
     >
       {message && <span>{message}</span>}
-      {!message && <>No data available.</>}
+      {!message && <>{t("dataTable.noData")}</>}
     </div>
   );
 };

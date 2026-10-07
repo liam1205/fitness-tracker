@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   closestCenter,
@@ -51,7 +52,7 @@ export type TemplateExerciseRow = {
 };
 
 export type ExerciseGroup = {
-  value: string;
+  value: MuscleGroup;
   items: ExerciseRead[];
 };
 
@@ -77,6 +78,8 @@ export function ExerciseRowsEditor({
   groupedExercises: ExerciseGroup[];
   containerRef: React.RefObject<HTMLDivElement | null>;
 }) {
+  const { t } = useTranslation();
+
   function addRow() {
     onRowsChange((rows) => {
       if (rows.length >= MAX_EXERCISES) return rows;
@@ -133,7 +136,7 @@ export function ExerciseRowsEditor({
       {rows.length < MAX_EXERCISES && (
         <Button variant={"outline"} className="w-full mt-1.5" onClick={addRow}>
           <Plus></Plus>
-          Add exercise
+          {t("templates.rows.addExercise")}
         </Button>
       )}
     </div>
@@ -159,6 +162,7 @@ function SortableExerciseRow({
     transition,
     isDragging,
   } = useSortable({ id: row.id });
+  const { t } = useTranslation();
 
   const isMobile = useIsMobile();
 
@@ -196,7 +200,7 @@ function SortableExerciseRow({
           isItemEqualToValue={(a, b) => a.id === b.id}
         >
           <ComboboxInput
-            placeholder="Select exercise"
+            placeholder={t("templates.rows.selectExercise")}
             className="flex-1 w-full"
           />
           <ComboboxContent container={containerRef}>
@@ -204,7 +208,7 @@ function SortableExerciseRow({
               {(group: ExerciseGroup) => (
                 <ComboboxGroup key={group.value} items={group.items}>
                   <ComboboxLabel className={"capitalize"}>
-                    {group.value}
+                    {t(`common.muscleGroups.${group.value}`)}
                   </ComboboxLabel>
                   <ComboboxCollection>
                     {(exercise: ExerciseRead) => (
@@ -240,6 +244,7 @@ function SetsAndMuscleGroup({
   row: TemplateExerciseRow;
   onUpdate: (changes: Partial<TemplateExerciseRow>) => void;
 }) {
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   return (
     <>
@@ -250,10 +255,12 @@ function SetsAndMuscleGroup({
           onChange={(e) => onUpdate({ sets: e.target.value })}
         />
         <InputGroupAddon align="inline-end">
-          <InputGroupText>Sets</InputGroupText>
+          <InputGroupText>{t("common.fields.sets")}</InputGroupText>
         </InputGroupAddon>
       </InputGroup>
-      <Badge className="w-fit capitalize">{row.exercise?.muscle_group}</Badge>
+      <Badge className="w-fit capitalize">
+        {row.exercise && t(`common.muscleGroups.${row.exercise.muscle_group}`)}
+      </Badge>
     </>
   );
 }

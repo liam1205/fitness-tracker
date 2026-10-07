@@ -7,6 +7,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { Loader, RotateCcw } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 /** Values made available to every route's `beforeLoad`/`loader` via `context`. */
 export interface RouterContext {
@@ -34,29 +35,33 @@ function RootLayout() {
 }
 
 function NotFound() {
+  const { t } = useTranslation();
+
   return (
     <div className="mx-auto flex max-w-4xl flex-col items-center gap-4 px-4 py-24 text-center">
       <h1 className="text-4xl font-bold tracking-tight">404</h1>
-      <p className="text-muted-foreground">This page could not be found.</p>
+      <p className="text-muted-foreground">{t("common.notFound")}</p>
       <Button asChild>
-        <Link to="/">Go home</Link>
+        <Link to="/">{t("common.actions.goHome")}</Link>
       </Button>
     </div>
   );
 }
 
 function ErrorBoundary({ error }: { error: Error }) {
+  const { t } = useTranslation();
+
   return (
     <div className="mx-auto flex max-w-4xl flex-col items-center gap-4 px-4 py-24 text-center">
       <h1 className="text-2xl font-semibold tracking-tight">
-        Something went wrong
+        {t("common.errors.somethingWentWrong")}
       </h1>
       <p className="max-w-prose text-sm text-muted-foreground">
         {error.message}
       </p>
       <Button onClick={() => window.location.reload()}>
         <RotateCcw />
-        Reload
+        {t("common.actions.reload")}
       </Button>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 import {
   getListExercisesQueryKey,
@@ -23,6 +24,7 @@ import { Save, Trash } from "lucide-react";
  * Modal for viewing and editing an existing exercise.
  */
 export function useViewExerciseModal() {
+  const { t } = useTranslation();
   const { openModal, closeModal } = useModal();
   const queryClient = useQueryClient();
   const { mutate: updateExercise } = useUpdateExercise();
@@ -61,12 +63,12 @@ export function useViewExerciseModal() {
     }
 
     openModal({
-      title: "Exercise",
-      subtitle: "Modify this exercise",
+      title: t("exercises.viewModal.title"),
+      subtitle: t("exercises.viewModal.subtitle"),
       content: (
         <div>
           <div className="flex flex-col gap-3">
-            <Label htmlFor="name-input">Name</Label>
+            <Label htmlFor="name-input">{t("common.fields.name")}</Label>
             <Input
               id="name-input"
               defaultValue={exercise.name}
@@ -74,7 +76,9 @@ export function useViewExerciseModal() {
                 name = event.target.value;
               }}
             ></Input>
-            <Label htmlFor="muscle-group-input">Muscle Group</Label>
+            <Label htmlFor="muscle-group-input">
+              {t("common.fields.muscleGroup")}
+            </Label>
             <Select
               defaultValue={exercise.muscle_group}
               onValueChange={(value) => {
@@ -82,12 +86,14 @@ export function useViewExerciseModal() {
               }}
             >
               <SelectTrigger id="muscle-group-input" className="w-full">
-                <SelectValue placeholder="Select a muscle group" />
+                <SelectValue
+                  placeholder={t("common.fields.selectMuscleGroup")}
+                />
               </SelectTrigger>
               <SelectContent>
                 {Object.values(MuscleGroup).map((muscleGroupOption) => (
                   <SelectItem key={muscleGroupOption} value={muscleGroupOption}>
-                    {muscleGroupOption}
+                    {t(`common.muscleGroups.${muscleGroupOption}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -98,13 +104,13 @@ export function useViewExerciseModal() {
       rightButtons: [
         {
           icon: <Trash></Trash>,
-          label: "Delete",
+          label: t("common.actions.delete"),
           onClick: handleDelete,
           variant: "destructive",
         },
         {
           icon: <Save></Save>,
-          label: "Save",
+          label: t("common.actions.save"),
           onClick: handleSave,
         },
       ],

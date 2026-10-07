@@ -15,11 +15,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Play } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 /**
  * Modal for starting a workout from one of the user's templates.
  */
 export function useStartWorkoutModal() {
+  const { t } = useTranslation();
   const { openModal, updateModal, closeModal } = useModal();
   const { mutate: startWorkoutSession, isPending } = useStartWorkoutSession();
   const navigate = useNavigate();
@@ -31,7 +33,7 @@ export function useStartWorkoutModal() {
       return [
         {
           icon: <Play></Play>,
-          label: "Start",
+          label: t("workouts.startModal.start"),
           disabled: !templateId || isPending,
           onClick: () => {
             if (!templateId) return;
@@ -42,7 +44,7 @@ export function useStartWorkoutModal() {
                   queryClient.invalidateQueries({
                     queryKey: getListActiveWorkoutSessionsQueryKey(),
                   });
-                  toast.success("Workout started.");
+                  toast.success(t("workouts.startModal.started"));
                   navigate({
                     to: "/workouts/$workoutId",
                     params: { workoutId: workout.id },
@@ -57,8 +59,8 @@ export function useStartWorkoutModal() {
     }
 
     openModal({
-      title: "Start workout",
-      subtitle: "Pick a template to start a training session from.",
+      title: t("workouts.startModal.title"),
+      subtitle: t("workouts.startModal.subtitle"),
       content: (
         <WorkoutModalContent
           onSelect={(templateId) =>
@@ -78,13 +80,14 @@ const WorkoutModalContent = ({
 }: {
   onSelect: (templateId: string) => void;
 }) => {
+  const { t } = useTranslation();
   const { data: templates } = useListWorkoutTemplates();
 
   return (
     <div className="flex flex-col gap-3">
       <Select onValueChange={onSelect}>
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select a template" />
+          <SelectValue placeholder={t("workouts.startModal.selectTemplate")} />
         </SelectTrigger>
         <SelectContent position="popper">
           {templates?.map((template) => (

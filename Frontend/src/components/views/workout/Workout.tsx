@@ -30,8 +30,10 @@ import {
 } from "@/hooks/use-session-controls";
 import { CompleteBlockedTooltip } from "@/components/views/workout/CompleteBlockedTooltip";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 const Workout = () => {
+  const { t } = useTranslation();
   const { workoutId: sessionId } = useParams({
     from: "/_authenticated/workouts/$workoutId",
   });
@@ -62,7 +64,7 @@ const Workout = () => {
         });
       },
       onError: (err) => {
-        toastError(err, "Couldn't save the set.");
+        toastError(err, t("workout.errors.saveSet"));
         // Drop the optimistic change and show what the server actually has.
         queryClient.invalidateQueries({ queryKey: sessionQueryKey });
       },
@@ -136,7 +138,7 @@ const Workout = () => {
               }
             >
               {data.is_paused ? <Play></Play> : <Pause></Pause>}
-              {data.is_paused ? "Resume" : "Pause"}
+              {data.is_paused ? t("workout.resume") : t("workout.pause")}
             </Button>
           )}
           {data && !data.completed_at && (
@@ -148,7 +150,7 @@ const Workout = () => {
                 disabled={isControlPending || !canCompleteSession(data)}
               >
                 <Square></Square>
-                Complete workout
+                {t("workout.complete")}
               </Button>
             </CompleteBlockedTooltip>
           )}
@@ -204,6 +206,7 @@ type SetProps = {
 };
 
 const Set = ({ set, disabled, onSave }: SetProps) => {
+  const { t } = useTranslation();
   const [weight, setWeight] = useState(set.weight?.toString() ?? "");
   const [reps, setReps] = useState(set.reps?.toString() ?? "");
 
@@ -241,7 +244,7 @@ const Set = ({ set, disabled, onSave }: SetProps) => {
       <div className="flex flex-row w-1/15">{set.set_number}</div>
       <div className="flex items-center gap-2 w-14/15">
         <Input
-          placeholder="Weight"
+          placeholder={t("common.fields.weight")}
           inputMode="decimal"
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
@@ -249,7 +252,7 @@ const Set = ({ set, disabled, onSave }: SetProps) => {
           className="w-fit"
         ></Input>
         <Input
-          placeholder="Reps"
+          placeholder={t("common.fields.reps")}
           inputMode="numeric"
           value={reps}
           onChange={(e) => setReps(e.target.value)}

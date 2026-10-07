@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 
 import { useListExercises } from "@/api/endpoints/exercises/exercises";
 import { useCreateWorkoutTemplate } from "@/api/endpoints/workout-templates/workout-templates";
@@ -24,6 +25,7 @@ export interface CreateTemplateHandle {
  * Modal for creating a new workout template.
  */
 export function useCreateTemplateModal() {
+  const { t } = useTranslation();
   const { openModal, closeModal } = useModal();
   const { mutate: createWorkoutTemplate } = useCreateWorkoutTemplate();
 
@@ -41,13 +43,13 @@ export function useCreateTemplateModal() {
     }
 
     openModal({
-      title: "Create workout template",
-      subtitle: "Build a reusable workout template.",
+      title: t("templates.createModal.title"),
+      subtitle: t("templates.createModal.subtitle"),
       content: <CreateTemplate ref={formRef}></CreateTemplate>,
       rightButtons: [
         {
           icon: <Save></Save>,
-          label: "Save",
+          label: t("common.actions.save"),
           onClick: handleSave,
         },
       ],
@@ -58,6 +60,7 @@ export function useCreateTemplateModal() {
 }
 
 const CreateTemplate = ({ ref }: { ref?: React.Ref<CreateTemplateHandle> }) => {
+  const { t } = useTranslation();
   const { data } = useListExercises({ page: 1, page_size: 100 });
   const exercises = data?.items ?? [];
   const groupedExercises = React.useMemo(
@@ -83,11 +86,14 @@ const CreateTemplate = ({ ref }: { ref?: React.Ref<CreateTemplateHandle> }) => {
       });
 
       if (!trimmedName || validExercises.length === 0) {
-        const missing = [
-          !trimmedName && "a name",
-          validExercises.length === 0 && "at least one exercise",
-        ].filter(Boolean);
-        toastError(null, `Template requires ${missing.join(" and ")}.`);
+        toastError(
+          null,
+          !trimmedName && validExercises.length === 0
+            ? t("templates.validation.missingNameAndExercise")
+            : !trimmedName
+              ? t("templates.validation.missingName")
+              : t("templates.validation.missingExercise"),
+        );
         return null;
       }
 
@@ -98,7 +104,7 @@ const CreateTemplate = ({ ref }: { ref?: React.Ref<CreateTemplateHandle> }) => {
   return (
     <div ref={containerRef} className="flex flex-col gap-3">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="template-name-input">Name</Label>
+        <Label htmlFor="template-name-input">{t("common.fields.name")}</Label>
         <Input
           id="template-name-input"
           value={name}

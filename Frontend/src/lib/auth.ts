@@ -7,6 +7,7 @@ import {
 } from '@/api/endpoints/auth/auth'
 import type { UserRead } from '@/api/model'
 import { getErrorMessage } from '@/lib/errors'
+import i18n from '@/lib/i18n'
 
 /**
  * Cookie-backed auth store.
@@ -91,7 +92,7 @@ export const auth = {
     try {
       setUser(await loginRequest({ email, password }))
     } catch (err) {
-      throw new Error(getErrorMessage(err, 'Sign in failed.'))
+      throw new Error(getErrorMessage(err, i18n.t('common.errors.signInFailed')))
     }
   },
 
@@ -111,7 +112,7 @@ export const auth = {
         }),
       )
     } catch (err) {
-      throw new Error(getErrorMessage(err, 'Sign up failed.'))
+      throw new Error(getErrorMessage(err, i18n.t('common.errors.signUpFailed')))
     }
   },
 
@@ -124,7 +125,7 @@ export const auth = {
     try {
       await logoutRequest()
     } catch (err) {
-      throw new Error(getErrorMessage(err, 'Log out failed.'))
+      throw new Error(getErrorMessage(err, i18n.t('common.errors.logOutFailed')))
     } finally {
       clear()
     }

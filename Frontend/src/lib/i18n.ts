@@ -1,6 +1,7 @@
 import i18n from "i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
+import { de as deDateLocale, enUS, type Locale } from "date-fns/locale";
 import en from "@/locales/en.json";
 import de from "@/locales/de.json";
 import type { Language } from "@/api/model";
@@ -31,6 +32,21 @@ export function currentLanguageSetting(): Language {
   );
   return (entry?.[0] as Language | undefined) ?? "english";
 }
+
+const DATE_FNS_LOCALES: Record<SupportedLanguage, Locale> = {
+  en: enUS,
+  de: deDateLocale,
+};
+
+/** The date-fns locale for i18next's active language, for `format(…, { locale })`. */
+export function dateFnsLocale(): Locale {
+  return DATE_FNS_LOCALES[i18n.resolvedLanguage as SupportedLanguage] ?? enUS;
+}
+
+// Keep <html lang> in step so screen readers and hyphenation use the right language.
+i18n.on("languageChanged", (lng) => {
+  document.documentElement.lang = lng;
+});
 
 /**
  * Translations are bundled statically, so init resolves synchronously and the

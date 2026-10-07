@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 import {
   getListExercisesQueryKey,
@@ -21,6 +22,7 @@ import { Save } from "lucide-react";
  * Modal for creating a new exercise.
  */
 export function useCreateExerciseModal() {
+  const { t } = useTranslation();
   const { openModal, closeModal } = useModal();
   const queryClient = useQueryClient();
   const { mutate: createExercise } = useCreateExercise();
@@ -48,12 +50,12 @@ export function useCreateExerciseModal() {
     }
 
     openModal({
-      title: "Create exercise",
-      subtitle: "Add a new exercise to your library.",
+      title: t("exercises.createModal.title"),
+      subtitle: t("exercises.createModal.subtitle"),
       content: (
         <div>
           <div className="flex flex-col gap-3">
-            <Label htmlFor="name-input">Name</Label>
+            <Label htmlFor="name-input">{t("common.fields.name")}</Label>
             <Input
               id="name-input"
               defaultValue={name}
@@ -61,7 +63,9 @@ export function useCreateExerciseModal() {
                 name = event.target.value;
               }}
             ></Input>
-            <Label htmlFor="muscle-group-input">Muscle Group</Label>
+            <Label htmlFor="muscle-group-input">
+              {t("common.fields.muscleGroup")}
+            </Label>
             <Select
               defaultValue={muscleGroup}
               onValueChange={(value) => {
@@ -69,12 +73,14 @@ export function useCreateExerciseModal() {
               }}
             >
               <SelectTrigger id="muscle-group-input" className="w-full">
-                <SelectValue placeholder="Select a muscle group" />
+                <SelectValue
+                  placeholder={t("common.fields.selectMuscleGroup")}
+                />
               </SelectTrigger>
               <SelectContent>
                 {Object.values(MuscleGroup).map((muscleGroupOption) => (
                   <SelectItem key={muscleGroupOption} value={muscleGroupOption}>
-                    {muscleGroupOption}
+                    {t(`common.muscleGroups.${muscleGroupOption}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -85,7 +91,7 @@ export function useCreateExerciseModal() {
       rightButtons: [
         {
           icon: <Save></Save>,
-          label: "Save",
+          label: t("common.actions.save"),
           onClick: handleSave,
         },
       ],

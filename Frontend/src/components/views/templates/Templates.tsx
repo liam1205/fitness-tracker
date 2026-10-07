@@ -1,6 +1,7 @@
 import { Ellipsis, Eye, Play, Plus, Trash, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Trans, useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { useCreateTemplateModal } from "@/components/views/modals/CreateTemplate";
@@ -32,6 +33,7 @@ import EmptyIndicator from "../empty-indicator/EmptyIndicator";
  * Workout templates: reusable exercise plans a user can start a workout from.
  */
 export function Templates() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -59,7 +61,7 @@ export function Templates() {
       { data: { template_id: template.id } },
       {
         onSuccess: (result) => {
-          toast.success(`Started "${template.name}".`);
+          toast.success(t("templates.workoutStarted", { name: template.name }));
           queryClient.invalidateQueries({
             queryKey: getListActiveWorkoutSessionsQueryKey(),
           });
@@ -75,15 +77,20 @@ export function Templates() {
   return (
     <div className="space-y-4">
       <h1 className="text-4xl font-bold tracking-tight">
-        {user?.firstName}'s{" "}
-        <span className="rounded-xl px-2 bg-foreground text-background">
-          Templates
-        </span>
+        <Trans
+          i18nKey="templates.heading"
+          values={{ name: user?.firstName ?? "" }}
+          components={{
+            highlight: (
+              <span className="rounded-xl px-2 bg-foreground text-background" />
+            ),
+          }}
+        />
       </h1>
       <div className="flex flex-col gap-3">
         {data?.length === 0 && (
           <EmptyIndicator
-            message={<>No templates available.</>}
+            message={<>{t("templates.empty")}</>}
           ></EmptyIndicator>
         )}
         {data?.map((template) => (
@@ -91,7 +98,9 @@ export function Templates() {
             <CardHeader>
               <CardTitle>{template.name}</CardTitle>
               <CardDescription className="flex justify-start">
-                Created on {dateString(new Date(template.created_at))}
+                {t("templates.createdOn", {
+                  date: dateString(new Date(template.created_at)),
+                })}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -102,7 +111,7 @@ export function Templates() {
                     <X className="size-2.5"></X>
                     {exercise.name}{" "}
                     <span className="capitalize">
-                      ({exercise.muscle_group})
+                      ({t(`common.muscleGroups.${exercise.muscle_group}`)})
                     </span>
                   </span>
                 ))}
@@ -114,7 +123,8 @@ export function Templates() {
                   variant={"destructive"}
                   onClick={() => handleDeleteTemplate(template.id)}
                 >
-                  <Trash className="size-2.5"></Trash> Delete
+                  <Trash className="size-2.5"></Trash>{" "}
+                  {t("common.actions.delete")}
                 </Button>
               </div>
               <div className="flex flex-row w-2/3 justify-end gap-2">
@@ -122,10 +132,11 @@ export function Templates() {
                   variant={"outline"}
                   onClick={() => handleStartWorkout(template)}
                 >
-                  <Play className="size-2.5"></Play> Start Workout
+                  <Play className="size-2.5"></Play>{" "}
+                  {t("templates.startWorkout")}
                 </Button>
                 <Button onClick={() => openViewTemplateModal(template)}>
-                  <Eye className="size-2.5"></Eye> View
+                  <Eye className="size-2.5"></Eye> {t("templates.view")}
                 </Button>
               </div>
             </CardFooter>
@@ -138,7 +149,7 @@ export function Templates() {
         onClick={openCreateTemplateModal}
       >
         <Plus />
-        Create template
+        {t("templates.create")}
       </Button>
     </div>
   );

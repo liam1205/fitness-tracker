@@ -13,7 +13,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { ModalProvider } from '@/hooks/use-modal'
 import { auth } from '@/lib/auth'
 import { toastError } from '@/lib/errors'
-import '@/lib/i18n'
+import i18n from '@/lib/i18n'
 import { routeTree } from './routeTree.gen'
 import './index.css'
 
@@ -23,10 +23,10 @@ import './index.css'
  */
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
-    onError: (error) => toastError(error, 'Something went wrong loading data.'),
+    onError: (error) => toastError(error, i18n.t('common.errors.loadingData')),
   }),
   mutationCache: new MutationCache({
-    onError: (error) => toastError(error, 'Something went wrong.'),
+    onError: (error) => toastError(error, i18n.t('common.errors.generic')),
   }),
 })
 

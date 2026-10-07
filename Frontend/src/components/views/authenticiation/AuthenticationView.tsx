@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,20 +27,6 @@ interface AuthenticationViewProps {
   redirectTo?: string;
 }
 
-const COPY: Record<Mode, { title: string; description: string; cta: string }> =
-  {
-    signin: {
-      title: "Sign in",
-      description: "Enter your credentials to access the app.",
-      cta: "Sign in",
-    },
-    signup: {
-      title: "Create account",
-      description: "Sign up to get started.",
-      cta: "Sign up",
-    },
-  };
-
 /**
  * Full-screen auth view handling both sign-in and sign-up. This is the only
  * thing an unauthenticated user can see — every other route is gated behind the
@@ -50,6 +37,7 @@ const COPY: Record<Mode, { title: string; description: string; cta: string }> =
  * for real backend calls and this view keeps working unchanged.
  */
 export function AuthenticationView({ redirectTo }: AuthenticationViewProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("signin");
   const [firstName, setFirstName] = useState("");
@@ -60,7 +48,6 @@ export function AuthenticationView({ redirectTo }: AuthenticationViewProps) {
   const [pending, setPending] = useState(false);
 
   const isSignup = mode === "signup";
-  const copy = COPY[mode];
 
   function switchMode(next: Mode) {
     setMode(next);
@@ -71,12 +58,12 @@ export function AuthenticationView({ redirectTo }: AuthenticationViewProps) {
   /** Cheap client-side checks. Returns an error message, or null if all good. */
   function validate(): string | null {
     if (isSignup && (!firstName.trim() || !lastName.trim())) {
-      return "Enter your first and last name.";
+      return t("auth.validation.nameRequired");
     }
-    if (!email.trim()) return "Enter your email address.";
-    if (!password) return "Enter your password.";
+    if (!email.trim()) return t("auth.validation.emailRequired");
+    if (!password) return t("auth.validation.passwordRequired");
     if (isSignup && password !== confirmPassword) {
-      return "Passwords do not match.";
+      return t("auth.validation.passwordMismatch");
     }
     return null;
   }
@@ -99,7 +86,12 @@ export function AuthenticationView({ redirectTo }: AuthenticationViewProps) {
       await router.invalidate();
       router.history.push(redirectTo || DEFAULT_REDIRECT);
     } catch (err) {
-      toastError(err, isSignup ? "Sign up failed." : "Sign in failed.");
+      toastError(
+        err,
+        isSignup
+          ? t("common.errors.signUpFailed")
+          : t("common.errors.signInFailed"),
+      );
       setPending(false);
     }
   }
@@ -108,8 +100,8 @@ export function AuthenticationView({ redirectTo }: AuthenticationViewProps) {
     <div className="flex min-h-svh items-center justify-center p-4 bg-[rgba(0,0,0,0.01)] ">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">{copy.title}</CardTitle>
-          <CardDescription>{copy.description}</CardDescription>
+          <CardTitle className="text-2xl">{t(`auth.${mode}.title`)}</CardTitle>
+          <CardDescription>{t(`auth.${mode}.description`)}</CardDescription>
         </CardHeader>
         <form
           onSubmit={(event) => {
@@ -121,21 +113,23 @@ export function AuthenticationView({ redirectTo }: AuthenticationViewProps) {
             {isSignup && (
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="first-name">First name</Label>
+                  <Label htmlFor="first-name">
+                    {t("auth.fields.firstName")}
+                  </Label>
                   <Input
                     id="first-name"
                     autoComplete="given-name"
-                    placeholder="Jane"
+                    placeholder={t("auth.placeholders.firstName")}
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="last-name">Last name</Label>
+                  <Label htmlFor="last-name">{t("auth.fields.lastName")}</Label>
                   <Input
                     id="last-name"
                     autoComplete="family-name"
-                    placeholder="Doe"
+                    placeholder={t("auth.placeholders.lastName")}
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                   />
@@ -143,18 +137,18 @@ export function AuthenticationView({ redirectTo }: AuthenticationViewProps) {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("auth.fields.email")}</Label>
               <Input
                 id="email"
                 type="email"
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder={t("auth.placeholders.email")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="space-y-2 mb-3">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("auth.fields.password")}</Label>
               <PasswordInput
                 id="password"
                 autoComplete={isSignup ? "new-password" : "current-password"}
@@ -164,7 +158,9 @@ export function AuthenticationView({ redirectTo }: AuthenticationViewProps) {
             </div>
             {isSignup && (
               <div className="space-y-2 mb-3">
-                <Label htmlFor="confirm-password">Confirm password</Label>
+                <Label htmlFor="confirm-password">
+                  {t("auth.fields.confirmPassword")}
+                </Label>
                 <PasswordInput
                   id="confirm-password"
                   autoComplete="new-password"
@@ -176,16 +172,16 @@ export function AuthenticationView({ redirectTo }: AuthenticationViewProps) {
           </CardContent>
           <CardFooter className="flex-col gap-3">
             <Button type="submit" className="w-full" disabled={pending}>
-              {pending ? "Please wait…" : copy.cta}
+              {pending ? t("auth.pending") : t(`auth.${mode}.cta`)}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
-              {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
+              {isSignup ? t("auth.haveAccount") : t("auth.noAccount")}{" "}
               <button
                 type="button"
                 className="font-medium text-foreground underline-offset-4 hover:underline"
                 onClick={() => switchMode(isSignup ? "signin" : "signup")}
               >
-                {isSignup ? "Sign in" : "Sign up"}
+                {isSignup ? t("auth.signin.cta") : t("auth.signup.cta")}
               </button>
             </p>
           </CardFooter>

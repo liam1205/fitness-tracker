@@ -1,21 +1,21 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import i18n from "@/lib/i18n";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** Formats as e.g. "05. October 2026 at 14:03", in i18next's active language. */
 export const dateString = (date: Date) => {
-  const day = date.getDate().toLocaleString().padStart(2, "0");
-  const month = date
-    .toLocaleString("en-US", { month: "long" })
-    .padStart(2, "0");
-  const year = date.getFullYear().toLocaleString();
+  const pad = (n: number) => String(n).padStart(2, "0");
 
-  const hours = date.getHours().toLocaleString().padStart(2, "0");
-  const minutes = date.getMinutes().toLocaleString().padStart(2, "0");
-
-  return `${day}. ${month} ${year} at ${hours}:${minutes}`;
+  return i18n.t("common.dateTime", {
+    day: pad(date.getDate()),
+    month: date.toLocaleString(i18n.resolvedLanguage, { month: "long" }),
+    year: date.getFullYear(),
+    time: `${pad(date.getHours())}:${pad(date.getMinutes())}`,
+  });
 };
 
 export const formatDuration = (totalSec: number) => {

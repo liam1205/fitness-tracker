@@ -40,11 +40,13 @@ import {
 } from "@/components/ui/accordion";
 import { useAuth } from "@/lib/auth";
 import EmptyIndicator from "../empty-indicator/EmptyIndicator";
+import { Trans, useTranslation } from "react-i18next";
 
 /**
  * Logged workouts: the history of completed training sessions.
  */
 export function Workouts() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { openStartWorkoutModal } = useStartWorkoutModal();
   const { data: workoutSessionsCompleted } = useListCompletedWorkoutSessions();
@@ -53,18 +55,23 @@ export function Workouts() {
   return (
     <div className="space-y-4">
       <h1 className="text-4xl font-bold tracking-tight">
-        {user?.firstName}'s{" "}
-        <span className="rounded-xl px-2 bg-foreground text-background">
-          Workouts
-        </span>
+        <Trans
+          i18nKey="workouts.title"
+          values={{ name: user?.firstName }}
+          components={{
+            highlight: (
+              <span className="rounded-xl px-2 bg-foreground text-background" />
+            ),
+          }}
+        />
       </h1>
       <Accordion type="single" defaultValue={"active"} collapsible>
         <AccordionItem value="active">
-          <AccordionTrigger>Active Sessions</AccordionTrigger>
+          <AccordionTrigger>{t("workouts.activeSessions")}</AccordionTrigger>
           <AccordionContent>
             {workoutSessionsNotCompleted?.length === 0 && (
               <EmptyIndicator
-                message={<>No active sessions available.</>}
+                message={<>{t("workouts.noActiveSessions")}</>}
               ></EmptyIndicator>
             )}
             {workoutSessionsNotCompleted?.map((session) => (
@@ -73,11 +80,11 @@ export function Workouts() {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem key={"completed"} value={"completed"}>
-          <AccordionTrigger>Completed Sessions</AccordionTrigger>
+          <AccordionTrigger>{t("workouts.completedSessions")}</AccordionTrigger>
           <AccordionContent>
             {workoutSessionsCompleted?.length === 0 && (
               <EmptyIndicator
-                message={<>No completed sessions available.</>}
+                message={<>{t("workouts.noCompletedSessions")}</>}
               ></EmptyIndicator>
             )}
             {workoutSessionsCompleted?.map((session) => (
@@ -93,7 +100,7 @@ export function Workouts() {
         onClick={openStartWorkoutModal}
       >
         <Play />
-        Start workout
+        {t("workouts.startWorkout")}
       </Button>
     </div>
   );
@@ -104,6 +111,7 @@ type WorkoutProps = {
 };
 
 const Workout = ({ session }: WorkoutProps) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const queryClient = useQueryClient();
   const { mutate: deleteWorkoutSession, isPending: isDeleting } =
@@ -131,7 +139,7 @@ const Workout = ({ session }: WorkoutProps) => {
       <CardHeader>
         <CardTitle>{session.template_name}</CardTitle>
         <CardDescription className="flex justify-start">
-          Started on {dateString(started)}
+          {t("workouts.startedOn", { date: dateString(started) })}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -149,16 +157,20 @@ const Workout = ({ session }: WorkoutProps) => {
           <div className="flex flex-row justify-start items-center gap-2 text-sm">
             <Timer id="timer-icon" className="size-3.5" />
             <Label htmlFor="timer-icon">
-              {Math.round(session.active_seconds / 60)} min
+              {t("workouts.durationMinutes", {
+                minutes: Math.round(session.active_seconds / 60),
+              })}
             </Label>
           </div>
           {!session.completed_at ? (
             <Badge variant={"default"}>
-              <Loader className="size-2"></Loader>Running
+              <Loader className="size-2"></Loader>
+              {t("workouts.status.running")}
             </Badge>
           ) : (
             <Badge variant={"success"}>
-              <Check className="size-2"></Check>Completed
+              <Check className="size-2"></Check>
+              {t("workouts.status.completed")}
             </Badge>
           )}
           <Button
@@ -166,13 +178,14 @@ const Workout = ({ session }: WorkoutProps) => {
             onClick={handleDelete}
             disabled={isDeleting}
           >
-            <Trash className="size-2.5"></Trash> Delete
+            <Trash className="size-2.5"></Trash> {t("common.actions.delete")}
           </Button>
         </div>
         <div className="flex flex-row justify-end gap-2 text-sm w-2/7">
           {!session.completed_at && (
             <Button variant="outline">
-              <Square className="size-2.5"></Square> Stop
+              <Square className="size-2.5"></Square>{" "}
+              {t("workouts.actions.stop")}
             </Button>
           )}
           <Button
@@ -184,7 +197,7 @@ const Workout = ({ session }: WorkoutProps) => {
               })
             }
           >
-            <Eye className="size-2.5"></Eye> View
+            <Eye className="size-2.5"></Eye> {t("workouts.actions.view")}
           </Button>
         </div>
       </CardFooter>

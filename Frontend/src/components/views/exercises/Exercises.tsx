@@ -1,11 +1,12 @@
 import { Eye, Plus } from "lucide-react";
+import { Trans, useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { useCreateExerciseModal } from "@/components/views/modals/CreateExercises";
 import { useListExercises } from "@/api/endpoints/exercises/exercises";
 import { Card, CardContent } from "@/components/ui/card";
 import { useViewExerciseModal } from "../modals/ViewExercise";
-import type { ExerciseRead } from "@/api/model";
+import type { ExerciseRead, MuscleGroup } from "@/api/model";
 import {
   Accordion,
   AccordionContent,
@@ -26,6 +27,7 @@ import { useAuth } from "@/lib/auth";
  * Exercise library: the catalog of exercises a user can add to templates and workouts.
  */
 export function Exercises() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { openCreateExerciseModal } = useCreateExerciseModal();
   const { data } = useListExercises({ page: 1, page_size: 100 });
@@ -41,10 +43,15 @@ export function Exercises() {
   return (
     <div className="space-y-4 pb-12">
       <h1 className="text-4xl font-bold tracking-tight">
-        {user?.firstName}'s{" "}
-        <span className="rounded-xl px-2 bg-foreground text-background">
-          Exercises
-        </span>
+        <Trans
+          i18nKey="exercises.heading"
+          values={{ name: user?.firstName ?? "" }}
+          components={{
+            highlight: (
+              <span className="rounded-xl px-2 bg-foreground text-background" />
+            ),
+          }}
+        />
       </h1>
       <Accordion
         type="single"
@@ -55,7 +62,8 @@ export function Exercises() {
         {Object.entries(groupedExercises).map(([muscleGroup, exercises]) => (
           <AccordionItem key={muscleGroup} value={muscleGroup}>
             <AccordionTrigger>
-              {muscleGroup} ({exercises.length})
+              {t(`common.muscleGroups.${muscleGroup as MuscleGroup}`)} (
+              {exercises.length})
             </AccordionTrigger>
             <AccordionContent className="gap-1">
               {exercises.map((exercise) => (
@@ -63,11 +71,13 @@ export function Exercises() {
                   <ItemMedia></ItemMedia>
                   <ItemContent>
                     <ItemTitle>{exercise.name}</ItemTitle>
-                    <ItemDescription>{exercise.muscle_group}</ItemDescription>
+                    <ItemDescription>
+                      {t(`common.muscleGroups.${exercise.muscle_group}`)}
+                    </ItemDescription>
                   </ItemContent>
                   <ItemActions>
                     <Button onClick={() => openViewExerciseModal(exercise)}>
-                      <Eye className="size-2.5"></Eye> View
+                      <Eye className="size-2.5"></Eye> {t("exercises.view")}
                     </Button>
                   </ItemActions>
                 </Item>
@@ -82,7 +92,7 @@ export function Exercises() {
         onClick={openCreateExerciseModal}
       >
         <Plus />
-        Create exercise
+        {t("exercises.create")}
       </Button>
     </div>
   );

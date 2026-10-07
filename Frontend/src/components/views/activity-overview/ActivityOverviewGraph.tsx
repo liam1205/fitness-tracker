@@ -7,25 +7,36 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 const WEEKS = 6;
-
-const chartConfig = {
-  sessions: { label: "Sessions", color: "var(--success)" },
-} satisfies ChartConfig;
 
 type Props = {
   currentWeek: (weeks: number) => void;
 };
 
 const ActivityOverviewGraph = ({ currentWeek }: Props) => {
+  const { t } = useTranslation();
+  const chartConfig = useMemo(
+    () =>
+      ({
+        sessions: {
+          label: t("activity.graph.sessions"),
+          color: "var(--success)",
+        },
+      }) satisfies ChartConfig,
+    [t],
+  );
   const { data: activity } = useGetWeeklyCompletedSessionCounts({
     weeks: WEEKS,
   });
   const firstMonday = startOfISOWeek(subWeeks(new Date(), WEEKS - 1));
 
   const data = activity?.map((sessions, w) => ({
-    week: `CW ${getISOWeek(addWeeks(firstMonday, w))}`,
+    week: t("activity.calendarWeek", {
+      week: getISOWeek(addWeeks(firstMonday, w)),
+    }),
     sessions,
   }));
 

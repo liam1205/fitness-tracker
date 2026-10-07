@@ -1,5 +1,6 @@
 import * as React from "react"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import {
   InputGroup,
@@ -19,6 +20,7 @@ function PasswordInput({
   ...props
 }: Omit<React.ComponentProps<"input">, "type">) {
   const [visible, setVisible] = React.useState(false)
+  const { t } = useTranslation()
 
   return (
     <InputGroup className={className}>
@@ -31,7 +33,9 @@ function PasswordInput({
         <InputGroupButton
           size="icon-xs"
           disabled={disabled}
-          aria-label={visible ? "Hide password" : "Show password"}
+          aria-label={
+            visible ? t("common.a11y.hidePassword") : t("common.a11y.showPassword")
+          }
           aria-pressed={visible}
           // Keep focus on the input so typing continues uninterrupted.
           onMouseDown={(e) => e.preventDefault()}

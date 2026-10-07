@@ -17,8 +17,10 @@ import { getCurrentWeekNumber } from "@/lib/utils";
 import ActivityOverview from "../activity-overview/ActivityOverview";
 import ActivityOverviewGraph from "../activity-overview/ActivityOverviewGraph";
 import { useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 
 export function Home() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { openCreateTemplateModal } = useCreateTemplateModal();
   const { openStartWorkoutModal } = useStartWorkoutModal();
@@ -30,24 +32,26 @@ export function Home() {
   return (
     <div className="space-y-4 pb-22">
       <h1 className="text-4xl font-bold tracking-tight">
-        Welcome
         {user ? (
-          <>
-            ,{" "}
-            <span className="rounded-xl px-2 bg-foreground text-background">
-              {user.name}
-            </span>
-          </>
+          <Trans
+            i18nKey="home.welcomeUser"
+            values={{ name: user.firstName }}
+            components={{
+              name: (
+                <span className="rounded-xl px-2 bg-foreground text-background" />
+              ),
+            }}
+          />
         ) : (
-          <></>
+          t("home.welcome")
         )}
       </h1>
       <div className="w-full h-full flex flex-col gap-2">
         <Card>
           <CardHeader>
-            <CardTitle>Your activity</CardTitle>
+            <CardTitle>{t("home.activity.title")}</CardTitle>
             <CardDescription>
-              Completed workouts in the last {activityWeeks} weeks
+              {t("home.activity.description", { count: activityWeeks ?? 0 })}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex">
@@ -56,9 +60,9 @@ export function Home() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Activity Graph</CardTitle>
+            <CardTitle>{t("home.activityGraph.title")}</CardTitle>
             <CardDescription>
-              Amounts of workout sessions in the last {graphWeeks} weeks
+              {t("home.activityGraph.description", { count: graphWeeks ?? 0 })}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex ">
@@ -69,8 +73,10 @@ export function Home() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>This week's summary</CardTitle>
-            <CardDescription>CW {getCurrentWeekNumber()}</CardDescription>
+            <CardTitle>{t("home.weekSummary.title")}</CardTitle>
+            <CardDescription>
+              {t("activity.calendarWeek", { week: getCurrentWeekNumber() })}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <WeekSummary></WeekSummary>
@@ -85,7 +91,7 @@ export function Home() {
           onClick={openCreateTemplateModal}
         >
           <Plus />
-          Create template
+          {t("home.actions.createTemplate")}
         </Button>
         <Button
           size={"lg"}
@@ -93,7 +99,7 @@ export function Home() {
           onClick={openStartWorkoutModal}
         >
           <Play />
-          Start workout
+          {t("home.actions.startWorkout")}
         </Button>
         <Button
           variant={"outline"}
@@ -102,7 +108,7 @@ export function Home() {
           onClick={openCreateExerciseModal}
         >
           <Plus />
-          Create exercise
+          {t("home.actions.createExercise")}
         </Button>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -8,7 +9,11 @@ import {
 } from "@/api/endpoints/workout-templates/workout-templates";
 import { useListExercises } from "@/api/endpoints/exercises/exercises";
 import { useStartWorkoutSession } from "@/api/endpoints/workout-sessions/workout-sessions";
-import type { WorkoutTemplateRead, WorkoutTemplateUpdate } from "@/api/model";
+import type {
+  MuscleGroup,
+  WorkoutTemplateRead,
+  WorkoutTemplateUpdate,
+} from "@/api/model";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -36,6 +41,7 @@ export interface ViewTemplateHandle {
  * Modal for viewing and editing a workout template.
  */
 export function useViewTemplateModal() {
+  const { t } = useTranslation();
   const { openModal, closeModal } = useModal();
   const queryClient = useQueryClient();
   const { mutate: updateWorkoutTemplate } = useUpdateWorkoutTemplate();
@@ -66,7 +72,9 @@ export function useViewTemplateModal() {
         { data: { template_id: template.id } },
         {
           onSuccess: () => {
-            toast.success(`Started "${template.name}".`);
+            toast.success(
+              t("templates.workoutStarted", { name: template.name }),
+            );
             closeModal();
           },
         },
@@ -75,18 +83,19 @@ export function useViewTemplateModal() {
 
     openModal({
       title: template.name,
-      subtitle: "Modify your template.",
+      subtitle: t("templates.viewModal.subtitle"),
       content: <ViewTemplate ref={formRef} template={template}></ViewTemplate>,
       rightButtons: [
         {
           icon: <Save></Save>,
-          label: "Save",
+          label: t("common.actions.save"),
           onClick: handleSave,
         },
         {
           label: (
             <>
-              <Play className="size-2.5"></Play>Start Workout
+              <Play className="size-2.5"></Play>
+              {t("templates.startWorkout")}
             </>
           ),
           variant: "outline",
@@ -107,6 +116,7 @@ const ViewTemplate = ({
   ref,
   template,
 }: Props & { ref?: React.Ref<ViewTemplateHandle> }) => {
+  const { t } = useTranslation();
   const { data } = useListExercises({ page: 1, page_size: 100 });
   const exercises = data?.items ?? [];
   const groupedExercises = React.useMemo(
@@ -129,7 +139,7 @@ const ViewTemplate = ({
       })),
   );
   const setsByMuscleGroup = React.useMemo(() => {
-    const totals = new Map<string, number>();
+    const totals = new Map<MuscleGroup, number>();
     for (const row of rows) {
       const setCount = Number(row.sets);
       if (!row.exercise || !Number.isInteger(setCount) || setCount <= 0) {
@@ -164,11 +174,14 @@ const ViewTemplate = ({
       });
 
       if (!trimmedName || validExercises.length === 0) {
-        const missing = [
-          !trimmedName && "a name",
-          validExercises.length === 0 && "at least one exercise",
-        ].filter(Boolean);
-        toastError(null, `Template requires ${missing.join(" and ")}.`);
+        toastError(
+          null,
+          !trimmedName && validExercises.length === 0
+            ? t("templates.validation.missingNameAndExercise")
+            : !trimmedName
+              ? t("templates.validation.missingName")
+              : t("templates.validation.missingExercise"),
+        );
         return null;
       }
 
@@ -179,7 +192,7 @@ const ViewTemplate = ({
   return (
     <div ref={containerRef} className="flex flex-col gap-3">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="template-name-input">Name</Label>
+        <Label htmlFor="template-name-input">{t("common.fields.name")}</Label>
         <Input
           id="template-name-input"
           value={name}
@@ -201,7 +214,7 @@ const ViewTemplate = ({
             className="flex w-fit items-center gap-1.5 text-xs text-muted-foreground"
           >
             <Info className="size-3.5"></Info>
-            Sets by muscle group
+            {t("templates.setsByMuscleGroup")}
           </button>
         </HoverCardTrigger>
         <HoverCardContent className="w-auto max-w-md">
@@ -224,9 +237,11 @@ const ViewTemplate = ({
                         variant={"default"}
                         className="w-24 capitalize text-xs"
                       >
-                        {muscleGroup}
+                        {t(`common.muscleGroups.${muscleGroup}`)}
                       </Badge>
-                      <span className="text-xs">{setCount} Sets</span>
+                      <span className="text-xs">
+                        {t("templates.setCount", { count: setCount })}
+                      </span>
                     </div>
                   ))}
                 </div>

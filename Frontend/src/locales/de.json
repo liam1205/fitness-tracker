@@ -1,1 +1,241 @@
-{}
+{
+  "common": {
+    "actions": {
+      "save": "Speichern",
+      "close": "Schließen",
+      "delete": "Löschen",
+      "reload": "Neu laden",
+      "goHome": "Zur Startseite"
+    },
+    "fields": {
+      "name": "Name",
+      "muscleGroup": "Muskelgruppe",
+      "sets": "Sätze",
+      "reps": "Wdh.",
+      "weight": "Gewicht",
+      "selectMuscleGroup": "Muskelgruppe auswählen"
+    },
+    "muscleGroups": {
+      "chest": "Brust",
+      "back": "Rücken",
+      "shoulders": "Schultern",
+      "biceps": "Bizeps",
+      "triceps": "Trizeps",
+      "abs": "Bauch",
+      "calves": "Waden",
+      "quads": "Quadrizeps",
+      "hamstrings": "Beinbeuger"
+    },
+    "a11y": {
+      "toggleSidebar": "Seitenleiste umschalten",
+      "sidebar": "Seitenleiste",
+      "sidebarDescription": "Zeigt die mobile Seitenleiste an.",
+      "showPassword": "Passwort anzeigen",
+      "hidePassword": "Passwort verbergen",
+      "previousPage": "Zur vorherigen Seite",
+      "nextPage": "Zur nächsten Seite"
+    },
+    "dateTime": "{{day}}. {{month}} {{year}} um {{time}}",
+    "notFound": "Diese Seite konnte nicht gefunden werden.",
+    "errors": {
+      "generic": "Etwas ist schiefgelaufen.",
+      "somethingWentWrong": "Etwas ist schiefgelaufen",
+      "loadingData": "Beim Laden der Daten ist etwas schiefgelaufen.",
+      "unreachable": "Der Server ist nicht erreichbar. Bitte prüfe deine Verbindung.",
+      "signInFailed": "Anmeldung fehlgeschlagen.",
+      "signUpFailed": "Registrierung fehlgeschlagen.",
+      "logOutFailed": "Abmeldung fehlgeschlagen."
+    }
+  },
+  "activity": {
+    "calendarWeek": "KW {{week}}",
+    "dayFormat": "EEE, d. MMM",
+    "dayTooltip_one": "{{date}} · {{count}} Einheit",
+    "dayTooltip_other": "{{date}} · {{count}} Einheiten",
+    "graph": {
+      "sessions": "Einheiten"
+    }
+  },
+  "auth": {
+    "signin": {
+      "title": "Anmelden",
+      "description": "Gib deine Zugangsdaten ein, um die App zu nutzen.",
+      "cta": "Anmelden"
+    },
+    "signup": {
+      "title": "Konto erstellen",
+      "description": "Registriere dich, um loszulegen.",
+      "cta": "Registrieren"
+    },
+    "fields": {
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen"
+    },
+    "placeholders": {
+      "firstName": "Max",
+      "lastName": "Mustermann",
+      "email": "du@beispiel.de"
+    },
+    "validation": {
+      "nameRequired": "Gib deinen Vor- und Nachnamen ein.",
+      "emailRequired": "Gib deine E-Mail-Adresse ein.",
+      "passwordRequired": "Gib dein Passwort ein.",
+      "passwordMismatch": "Die Passwörter stimmen nicht überein."
+    },
+    "pending": "Bitte warten…",
+    "haveAccount": "Du hast schon ein Konto?",
+    "noAccount": "Du hast noch kein Konto?"
+  },
+  "dataTable": {
+    "noResults": "Keine Ergebnisse.",
+    "noData": "Keine Daten vorhanden.",
+    "searchPlaceholder": "Suchen...",
+    "columns": "Spalten",
+    "rowsSelected_one": "{{selected}} von {{count}} Zeile ausgewählt",
+    "rowsSelected_other": "{{selected}} von {{count}} Zeilen ausgewählt",
+    "pageOf": "Seite {{page}} von {{pageCount}}",
+    "selectAll": "Alle auswählen",
+    "selectRow": "Zeile auswählen"
+  },
+  "exercises": {
+    "heading": "{{name}}'s <highlight>Übungen</highlight>",
+    "view": "Ansehen",
+    "create": "Übung erstellen",
+    "createModal": {
+      "title": "Übung erstellen",
+      "subtitle": "Füge deiner Bibliothek eine neue Übung hinzu."
+    },
+    "viewModal": {
+      "title": "Übung",
+      "subtitle": "Bearbeite diese Übung"
+    }
+  },
+  "home": {
+    "welcome": "Willkommen",
+    "welcomeUser": "Willkommen, <name>{{name}}</name>",
+    "activity": {
+      "title": "Deine Aktivität",
+      "description_one": "Abgeschlossene Trainings der letzten Woche",
+      "description_other": "Abgeschlossene Trainings der letzten {{count}} Wochen"
+    },
+    "activityGraph": {
+      "title": "Aktivitätsverlauf",
+      "description_one": "Anzahl der Trainingseinheiten der letzten Woche",
+      "description_other": "Anzahl der Trainingseinheiten der letzten {{count}} Wochen"
+    },
+    "weekSummary": {
+      "title": "Deine Woche im Überblick"
+    },
+    "actions": {
+      "createTemplate": "Vorlage erstellen",
+      "startWorkout": "Training starten",
+      "createExercise": "Übung erstellen"
+    }
+  },
+  "sidebar": {
+    "brand": "{{name}}'s <highlight>Trainingsplaner</highlight>",
+    "nav": {
+      "home": "Start",
+      "templates": "Vorlagen",
+      "workouts": "Trainings",
+      "exercises": "Übungen"
+    },
+    "activeSessions": {
+      "title": "Aktive Einheiten",
+      "untitled": "Training",
+      "pause": "Pausieren",
+      "resume": "Fortsetzen",
+      "complete": "Abschließen"
+    },
+    "themes": {
+      "label": "Designs",
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "System"
+    },
+    "languages": {
+      "label": "Sprachen",
+      "english": "English",
+      "german": "Deutsch"
+    },
+    "logOut": "Abmelden"
+  },
+  "templates": {
+    "heading": "{{name}}'s <highlight>Vorlagen</highlight>",
+    "empty": "Keine Vorlagen vorhanden.",
+    "createdOn": "Erstellt am {{date}}",
+    "startWorkout": "Training starten",
+    "view": "Ansehen",
+    "create": "Vorlage erstellen",
+    "workoutStarted": "„{{name}}“ gestartet.",
+    "createModal": {
+      "title": "Trainingsvorlage erstellen",
+      "subtitle": "Erstelle eine wiederverwendbare Trainingsvorlage."
+    },
+    "viewModal": {
+      "subtitle": "Bearbeite deine Vorlage."
+    },
+    "validation": {
+      "missingName": "Die Vorlage braucht einen Namen.",
+      "missingExercise": "Die Vorlage braucht mindestens eine Übung.",
+      "missingNameAndExercise": "Die Vorlage braucht einen Namen und mindestens eine Übung."
+    },
+    "setsByMuscleGroup": "Sätze pro Muskelgruppe",
+    "setCount_one": "{{count}} Satz",
+    "setCount_other": "{{count}} Sätze",
+    "rows": {
+      "addExercise": "Übung hinzufügen",
+      "selectExercise": "Übung auswählen"
+    }
+  },
+  "weekSummary": {
+    "columns": {
+      "mev": "MEV",
+      "mav": "MAV",
+      "mrv": "MRV"
+    },
+    "mevMissing_one": "Noch <count>{{count}} Satz</count> bis zum <term>Minimum Effective Volume</term> für {{muscleGroup}}.",
+    "mevMissing_other": "Noch <count>{{count}} Sätze</count> bis zum <term>Minimum Effective Volume</term> für {{muscleGroup}}.",
+    "mavMissing": "Noch <count>{{min}} - {{max}} Sätze</count> bis zum <term>Maximum Adaptive Volume</term> für {{muscleGroup}}."
+  },
+  "workout": {
+    "pause": "Pausieren",
+    "resume": "Fortsetzen",
+    "complete": "Training abschließen",
+    "completeBlocked": "Schließe alle Sätze ab, um das Training zu beenden.",
+    "errors": {
+      "saveSet": "Der Satz konnte nicht gespeichert werden.",
+      "pause": "Das Training konnte nicht pausiert werden.",
+      "resume": "Das Training konnte nicht fortgesetzt werden.",
+      "complete": "Das Training konnte nicht abgeschlossen werden."
+    }
+  },
+  "workouts": {
+    "title": "{{name}}'s <highlight>Trainings</highlight>",
+    "activeSessions": "Aktive Einheiten",
+    "completedSessions": "Abgeschlossene Einheiten",
+    "noActiveSessions": "Keine aktiven Einheiten vorhanden.",
+    "noCompletedSessions": "Keine abgeschlossenen Einheiten vorhanden.",
+    "startWorkout": "Training starten",
+    "startedOn": "Gestartet am {{date}}",
+    "durationMinutes": "{{minutes}} Min.",
+    "status": {
+      "running": "Läuft",
+      "completed": "Abgeschlossen"
+    },
+    "actions": {
+      "stop": "Beenden",
+      "view": "Ansehen"
+    },
+    "startModal": {
+      "title": "Training starten",
+      "subtitle": "Wähle eine Vorlage, um eine Trainingseinheit zu starten.",
+      "start": "Starten",
+      "selectTemplate": "Vorlage auswählen",
+      "started": "Training gestartet."
+    }
+  }
+}
