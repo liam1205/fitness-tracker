@@ -9,6 +9,7 @@ DEFAULT_MEV: list[tuple[int, MuscleGroup]] = [
     (4, MuscleGroup.HAMS),
     (4, MuscleGroup.BICEPS),
     (4, MuscleGroup.TRICEPS),
+    (4, MuscleGroup.ABS),
     (6, MuscleGroup.CALVES),
 ]
 
@@ -21,6 +22,7 @@ DEFAULT_MAV: list[tuple[int, MuscleGroup]] = [
     (10, MuscleGroup.HAMS),
     (10, MuscleGroup.BICEPS),
     (10, MuscleGroup.TRICEPS),
+    (6, MuscleGroup.ABS),
     (12, MuscleGroup.CALVES),
 ]
 
@@ -34,5 +36,6 @@ DEFAULT_MRV: list[tuple[int, MuscleGroup]] = [
     (16, MuscleGroup.HAMS),
     (16, MuscleGroup.BICEPS),
     (14, MuscleGroup.TRICEPS),
+    (8, MuscleGroup.ABS),
     (20, MuscleGroup.CALVES),
 ]

@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.data.default_mev_mav_mrv import DEFAULT_MAV, DEFAULT_MEV, DEFAULT_MRV
 from app.models.enums import MuscleGroup
-from app.models.exercise import Exercise
+from app.models.exercise import Exercise, ExerciseMuscleGroup
 from app.models.workout_session import (
     SessionExercise,
     SessionPause,
@@ -74,7 +74,8 @@ async def _get_exercises_for_sessions(
                 id=session_exercise.id,
                 exercise_id=session_exercise.exercise_id,
                 name=exercise.name,
-                muscle_group=exercise.muscle_group,
+                primary_muscle_group=exercise.primary_muscle_group,
+                secondary_muscle_groups=exercise.secondary_muscle_groups,
                 position=session_exercise.position,
                 sets=sets_by_session_exercise[session_exercise.id],
             )
@@ -210,9 +211,11 @@ async def get_weekly_muscle_group_sets_for_user(
     Weeks run from Monday 00:00 to the following Monday 00:00 (UTC);
     ``weeks_ago`` of 0 is the current week, 1 the previous one, and so on. A
     set belongs to the week its session was started in, regardless of whether
-    the session itself has been completed. Every muscle group is returned,
-    with 0 for those without completed sets. Each entry also carries the
-    default MEV/MAV/MRV weekly set thresholds (``None`` where none are defined).
+    the session itself has been completed. Each set counts towards every
+    muscle group its exercise trains, weighted by that muscle group's factor.
+    Every muscle group is returned, with 0 for those without completed sets.
+    Each entry also carries the default MEV/MAV/MRV weekly set thresholds
+    (``None`` where none are defined).
     """
     today = datetime.now(UTC).date()
     week_start = today - timedelta(days=today.weekday() + 7 * weeks_ago)
@@ -221,20 +224,23 @@ async def get_weekly_muscle_group_sets_for_user(
     range_end = range_start + timedelta(days=7)
 
     rows = await db.execute(
-        select(Exercise.muscle_group, func.count(SessionSet.id))
+        select(ExerciseMuscleGroup.muscle_group, func.sum(ExerciseMuscleGroup.factor))
         .select_from(SessionSet)
         .join(SessionExercise, SessionExercise.id == SessionSet.session_exercise_id)
         .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
-        .join(Exercise, Exercise.id == SessionExercise.exercise_id)
+        .join(
+            ExerciseMuscleGroup,
+            ExerciseMuscleGroup.exercise_id == SessionExercise.exercise_id,
+        )
         .where(
             WorkoutSession.user_id == user_id,
             WorkoutSession.started_at >= range_start,
             WorkoutSession.started_at < range_end,
             SessionSet.completed.is_(True),
         )
-        .group_by(Exercise.muscle_group)
+        .group_by(ExerciseMuscleGroup.muscle_group)
     )
-    counts = {muscle_group: count for muscle_group, count in rows.all()}
+    counts = {muscle_group: float(total) for muscle_group, total in rows.all()}
 
     return WeeklyMuscleGroupSets(
         week_start=week_start,
@@ -577,7 +583,8 @@ async def start_workout_session_from_template(
                 id=session_exercise.id,
                 exercise_id=session_exercise.exercise_id,
                 name=exercise.name,
-                muscle_group=exercise.muscle_group,
+                primary_muscle_group=exercise.primary_muscle_group,
+                secondary_muscle_groups=exercise.secondary_muscle_groups,
                 position=session_exercise.position,
                 sets=sets,
             )

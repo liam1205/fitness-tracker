@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.models.enums import MuscleGroup
+from app.schemas.exercise import MuscleGroupFactor
 
 
 class TemplateExerciseCreate(BaseModel):
@@ -21,7 +21,12 @@ class TemplateExerciseRead(BaseModel):
     id: uuid.UUID = Field(..., description="Unique identifier.")
     exercise_id: uuid.UUID = Field(..., description="Id of the exercise in this slot.")
     name: str = Field(..., description="Exercise name.", examples=["Bench Press"])
-    muscle_group: MuscleGroup = Field(..., description="Primary muscle group targeted.")
+    primary_muscle_group: MuscleGroupFactor = Field(
+        ..., description="Muscle group the exercise mainly targets."
+    )
+    secondary_muscle_groups: list[MuscleGroupFactor] = Field(
+        ..., description="Other muscle groups the exercise trains, highest factor first."
+    )
     position: int = Field(..., description="Display order within the template, 1-indexed.")
     set_count: int = Field(..., description="Number of planned sets.")
 

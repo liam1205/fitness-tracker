@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
@@ -7,16 +8,10 @@ import {
   useUpdateExercise,
 } from "@/api/endpoints/exercises/exercises";
 import type { ExerciseRead } from "@/api/model";
-import { MuscleGroup } from "@/api/model/muscleGroup";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  ExerciseForm,
+  type ExerciseFormHandle,
+} from "@/components/views/modals/ExerciseForm";
 import { useModal } from "@/hooks/use-modal";
 import { Save, Trash } from "lucide-react";
 
@@ -31,12 +26,14 @@ export function useViewExerciseModal() {
   const { mutate: deleteExercise } = useDeleteExercise();
 
   function openViewExerciseModal(exercise: ExerciseRead) {
-    let name = exercise.name;
-    let muscleGroup = exercise.muscle_group;
+    const formRef = React.createRef<ExerciseFormHandle>();
 
     function handleSave() {
+      const payload = formRef.current?.getPayload();
+      if (!payload) return;
+
       updateExercise(
-        { exerciseId: exercise.id, data: { name, muscle_group: muscleGroup } },
+        { exerciseId: exercise.id, data: payload },
         {
           onSuccess: () => {
             queryClient.invalidateQueries({
@@ -65,42 +62,7 @@ export function useViewExerciseModal() {
     openModal({
       title: t("exercises.viewModal.title"),
       subtitle: t("exercises.viewModal.subtitle"),
-      content: (
-        <div>
-          <div className="flex flex-col gap-3">
-            <Label htmlFor="name-input">{t("common.fields.name")}</Label>
-            <Input
-              id="name-input"
-              defaultValue={exercise.name}
-              onChange={(event) => {
-                name = event.target.value;
-              }}
-            ></Input>
-            <Label htmlFor="muscle-group-input">
-              {t("common.fields.muscleGroup")}
-            </Label>
-            <Select
-              defaultValue={exercise.muscle_group}
-              onValueChange={(value) => {
-                muscleGroup = value as MuscleGroup;
-              }}
-            >
-              <SelectTrigger id="muscle-group-input" className="w-full">
-                <SelectValue
-                  placeholder={t("common.fields.selectMuscleGroup")}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(MuscleGroup).map((muscleGroupOption) => (
-                  <SelectItem key={muscleGroupOption} value={muscleGroupOption}>
-                    {t(`common.muscleGroups.${muscleGroupOption}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      ),
+      content: <ExerciseForm ref={formRef} exercise={exercise}></ExerciseForm>,
       rightButtons: [
         {
           icon: <Trash></Trash>,

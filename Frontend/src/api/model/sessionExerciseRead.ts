@@ -5,7 +5,7 @@
  * Backend API for the web app template.
  * OpenAPI spec version: 0.1.0
  */
-import type { MuscleGroup } from './muscleGroup';
+import type { MuscleGroupFactor } from './muscleGroupFactor';
 import type { SessionSetRead } from './sessionSetRead';
 
 /**
@@ -18,8 +18,10 @@ export interface SessionExerciseRead {
   exercise_id: string;
   /** Exercise name. */
   name: string;
-  /** Primary muscle group targeted. */
-  muscle_group: MuscleGroup;
+  /** Muscle group the exercise mainly targets. */
+  primary_muscle_group: MuscleGroupFactor;
+  /** Other muscle groups the exercise trains, highest factor first. */
+  secondary_muscle_groups: MuscleGroupFactor[];
   /** Display order within the session, 1-indexed. */
   position: number;
   /** Sets performed for this exercise, in order. */

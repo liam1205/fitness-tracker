@@ -17,6 +17,7 @@ export * from './hTTPValidationError';
 export * from './language';
 export * from './listExercisesParams';
 export * from './muscleGroup';
+export * from './muscleGroupFactor';
 export * from './muscleGroupSetCount';
 export * from './pageExerciseRead';
 export * from './sessionExerciseRead';

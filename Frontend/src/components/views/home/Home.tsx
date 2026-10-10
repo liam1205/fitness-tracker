@@ -30,7 +30,7 @@ export function Home() {
   const [activityWeeks, setActivityWeeks] = useState<number>();
 
   return (
-    <div className="space-y-4 pb-22">
+    <div className="space-y-4">
       <h1 className="text-4xl font-bold tracking-tight">
         {user ? (
           <Trans

@@ -5,7 +5,7 @@
  * Backend API for the web app template.
  * OpenAPI spec version: 0.1.0
  */
-import type { MuscleGroup } from './muscleGroup';
+import type { MuscleGroupFactor } from './muscleGroupFactor';
 
 /**
  * An exercise slot within a workout template, as returned by the API.
@@ -17,8 +17,10 @@ export interface TemplateExerciseRead {
   exercise_id: string;
   /** Exercise name. */
   name: string;
-  /** Primary muscle group targeted. */
-  muscle_group: MuscleGroup;
+  /** Muscle group the exercise mainly targets. */
+  primary_muscle_group: MuscleGroupFactor;
+  /** Other muscle groups the exercise trains, highest factor first. */
+  secondary_muscle_groups: MuscleGroupFactor[];
   /** Display order within the template, 1-indexed. */
   position: number;
   /** Number of planned sets. */

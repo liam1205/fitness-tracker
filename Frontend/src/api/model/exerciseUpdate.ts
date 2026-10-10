@@ -5,14 +5,19 @@
  * Backend API for the web app template.
  * OpenAPI spec version: 0.1.0
  */
-import type { MuscleGroup } from './muscleGroup';
+import type { MuscleGroupFactor } from './muscleGroupFactor';
 
 /**
  * Payload for updating an exercise. Omitted fields are left unchanged.
+ *
+ * The muscle groups are replaced as a whole, so ``primary_muscle_group`` and
+ * ``secondary_muscle_groups`` must be sent together or not at all.
  */
 export interface ExerciseUpdate {
   /** Exercise name. */
   name?: string | null;
-  /** Primary muscle group targeted. */
-  muscle_group?: MuscleGroup | null;
+  /** Muscle group the exercise mainly targets. */
+  primary_muscle_group?: MuscleGroupFactor | null;
+  /** Other muscle groups the exercise trains. Factors must not exceed the primary's. */
+  secondary_muscle_groups?: MuscleGroupFactor[] | null;
 }

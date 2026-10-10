@@ -156,7 +156,7 @@ const Workout = ({ session }: WorkoutProps) => {
         <div className="flex flex-row items-center justify-start gap-4 text-sm w-5/7">
           <div className="flex flex-row justify-start items-center gap-2 text-sm">
             <Timer id="timer-icon" className="size-3.5" />
-            <Label htmlFor="timer-icon">
+            <Label htmlFor="timer-icon" className="text-xs">
               {t("workouts.durationMinutes", {
                 minutes: Math.round(session.active_seconds / 60),
               })}
@@ -177,6 +177,7 @@ const Workout = ({ session }: WorkoutProps) => {
             variant="destructive"
             onClick={handleDelete}
             disabled={isDeleting}
+            size={"sm"}
           >
             <Trash className="size-2.5"></Trash> {t("common.actions.delete")}
           </Button>
@@ -190,6 +191,7 @@ const Workout = ({ session }: WorkoutProps) => {
           )}
           <Button
             variant="default"
+            size={"sm"}
             onClick={() =>
               router.navigate({
                 to: "/workouts/$workoutId",

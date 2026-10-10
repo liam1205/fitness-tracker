@@ -8,13 +8,13 @@
 import type { MuscleGroup } from './muscleGroup';
 
 /**
- * Number of completed sets for one muscle group.
+ * Weighted number of completed sets for one muscle group.
  */
 export interface MuscleGroupSetCount {
   /** Muscle group the sets were performed for. */
   muscle_group: MuscleGroup;
   /**
-     * Number of sets marked as completed.
+     * Completed sets, each weighted by the exercise's factor for this muscle group (e.g. a bench press set adds 1 to chest and 0.5 to triceps).
      * @minimum 0
      */
   completed_sets: number;

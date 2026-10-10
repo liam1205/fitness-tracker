@@ -1230,15 +1230,23 @@
               "Bench Press"
             ]
           },
-          "muscle_group": {
-            "$ref": "#/components/schemas/MuscleGroup",
-            "description": "Primary muscle group targeted."
+          "primary_muscle_group": {
+            "$ref": "#/components/schemas/MuscleGroupFactor",
+            "description": "Muscle group the exercise mainly targets."
+          },
+          "secondary_muscle_groups": {
+            "items": {
+              "$ref": "#/components/schemas/MuscleGroupFactor"
+            },
+            "type": "array",
+            "title": "Secondary Muscle Groups",
+            "description": "Other muscle groups the exercise trains. Factors must not exceed the primary's."
           }
         },
         "type": "object",
         "required": [
           "name",
-          "muscle_group"
+          "primary_muscle_group"
         ],
         "title": "ExerciseCreate",
         "description": "Payload for creating a new exercise."
@@ -1259,9 +1267,17 @@
               "Bench Press"
             ]
           },
-          "muscle_group": {
-            "$ref": "#/components/schemas/MuscleGroup",
-            "description": "Primary muscle group targeted."
+          "primary_muscle_group": {
+            "$ref": "#/components/schemas/MuscleGroupFactor",
+            "description": "Muscle group the exercise mainly targets."
+          },
+          "secondary_muscle_groups": {
+            "items": {
+              "$ref": "#/components/schemas/MuscleGroupFactor"
+            },
+            "type": "array",
+            "title": "Secondary Muscle Groups",
+            "description": "Other muscle groups the exercise trains, highest factor first."
           },
           "created_by": {
             "anyOf": [
@@ -1287,7 +1303,8 @@
         "required": [
           "id",
           "name",
-          "muscle_group",
+          "primary_muscle_group",
+          "secondary_muscle_groups",
           "created_at"
         ],
         "title": "ExerciseRead",
@@ -1310,21 +1327,36 @@
               "Bench Press"
             ]
           },
-          "muscle_group": {
+          "primary_muscle_group": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/MuscleGroup"
+                "$ref": "#/components/schemas/MuscleGroupFactor"
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Primary muscle group targeted."
+            "description": "Muscle group the exercise mainly targets."
+          },
+          "secondary_muscle_groups": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/MuscleGroupFactor"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secondary Muscle Groups",
+            "description": "Other muscle groups the exercise trains. Factors must not exceed the primary's."
           }
         },
         "type": "object",
         "title": "ExerciseUpdate",
-        "description": "Payload for updating an exercise. Omitted fields are left unchanged."
+        "description": "Payload for updating an exercise. Omitted fields are left unchanged.\n\nThe muscle groups are replaced as a whole, so ``primary_muscle_group`` and\n``secondary_muscle_groups`` must be sent together or not at all."
       },
       "HTTPValidationError": {
         "properties": {
@@ -1398,6 +1430,31 @@
         ],
         "title": "MuscleGroup"
       },
+      "MuscleGroupFactor": {
+        "properties": {
+          "muscle_group": {
+            "$ref": "#/components/schemas/MuscleGroup",
+            "description": "Muscle group trained."
+          },
+          "factor": {
+            "type": "number",
+            "maximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Factor",
+            "description": "How much one completed set counts towards this muscle group's weekly volume, with at most two decimal places.",
+            "examples": [
+              0.5
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "muscle_group",
+          "factor"
+        ],
+        "title": "MuscleGroupFactor",
+        "description": "A muscle group an exercise trains, weighted by how strongly it trains it."
+      },
       "MuscleGroupSetCount": {
         "properties": {
           "muscle_group": {
@@ -1405,10 +1462,13 @@
             "description": "Muscle group the sets were performed for."
           },
           "completed_sets": {
-            "type": "integer",
+            "type": "number",
             "minimum": 0.0,
             "title": "Completed Sets",
-            "description": "Number of sets marked as completed."
+            "description": "Completed sets, each weighted by the exercise's factor for this muscle group (e.g. a bench press set adds 1 to chest and 0.5 to triceps).",
+            "examples": [
+              7.5
+            ]
           },
           "mev": {
             "anyOf": [
@@ -1453,7 +1513,7 @@
           "completed_sets"
         ],
         "title": "MuscleGroupSetCount",
-        "description": "Number of completed sets for one muscle group."
+        "description": "Weighted number of completed sets for one muscle group."
       },
       "Page_ExerciseRead_": {
         "properties": {
@@ -1524,9 +1584,17 @@
               "Bench Press"
             ]
           },
-          "muscle_group": {
-            "$ref": "#/components/schemas/MuscleGroup",
-            "description": "Primary muscle group targeted."
+          "primary_muscle_group": {
+            "$ref": "#/components/schemas/MuscleGroupFactor",
+            "description": "Muscle group the exercise mainly targets."
+          },
+          "secondary_muscle_groups": {
+            "items": {
+              "$ref": "#/components/schemas/MuscleGroupFactor"
+            },
+            "type": "array",
+            "title": "Secondary Muscle Groups",
+            "description": "Other muscle groups the exercise trains, highest factor first."
           },
           "position": {
             "type": "integer",
@@ -1547,7 +1615,8 @@
           "id",
           "exercise_id",
           "name",
-          "muscle_group",
+          "primary_muscle_group",
+          "secondary_muscle_groups",
           "position",
           "sets"
         ],
@@ -1720,9 +1789,17 @@
               "Bench Press"
             ]
           },
-          "muscle_group": {
-            "$ref": "#/components/schemas/MuscleGroup",
-            "description": "Primary muscle group targeted."
+          "primary_muscle_group": {
+            "$ref": "#/components/schemas/MuscleGroupFactor",
+            "description": "Muscle group the exercise mainly targets."
+          },
+          "secondary_muscle_groups": {
+            "items": {
+              "$ref": "#/components/schemas/MuscleGroupFactor"
+            },
+            "type": "array",
+            "title": "Secondary Muscle Groups",
+            "description": "Other muscle groups the exercise trains, highest factor first."
           },
           "position": {
             "type": "integer",
@@ -1740,7 +1817,8 @@
           "id",
           "exercise_id",
           "name",
-          "muscle_group",
+          "primary_muscle_group",
+          "secondary_muscle_groups",
           "position",
           "set_count"
         ],

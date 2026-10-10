@@ -111,6 +111,20 @@
     "viewModal": {
       "title": "Exercise",
       "subtitle": "Modify this exercise"
+    },
+    "form": {
+      "primaryMuscleGroup": "Primary muscle group",
+      "secondaryMuscleGroups": "Secondary muscle groups",
+      "addMuscleGroup": "Add muscle group",
+      "removeMuscleGroup": "Remove muscle group",
+      "factor": "Factor",
+      "factorHint": "The factor sets how much one set counts towards a muscle group's weekly volume, e.g. 0.5 counts as half a set."
+    },
+    "validation": {
+      "missingName": "Please enter a name.",
+      "missingPrimaryMuscleGroup": "Please select a primary muscle group.",
+      "invalidFactor": "Factors must be between 0.01 and 1, with at most two decimal places.",
+      "secondaryExceedsPrimary": "A secondary muscle group's factor can't be higher than the primary one's."
     }
   },
   "home": {
@@ -184,8 +198,8 @@
       "missingNameAndExercise": "Template requires a name and at least one exercise."
     },
     "setsByMuscleGroup": "Sets by muscle group",
-    "setCount_one": "{{count}} Set",
-    "setCount_other": "{{count}} Sets",
+    "setCount_one": "{{count, number}} Set",
+    "setCount_other": "{{count, number}} Sets",
     "rows": {
       "addExercise": "Add exercise",
       "selectExercise": "Select exercise"
@@ -197,9 +211,9 @@
       "mav": "MAV",
       "mrv": "MRV"
     },
-    "mevMissing_one": "<count>{{count}} set</count> missing to reach <term>Minimum Effective Volume</term> for {{muscleGroup}}.",
-    "mevMissing_other": "<count>{{count}} sets</count> missing to reach <term>Minimum Effective Volume</term> for {{muscleGroup}}.",
-    "mavMissing": "<count>{{min}} - {{max}} sets</count> missing to reach <term>Maximum Adaptive Volume</term> for {{muscleGroup}}."
+    "mevMissing_one": "<count>{{count, number}} set</count> missing to reach <term>Minimum Effective Volume</term> for {{muscleGroup}}.",
+    "mevMissing_other": "<count>{{count, number}} sets</count> missing to reach <term>Minimum Effective Volume</term> for {{muscleGroup}}.",
+    "mavMissing": "<count>{{min, number}} - {{max, number}} sets</count> missing to reach <term>Maximum Adaptive Volume</term> for {{muscleGroup}}."
   },
   "workout": {
     "pause": "Pause",

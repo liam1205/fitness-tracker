@@ -1,4 +1,4 @@
-import { Ellipsis, Eye, Play, Plus, Trash, X } from "lucide-react";
+import { Eye, Play, Plus, Trash, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Trans, useTranslation } from "react-i18next";
@@ -111,7 +111,11 @@ export function Templates() {
                     <X className="size-2.5"></X>
                     {exercise.name}{" "}
                     <span className="capitalize">
-                      ({t(`common.muscleGroups.${exercise.muscle_group}`)})
+                      (
+                      {t(
+                        `common.muscleGroups.${exercise.primary_muscle_group.muscle_group}`,
+                      )}
+                      )
                     </span>
                   </span>
                 ))}

@@ -4,7 +4,6 @@ import { Trans, useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { useCreateExerciseModal } from "@/components/views/modals/CreateExercises";
 import { useListExercises } from "@/api/endpoints/exercises/exercises";
-import { Card, CardContent } from "@/components/ui/card";
 import { useViewExerciseModal } from "../modals/ViewExercise";
 import type { ExerciseRead, MuscleGroup } from "@/api/model";
 import {
@@ -27,7 +26,7 @@ import { useAuth } from "@/lib/auth";
  * Exercise library: the catalog of exercises a user can add to templates and workouts.
  */
 export function Exercises() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { openCreateExerciseModal } = useCreateExerciseModal();
   const { data } = useListExercises({ page: 1, page_size: 100 });
@@ -36,9 +35,20 @@ export function Exercises() {
   const groupedExercises = (data?.items ?? []).reduce<
     Record<string, ExerciseRead[]>
   >((groups, exercise) => {
-    (groups[exercise.muscle_group] ??= []).push(exercise);
+    (groups[exercise.primary_muscle_group.muscle_group] ??= []).push(exercise);
     return groups;
   }, {});
+
+  /** E.g. "Chest · Triceps 0.5 · Shoulders 0.25". */
+  function describeMuscleGroups(exercise: ExerciseRead) {
+    return [
+      t(`common.muscleGroups.${exercise.primary_muscle_group.muscle_group}`),
+      ...exercise.secondary_muscle_groups.map(
+        ({ muscle_group, factor }) =>
+          `${t(`common.muscleGroups.${muscle_group}`)} ${factor.toLocaleString(i18n.resolvedLanguage)}`,
+      ),
+    ].join(" · ");
+  }
 
   return (
     <div className="space-y-4 pb-12">
@@ -72,7 +82,7 @@ export function Exercises() {
                   <ItemContent>
                     <ItemTitle>{exercise.name}</ItemTitle>
                     <ItemDescription>
-                      {t(`common.muscleGroups.${exercise.muscle_group}`)}
+                      {describeMuscleGroups(exercise)}
                     </ItemDescription>
                   </ItemContent>
                   <ItemActions>

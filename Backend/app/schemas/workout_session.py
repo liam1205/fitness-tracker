@@ -5,6 +5,7 @@ from decimal import Decimal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.models.enums import MuscleGroup
+from app.schemas.exercise import MuscleGroupFactor
 
 
 class SessionSetRead(BaseModel):
@@ -27,7 +28,12 @@ class SessionExerciseRead(BaseModel):
     id: uuid.UUID = Field(..., description="Unique identifier.")
     exercise_id: uuid.UUID = Field(..., description="Id of the exercise in this slot.")
     name: str = Field(..., description="Exercise name.", examples=["Bench Press"])
-    muscle_group: MuscleGroup = Field(..., description="Primary muscle group targeted.")
+    primary_muscle_group: MuscleGroupFactor = Field(
+        ..., description="Muscle group the exercise mainly targets."
+    )
+    secondary_muscle_groups: list[MuscleGroupFactor] = Field(
+        ..., description="Other muscle groups the exercise trains, highest factor first."
+    )
     position: int = Field(..., description="Display order within the session, 1-indexed.")
     sets: list[SessionSetRead] = Field(
         ..., description="Sets performed for this exercise, in order."
@@ -66,10 +72,18 @@ class WorkoutSessionRead(BaseModel):
 
 
 class MuscleGroupSetCount(BaseModel):
-    """Number of completed sets for one muscle group."""
+    """Weighted number of completed sets for one muscle group."""
 
     muscle_group: MuscleGroup = Field(..., description="Muscle group the sets were performed for.")
-    completed_sets: int = Field(..., ge=0, description="Number of sets marked as completed.")
+    completed_sets: float = Field(
+        ...,
+        ge=0,
+        description=(
+            "Completed sets, each weighted by the exercise's factor for this muscle group "
+            "(e.g. a bench press set adds 1 to chest and 0.5 to triceps)."
+        ),
+        examples=[7.5],
+    )
     mev: int | None = Field(
         None, description="Minimum effective volume: weekly sets needed to grow, if defined."
     )

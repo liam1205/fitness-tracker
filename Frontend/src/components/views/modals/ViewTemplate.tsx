@@ -132,23 +132,38 @@ const ViewTemplate = ({
         exercise: {
           id: templateExercise.exercise_id,
           name: templateExercise.name,
-          muscle_group: templateExercise.muscle_group,
+          primary_muscle_group: templateExercise.primary_muscle_group,
+          secondary_muscle_groups: templateExercise.secondary_muscle_groups,
           created_at: template.created_at,
         },
         sets: String(templateExercise.set_count),
       })),
   );
+  // Weighted like the backend's weekly summary: each set counts towards every
+  // muscle group the exercise trains, multiplied by that muscle group's factor.
   const setsByMuscleGroup = React.useMemo(() => {
-    const totals = new Map<MuscleGroup, number>();
+    // Summed in hundredths (factors have at most two decimals) so the totals
+    // don't pick up floating-point noise like 5.6000000001.
+    const hundredths = new Map<MuscleGroup, number>();
     for (const row of rows) {
       const setCount = Number(row.sets);
       if (!row.exercise || !Number.isInteger(setCount) || setCount <= 0) {
         continue;
       }
-      const muscleGroup = row.exercise.muscle_group;
-      totals.set(muscleGroup, (totals.get(muscleGroup) ?? 0) + setCount);
+      for (const { muscle_group, factor } of [
+        row.exercise.primary_muscle_group,
+        ...row.exercise.secondary_muscle_groups,
+      ]) {
+        hundredths.set(
+          muscle_group,
+          (hundredths.get(muscle_group) ?? 0) +
+            setCount * Math.round(factor * 100),
+        );
+      }
     }
-    return [...totals.entries()];
+    return [...hundredths.entries()].map(
+      ([muscleGroup, total]) => [muscleGroup, total / 100] as const,
+    );
   }, [rows]);
   const setsByMuscleGroupColumns = React.useMemo(() => {
     const columnCount = 3;

@@ -14,10 +14,20 @@ import {
 import { useMemo } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
+import i18n from "@/lib/i18n";
 
 const columnHelper = createDataTableColumnHelper<MuscleGroupSetCount>();
 
 const optionalSets = (value: number | null | undefined) => value ?? "—";
+
+/**
+ * Sets are weighted by muscle group factors, so they can be fractions. Rounds
+ * to two decimals to drop floating-point noise, e.g. 6 - 5.6 = 0.4000000000004.
+ */
+const roundSets = (value: number) => Math.round(value * 100) / 100;
+
+const formatSets = (value: number) =>
+  roundSets(value).toLocaleString(i18n.resolvedLanguage);
 
 const isDefined = (value: number | null | undefined): value is number =>
   value != null;
@@ -57,13 +67,13 @@ const buildColumns = (
         !info.row.original.mav ||
         !info.row.original.mrv ? (
         <Badge variant={setsColorClass(info.row.original)}>
-          {info.getValue()}
+          {formatSets(info.getValue())}
         </Badge>
       ) : (
         <HoverCard>
           <HoverCardTrigger>
             <Badge variant={setsColorClass(info.row.original)}>
-              {info.getValue()}
+              {formatSets(info.getValue())}
             </Badge>
           </HoverCardTrigger>
           <HoverCardContent className="min-w-fit">
@@ -71,9 +81,9 @@ const buildColumns = (
               <p>
                 <Trans
                   i18nKey="weekSummary.mevMissing"
-                  count={
-                    info.row.original.mev - info.row.original.completed_sets
-                  }
+                  count={roundSets(
+                    info.row.original.mev - info.row.original.completed_sets,
+                  )}
                   values={{
                     muscleGroup: t(
                       `common.muscleGroups.${info.row.original.muscle_group}`,
@@ -86,10 +96,12 @@ const buildColumns = (
                 <Trans
                   i18nKey="weekSummary.mavMissing"
                   values={{
-                    min:
+                    min: roundSets(
                       info.row.original.mav - info.row.original.completed_sets,
-                    max:
+                    ),
+                    max: roundSets(
                       info.row.original.mrv - info.row.original.completed_sets,
+                    ),
                     muscleGroup: t(
                       `common.muscleGroups.${info.row.original.muscle_group}`,
                     ),

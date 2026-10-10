@@ -4,6 +4,7 @@ from collections import defaultdict
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.data.default_templates import DEFAULT_TEMPLATES
 from app.models.exercise import Exercise
 from app.models.workout_template import TemplateExercise, WorkoutTemplate
 from app.schemas.workout_template import (
@@ -39,7 +40,8 @@ async def _get_exercises_for_template(
             id=template_exercise.id,
             exercise_id=template_exercise.exercise_id,
             name=exercise.name,
-            muscle_group=exercise.muscle_group,
+            primary_muscle_group=exercise.primary_muscle_group,
+            secondary_muscle_groups=exercise.secondary_muscle_groups,
             position=template_exercise.position,
             set_count=template_exercise.set_count,
         )
@@ -81,7 +83,8 @@ async def list_workout_templates_for_user(
                     id=template_exercise.id,
                     exercise_id=template_exercise.exercise_id,
                     name=exercise.name,
-                    muscle_group=exercise.muscle_group,
+                    primary_muscle_group=exercise.primary_muscle_group,
+                    secondary_muscle_groups=exercise.secondary_muscle_groups,
                     position=template_exercise.position,
                     set_count=template_exercise.set_count,
                 )
@@ -128,7 +131,8 @@ async def create_workout_template_for_user(
                 id=template_exercise.id,
                 exercise_id=template_exercise.exercise_id,
                 name=exercise.name,
-                muscle_group=exercise.muscle_group,
+                primary_muscle_group=exercise.primary_muscle_group,
+                secondary_muscle_groups=exercise.secondary_muscle_groups,
                 position=template_exercise.position,
                 set_count=template_exercise.set_count,
             )
@@ -222,3 +226,36 @@ async def delete_workout_template_for_user(
     await db.delete(template)
     await db.flush()
     return True
+
+
+async def create_default_templates_for_user(
+    db: AsyncSession, user_id: uuid.UUID
+) -> list[WorkoutTemplate]:
+    """Seed a user's workout templates from the built-in defaults.
+
+    Must run after the user's exercises exist: slots are linked to the user's
+    own exercises by name. A slot whose exercise the user no longer has (e.g.
+    renamed or deleted before a backfill) is skipped.
+    """
+    rows = await db.execute(
+        select(Exercise.name, Exercise.id).where(Exercise.created_by == user_id)
+    )
+    exercise_ids: dict[str, uuid.UUID] = dict(rows.tuples().all())
+
+    templates = [WorkoutTemplate(user_id=user_id, name=name) for name, _ in DEFAULT_TEMPLATES]
+    db.add_all(templates)
+    await db.flush()
+
+    for template, (_, slots) in zip(templates, DEFAULT_TEMPLATES):
+        available = [(exercise_ids[name], sets) for name, sets in slots if name in exercise_ids]
+        db.add_all(
+            TemplateExercise(
+                template_id=template.id,
+                exercise_id=exercise_id,
+                position=position,
+                set_count=set_count,
+            )
+            for position, (exercise_id, set_count) in enumerate(available, start=1)
+        )
+    await db.flush()
+    return templates

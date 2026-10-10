@@ -111,6 +111,20 @@
     "viewModal": {
       "title": "Übung",
       "subtitle": "Bearbeite diese Übung"
+    },
+    "form": {
+      "primaryMuscleGroup": "Primäre Muskelgruppe",
+      "secondaryMuscleGroups": "Sekundäre Muskelgruppen",
+      "addMuscleGroup": "Muskelgruppe hinzufügen",
+      "removeMuscleGroup": "Muskelgruppe entfernen",
+      "factor": "Faktor",
+      "factorHint": "Der Faktor legt fest, wie stark ein Satz zum wöchentlichen Volumen einer Muskelgruppe zählt, z. B. zählt 0,5 als halber Satz."
+    },
+    "validation": {
+      "missingName": "Bitte gib einen Namen ein.",
+      "missingPrimaryMuscleGroup": "Bitte wähle eine primäre Muskelgruppe aus.",
+      "invalidFactor": "Faktoren müssen zwischen 0,01 und 1 liegen und dürfen höchstens zwei Nachkommastellen haben.",
+      "secondaryExceedsPrimary": "Der Faktor einer sekundären Muskelgruppe darf nicht höher sein als der der primären."
     }
   },
   "home": {
@@ -184,8 +198,8 @@
       "missingNameAndExercise": "Die Vorlage braucht einen Namen und mindestens eine Übung."
     },
     "setsByMuscleGroup": "Sätze pro Muskelgruppe",
-    "setCount_one": "{{count}} Satz",
-    "setCount_other": "{{count}} Sätze",
+    "setCount_one": "{{count, number}} Satz",
+    "setCount_other": "{{count, number}} Sätze",
     "rows": {
       "addExercise": "Übung hinzufügen",
       "selectExercise": "Übung auswählen"
@@ -197,9 +211,9 @@
       "mav": "MAV",
       "mrv": "MRV"
     },
-    "mevMissing_one": "Noch <count>{{count}} Satz</count> bis zum <term>Minimum Effective Volume</term> für {{muscleGroup}}.",
-    "mevMissing_other": "Noch <count>{{count}} Sätze</count> bis zum <term>Minimum Effective Volume</term> für {{muscleGroup}}.",
-    "mavMissing": "Noch <count>{{min}} - {{max}} Sätze</count> bis zum <term>Maximum Adaptive Volume</term> für {{muscleGroup}}."
+    "mevMissing_one": "Noch <count>{{count, number}} Satz</count> bis zum <term>Minimum Effective Volume</term> für {{muscleGroup}}.",
+    "mevMissing_other": "Noch <count>{{count, number}} Sätze</count> bis zum <term>Minimum Effective Volume</term> für {{muscleGroup}}.",
+    "mavMissing": "Noch <count>{{min, number}} - {{max, number}} Sätze</count> bis zum <term>Maximum Adaptive Volume</term> für {{muscleGroup}}."
   },
   "workout": {
     "pause": "Pausieren",

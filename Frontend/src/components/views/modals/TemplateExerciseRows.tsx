@@ -61,7 +61,7 @@ export function groupExercisesByMuscleGroup(
 ): ExerciseGroup[] {
   return Object.values(MuscleGroup).flatMap((muscleGroup) => {
     const items = exercises.filter(
-      (exercise) => exercise.muscle_group === muscleGroup,
+      (exercise) => exercise.primary_muscle_group.muscle_group === muscleGroup,
     );
     return items.length > 0 ? [{ value: muscleGroup, items }] : [];
   });
@@ -245,7 +245,6 @@ function SetsAndMuscleGroup({
   onUpdate: (changes: Partial<TemplateExerciseRow>) => void;
 }) {
   const { t } = useTranslation();
-  const isMobile = useIsMobile();
   return (
     <>
       <InputGroup className="w-21">
@@ -259,7 +258,10 @@ function SetsAndMuscleGroup({
         </InputGroupAddon>
       </InputGroup>
       <Badge className="w-fit capitalize">
-        {row.exercise && t(`common.muscleGroups.${row.exercise.muscle_group}`)}
+        {row.exercise &&
+          t(
+            `common.muscleGroups.${row.exercise.primary_muscle_group.muscle_group}`,
+          )}
       </Badge>
     </>
   );
