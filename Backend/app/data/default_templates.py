@@ -74,12 +74,12 @@ DEFAULT_TEMPLATES: list[tuple[str, list[tuple[str, int]]]] = [
     (
         "Legs",
         [
-            ("Squats", 3),
-            ("Romanian Deadlifts, Barbell", 3),
-            ("Leg Press, 45 Degrees", 3),
-            ("Leg Curls, Seated", 3),
-            ("Leg Extensions", 3),
-            ("Calf Raises, Machine", 3),
+            ("Lunges, Free",3),
+            ("Romanian Deadlifts, Dumbbell", 3),
+            ("Leg Extensions", 2),
+            ("Calf Raises, Machine", 4),
+            ("Crunches, Cable", 3),
+            ("Lateral Raises, Dumbbell", 3),
         ],
     ),
     (

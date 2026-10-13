@@ -239,9 +239,18 @@ const Set = ({ set, disabled, onSave }: SetProps) => {
     });
   };
 
+  const completedBgInput =
+    set.completed && "bg-background dark:bg-background/25";
+  const completedBg = set.completed && "bg-success/25";
+
   return (
-    <div className="flex flex-row justify-between px-3 items-center">
-      <div className="flex flex-row w-1/15">{set.set_number}</div>
+    <div
+      className={cn(
+        "flex flex-row justify-between px-3 items-center py-1 rounded-xl",
+        completedBg,
+      )}
+    >
+      <div className={cn("flex flex-row w-1/15")}>{set.set_number}</div>
       <div className="flex items-center gap-2 w-14/15">
         <Input
           placeholder={t("common.fields.weight")}
@@ -249,7 +258,7 @@ const Set = ({ set, disabled, onSave }: SetProps) => {
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
           aria-invalid={weightInvalid}
-          className="w-fit"
+          className={cn("w-fit h-7 px-2 py-1", completedBgInput)}
         ></Input>
         <Input
           placeholder={t("common.fields.reps")}
@@ -258,18 +267,18 @@ const Set = ({ set, disabled, onSave }: SetProps) => {
           onChange={(e) => setReps(e.target.value)}
           required
           aria-invalid={repsInvalid}
-          className="w-fit"
+          className={cn("w-fit h-7 px-2 py-1", completedBgInput)}
         ></Input>
         <Toggle
           pressed={set.completed}
           onPressedChange={toggle}
           disabled={disabled}
-          className={cn("w-4")}
+          className={cn("w-7 h-7", set.completed && "bg-success")}
         >
           {set.completed ? (
-            <Check className="h-4 w-4 text-success" />
+            <Check className="size-4 text-success" />
           ) : (
-            <CircleDashed className="h-4 w-4" />
+            <CircleDashed className="size-4" />
           )}
         </Toggle>
       </div>
